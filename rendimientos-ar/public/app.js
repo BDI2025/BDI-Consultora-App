@@ -470,14 +470,14 @@ function setupTabs() {
   }
 
   function updatePageTitle(section) {
-    const base = 'Rendimientos AR';
+    const base = 'BDI Consultora';
     const titles = {
-      mundo: 'Monitor Global',
-      ars: 'Billeteras y Fondos',
-      bonos: 'Bonos Soberanos USD',
-      plazofijo: 'Tasas Plazo Fijo',
-      lecaps: 'LECAPs y BONCAPs',
-      portfolio: 'Mi Portfolio'
+      mundo: 'Panorama de mercado',
+      ars: 'Liquidez',
+      bonos: 'Renta fija USD',
+      plazofijo: 'Plazo fijo',
+      lecaps: 'Renta fija ARS',
+      portfolio: 'Mi cartera'
     };
     document.title = titles[section] ? `${titles[section]} — ${base}` : base;
   }
@@ -522,16 +522,16 @@ function setupTabs() {
     // Restore hero
     const activeSubtab = document.querySelector('.subnav-tab.active');
     if (activeSubtab && activeSubtab.dataset.tab === 'plazofijo') {
-      hero.querySelector('h1').textContent = 'Tasas de Plazo Fijo';
+      hero.querySelector('h1').textContent = 'Plazo fijo';
       hero.querySelector('p').textContent = 'Compará tasas de plazo fijo de bancos argentinos. Datos provistos por el BCRA.';
     } else if (activeSubtab && activeSubtab.dataset.tab === 'lecaps') {
-      hero.querySelector('h1').textContent = 'LECAPs y BONCAPs';
+      hero.querySelector('h1').textContent = 'Renta fija ARS';
       hero.querySelector('p').textContent = 'Rendimiento implícito de letras y bonos capitalizables del Tesoro según precio de mercado.';
     } else if (activeSubtab && activeSubtab.dataset.tab === 'cer') {
       hero.querySelector('h1').textContent = 'Bonos CER';
-      hero.querySelector('p').textContent = 'Rendimiento real de bonos ajustados por CER en pesos argentinos.';
+      hero.querySelector('p').textContent = 'Instrumentos ajustados por inflacion para analizar cobertura, duration y rendimiento real.';
     } else {
-      hero.querySelector('h1').textContent = 'Rendimientos de Fondos y Billeteras';
+      hero.querySelector('h1').textContent = 'Liquidez en pesos';
       hero.querySelector('p').textContent = 'Compará rendimientos actualizados de billeteras y fondos de liquidez en Argentina.';
     }
     const sub = document.querySelector('.subnav-tab.active')?.dataset.tab || 'ars';
@@ -543,7 +543,7 @@ function setupTabs() {
     headerSoberanos.classList.add('active');
     subnav.style.display = 'none';
     document.getElementById('tab-soberanos').style.display = 'block';
-    hero.querySelector('h1').textContent = 'Bonos Soberanos';
+    hero.querySelector('h1').textContent = 'Renta fija USD';
     hero.querySelector('p').textContent = 'Rendimiento de bonos soberanos argentinos en dólares. Ley local y ley extranjera.';
     updatePageTitle('bonos');
     if (!document.getElementById('soberanos-list').hasChildNodes()) {
@@ -556,7 +556,7 @@ function setupTabs() {
     headerMundo.classList.add('active');
     subnav.style.display = 'none';
     document.getElementById('section-mundo').style.display = '';
-    hero.querySelector('h1').textContent = 'Monitor Global';
+    hero.querySelector('h1').textContent = 'Panorama de mercado';
     hero.querySelector('p').textContent = 'Principales indicadores del mercado mundial en tiempo real.';
     updatePageTitle('mundo');
     if (!document.getElementById('mundo-grid').hasChildNodes()) {
@@ -570,7 +570,7 @@ function setupTabs() {
     headerONs.classList.add('active');
     subnav.style.display = 'none';
     document.getElementById('tab-ons').style.display = 'block';
-    hero.querySelector('h1').textContent = 'Obligaciones Negociables';
+    hero.querySelector('h1').textContent = 'Corporativos en USD';
     hero.querySelector('p').textContent = 'Rendimiento de bonos corporativos en USD. Hacé click en cualquier ON para abrir la calculadora.';
     updatePageTitle('ons');
     if (!document.getElementById('ons-list').hasChildNodes()) {

@@ -59,10 +59,10 @@ Pendiente de confirmar luego de la auditoría técnica del repositorio base. La 
 - Mantener diferenciados: hallazgo técnico, propuesta de mejora, cambio obligatorio y mejora opcional.
 
 ## Estado Actual Del Proyecto
-- Etapa activa: `Etapa 2 - Propuesta de producto BDI`
+- Etapa activa: `Etapa 4 - Plan técnico de implementación`
 - Documentación operativa inicial: creada.
 - Auditoría del repositorio fuente: en curso, ahora sobre el clon local `rendimientos-ar` y complementada con la app publicada `https://rendimientos.co/`.
-- Implementación local sobre el código fuente: no iniciada.
+- Implementación local sobre el código fuente: iniciada en `Bloque 1 - identidad visual y branding base`.
 
 ## Propuesta Inicial De Producto BDI
 
@@ -224,6 +224,134 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
    - `rendimientos-ar/`
 3. Crear luego un repositorio nuevo de BDI en GitHub y agregarlo como remoto cuando el usuario lo decida.
 
+## Estado Git Actual
+- La carpeta raíz ya fue agregada a GitHub Desktop como repositorio local confiable.
+- Es normal que el primer estado muestre una gran cantidad de archivos para commit:
+  - incluye documentación raíz;
+  - incluye assets de marca;
+  - incluye todo el código fuente dentro de `rendimientos-ar/`.
+- Esto corresponde al primer versionado del proyecto BDI como repositorio independiente.
+
+## Avance De Implementación
+
+### Bloque 1 En Curso
+- Branding base aplicado en:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/manifest.json`
+  - `rendimientos-ar/netlify/functions/auth-config.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+- Cambios introducidos:
+  - títulos y metadatos BDI;
+  - header y navegación con naming inicial BDI;
+  - tipografía base migrada a `IBM Plex Sans` / `IBM Plex Mono`;
+  - paleta base alineada con colores confirmados de marca;
+  - visual principal movida desde terminal oscura a interfaz clara institucional;
+  - CORS preparado para `bdiconsultora.com`.
+  - script de overrides para alinear títulos y copy visibles sin reescribir por completo la lógica central de `app.js`.
+  - home reforzada con briefing editorial y shortcuts a bloques principales.
+
+### Limitación De Verificación Actual
+- En esta sesión no hay `node` ni `npm`, por lo que no fue posible levantar la app localmente desde el entorno del agente.
+- El testing visual/manual de este bloque deberá hacerse en la máquina del usuario cuando lo indique el flujo.
+
+## Plan Técnico De Implementación
+
+### Objetivo Del Plan
+Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando compatibilidad funcional mientras se desacopla branding, navegación y lógica.
+
+### Orden Recomendado De Trabajo
+1. `Bloque 0 - Base y seguridad operativa`
+   - corregir documentación del proyecto propio;
+   - revisar `.gitignore` y variables de entorno;
+   - confirmar estructura final de trabajo.
+2. `Bloque 1 - Identidad visual y branding base`
+   - reemplazar nombre, metadatos, favicon, colores y tipografía;
+   - actualizar header, footer y textos de marca;
+   - corregir problemas de encoding visibles.
+3. `Bloque 2 - Reorganización de navegación`
+   - transformar la jerarquía actual de tabs hacia la navegación BDI;
+   - sin alterar todavía cálculos financieros ni endpoints.
+4. `Bloque 3 - Rediseño de home e información clave`
+   - convertir `Mundo` en `Inicio`/`Resumen ejecutivo`;
+   - reformular ticker, cotizaciones y noticias a formato más consultivo.
+5. `Bloque 4 - Reordenamiento por secciones`
+   - Liquidez;
+   - Renta fija ARS;
+   - Bonos CER;
+   - Renta fija USD;
+   - Corporativos.
+6. `Bloque 5 - Refactor técnico interno`
+   - modularizar `app.js`;
+   - separar fetch, transformación y render;
+   - aislar config y utilidades.
+7. `Bloque 6 - Portfolio`
+   - decidir continuidad;
+   - si se conserva, rebrandear y auditar auth/Supabase con cuidado.
+8. `Bloque 7 - Deploy y endurecimiento`
+   - actualizar README técnico;
+   - documentar variables de entorno;
+   - preparar remoto y despliegue propio.
+
+### Archivos A Modificar Primero
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\index.html`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\styles.css`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\app.js`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\manifest.json`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\config.json`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\server.js`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\netlify.toml`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\netlify\functions\auth-config.js`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\README.md`
+
+### Archivos Nuevos Recomendados
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\docs\migration-plan.md`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\docs\deploy.md`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\docs\data-sources.md`
+- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\icons\...` actualizados a marca BDI
+- archivos modulares futuros para reemplazar partes de `app.js`, por ejemplo:
+  - `public/js/navigation.js`
+  - `public/js/market-home.js`
+  - `public/js/liquidity.js`
+  - `public/js/fixed-income.js`
+
+### Archivos A No Tocar En La Primera Ola
+- `supabase/rls_policies.sql` salvo necesidad puntual.
+- lógica de cálculos financieros profundos mientras se reordena branding y UX.
+- funciones serverless de datos, excepto branding/cors/documentación mínima.
+
+### Riesgos De Compatibilidad
+- cambiar nombres de secciones sin mapear bien los IDs y hashes puede romper navegación.
+- mover demasiado rápido lógica desde `app.js` puede romper render, eventos y cálculos.
+- tocar `config.json` sin disciplina puede romper portfolio, bonos y cashflows.
+- tocar Netlify o auth demasiado temprano puede romper entorno productivo y login.
+- cambiar branding sin revisar manifest, metadata social y favicon deja inconsistencias de producto.
+
+### Estrategia De Testing Manual
+- revisar desktop y mobile en cada bloque.
+- validar navegación hash/tab por tab.
+- validar que cada sección cargue datos o falle de forma controlada.
+- verificar:
+  - Mundo/Inicio
+  - Liquidez
+  - Plazo fijo
+  - LECAPs
+  - CER
+  - Soberanos
+  - ONs
+  - Portfolio si sigue activo
+- verificar que login no muestre errores si faltan credenciales.
+- revisar encoding de textos y consistencia visual.
+
+### Estrategia De Despliegue
+- no desplegar primero sobre el dominio productivo BDI;
+- usar entorno de preview o branch deploy;
+- revisar variables:
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+  - CORS y dominios permitidos;
+- definir luego remoto GitHub propio y target de hosting propio.
+
 ## Auditoría Remota Inicial Del Repositorio Base
 
 ### Stack Detectado
@@ -342,3 +470,134 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 3. Evaluar legalidad/licencia de reutilización comercial.
 4. Proponer estrategia de migración BDI sobre el repo local sin romper endpoints.
 5. Definir estructura objetivo y fases de implementación antes de editar la app.
+## Actualizacion De Estado 2026-03-25
+
+### Repo Y Worktree
+- La raiz `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` ya es el repo Git principal del proyecto BDI.
+- `rendimientos-ar` ya no es un repo separado: quedo integrado como carpeta de codigo dentro del proyecto propio.
+- La documentacion operativa que se debe mantener es:
+  - `README.md`
+  - `AGENTS.md`
+  - `LOG.md`
+
+### Avance Real De Implementacion
+- Etapa actual: `Etapa 5 - Implementacion incremental`
+- Bloque activo: `Bloque 1 - Branding base BDI`
+- Implementado hasta ahora:
+  - metadata y manifest rebrandeados a BDI;
+  - header y hero con identidad BDI;
+  - home con bloque editorial de lectura ejecutiva;
+  - shortcuts hacia Liquidez, Renta fija ARS, Bonos CER, Soberanos y Corporativos;
+  - paleta clara institucional basada en marca BDI;
+  - tipografias `IBM Plex Sans` y `IBM Plex Mono`;
+  - `auth-config.js` actualizado para contemplar dominios BDI;
+  - `rendimientos-ar/public/bdi-overrides.js` agregado para sostener copy y rotulos BDI sin reescribir todavia todo `app.js`.
+
+### Riesgo Tecnico Vigente
+- `rendimientos-ar/public/app.js` sigue siendo el archivo mas fragil por tamano, acoplamiento y problemas de encoding.
+- Se prioriza una estrategia de cambios visuales controlados y overrides antes de una refactorizacion profunda.
+
+### Testing Manual
+- Aun no se realizo una prueba visual completa en navegador desde esta sesion porque el entorno del agente no tiene `node` ni `npm`.
+- La app no conviene abrirla con doble click sobre `index.html`, porque depende de endpoints y rutas que esperan un servidor local.
+- Proximo uso previsto del testing manual:
+  1. levantar la app localmente en la maquina del usuario;
+  2. validar branding BDI visible;
+  3. revisar navegacion, home, tablas, cards y cambios de seccion.
+
+### Resultado De La Primera Prueba Local
+- La app ya abre correctamente en `http://localhost:3000`.
+- `node` esta disponible en la maquina del usuario.
+- En PowerShell, `npm` directo falla por politica de scripts, pero `npm.cmd` funciona correctamente.
+- El branding base y la home ya pueden validarse en navegador real.
+- Problemas funcionales confirmados en testing:
+  - CER falla localmente porque falta `data_base/CER_serie.csv`;
+  - tambien hay errores al probar Renta fija ARS y Corporativos/ONs, que deben auditarse en una siguiente pasada tecnica;
+  - esto confirma que el primer hito actual sirve como base visual, pero no cierra aun la estabilizacion funcional completa.
+
+### Proximos Pasos Actualizados
+1. Cerrar este primer hito de branding base y tomarlo como commit logico inicial.
+2. Explicar al usuario, en lenguaje simple, como abrir la app localmente para testing manual.
+3. Validar visualmente el Bloque 1 en navegador real.
+4. Avanzar luego con reorganizacion de secciones y navegacion manteniendo compatibilidad actual.
+
+## Como Abrir La App Localmente
+
+### Que significa "levantar la app"
+- No es abrir un archivo suelto.
+- Es encender un pequeño servidor local para que la app funcione como sitio web en tu computadora.
+- Este proyecto usa `node` para eso.
+
+### Paso 1 - Ver si ya tenes Node instalado
+En Windows, abri:
+- `PowerShell`, o
+- `Terminal`, o
+- `Símbolo del sistema`
+
+Y ejecuta:
+
+```powershell
+node -v
+npm -v
+```
+
+Si ambos muestran un numero, ya lo tenes instalado.
+Si alguno dice que no existe, hay que instalar Node.js antes de seguir.
+
+### Nota sobre PowerShell y `npm`
+- Puede pasar que `node -v` funcione pero `npm -v` falle con un error de `PSSecurityException`.
+- Eso no significa que `npm` no este instalado.
+- Significa que PowerShell esta bloqueando la ejecucion del wrapper `npm.ps1`.
+- En ese caso, se puede usar directamente:
+
+```powershell
+npm.cmd -v
+```
+
+- Y para correr el proyecto:
+
+```powershell
+npm.cmd install
+npm.cmd start
+```
+
+### Paso 2 - Ir a la carpeta correcta
+La carpeta desde la que hay que correr la app es:
+
+`C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar`
+
+### Paso 3 - Instalar dependencias
+Solo la primera vez:
+
+```powershell
+cd "C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar"
+npm install
+```
+
+Esto descarga lo necesario para que el proyecto pueda correr.
+
+### Paso 4 - Iniciar la app
+
+```powershell
+npm start
+```
+
+Segun `package.json`, eso ejecuta:
+
+```powershell
+node server.js
+```
+
+### Paso 5 - Abrirla en el navegador
+Cuando el servidor arranque, abri:
+
+[http://localhost:3000](http://localhost:3000)
+
+### Importante
+- No conviene abrir `public/index.html` con doble click.
+- Si lo haces asi, varias partes pueden fallar porque la app espera rutas tipo `/api/...` y un servidor local.
+
+### Limitaciones conocidas al probar local
+- La parte de `Mi cartera` puede aparecer incompleta si no estan cargadas variables de Supabase.
+- La seccion CER puede tener problemas locales porque `server.js` espera un archivo `data_base/CER_serie.csv` que hoy no esta en el repo.
+- Eso no invalida probar branding, home, navegacion y muchas tablas principales.

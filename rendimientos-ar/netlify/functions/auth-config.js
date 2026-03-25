@@ -2,6 +2,8 @@ exports.handler = async (event) => {
   const allowedOrigins = [
     'https://rendimientos.co',
     'https://rendimientos-ar.netlify.app',
+    'https://bdiconsultora.com',
+    'https://www.bdiconsultora.com',
   ];
   const origin = (event.headers || {}).origin || '';
   const corsOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];

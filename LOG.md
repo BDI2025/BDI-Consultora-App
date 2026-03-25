@@ -275,3 +275,203 @@
   - continuar luego con Etapa 4 y la implementación.
 - Siguiente paso sugerido:
   - explicarle al usuario cómo verificar visualmente el nuevo repo en GitHub Desktop y luego seguir con el plan técnico de implementación.
+
+## 2026-03-25 13:38:00 -03:00
+- Acción: confirmación de apertura del repo raíz en GitHub Desktop.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: registrar el estado operativo luego de la conversión a repo propio.
+- Resultado:
+  - el usuario confirmó que GitHub Desktop ya pudo abrir `BDI-App-Cocos`;
+  - apareció advertencia de seguridad esperable por ownership y fue aceptada;
+  - GitHub Desktop mostró más de 119 archivos para el primer commit, lo cual es consistente con un repo nuevo que incluye código, documentación y assets.
+- Problemas encontrados: ninguno nuevo; comportamiento esperado.
+- Decisiones tomadas:
+  - considerar validada la nueva raíz Git del proyecto desde el punto de vista operativo del usuario.
+- Pendientes:
+  - confirmar si el usuario creó ya el primer commit o solo aceptó la incorporación del repo;
+  - seguir con Etapa 4 y luego implementación.
+- Siguiente paso sugerido:
+  - explicar al usuario por qué ese volumen de archivos es normal y continuar con el plan técnico de implementación.
+
+## 2026-03-25 13:45:00 -03:00
+- Acción: elaboración de Etapa 4, plan técnico de implementación.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: definir un orden de trabajo seguro antes de modificar código de la app BDI.
+- Resultado:
+  - se documentó un plan por bloques, desde branding base hasta refactor técnico y deploy;
+  - se identificaron archivos prioritarios, archivos nuevos recomendados y áreas a no tocar en la primera ola;
+  - se registró estrategia de testing manual y estrategia de despliegue.
+- Problemas encontrados: ninguno nuevo.
+- Decisiones tomadas:
+  - separar rebranding visual de refactor profundo para reducir riesgo;
+  - postergar trabajo fuerte sobre Supabase y portfolio hasta estabilizar el core público.
+- Pendientes:
+  - entregar el plan al usuario de forma clara;
+  - luego iniciar la implementación incremental.
+- Siguiente paso sugerido:
+  - comenzar con Bloque 1: identidad visual y branding base.
+
+## 2026-03-25 14:05:00 -03:00
+- Acción: implementación inicial de Bloque 1, branding base BDI.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/manifest.json`
+  - `rendimientos-ar/netlify/functions/auth-config.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: iniciar la transformación visible del producto sin tocar todavía lógica financiera profunda.
+- Resultado:
+  - se reescribió `index.html` con metadatos, header y textos base alineados a BDI;
+  - se actualizaron colores, tipografías y estilos principales en `styles.css`;
+  - se rebrandearon nombre y theme color del manifest;
+  - se agregaron dominios BDI permitidos en `auth-config.js`.
+- Problemas encontrados:
+  - archivos con encoding inconsistente dificultaron parches quirúrgicos;
+  - no hay `node` ni `npm` en esta sesión, por lo que no se pudo levantar preview local desde el entorno del agente.
+- Intentos fallidos:
+  - parches parciales sobre archivos con texto roto por encoding, especialmente `index.html`, `manifest.json` y `app.js`.
+- Decisiones tomadas:
+  - reescribir archivos chicos y visibles cuando el encoding bloqueó reemplazos estables;
+  - dejar `app.js` para una pasada posterior más controlada, sin forzar una reescritura riesgosa.
+- Pendientes:
+  - ajustar textos dinámicos y títulos en `app.js`;
+  - revisar preview visual en máquina del usuario;
+  - continuar con navegación BDI y home.
+- Siguiente paso sugerido:
+  - revisar este primer bloque en GitHub Desktop y luego avanzar con la segunda pasada de branding sobre `app.js`.
+
+## 2026-03-25 14:20:00 -03:00
+- Acción: cierre parcial del Bloque 1 con overrides de copy y navegación.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: evitar una reescritura riesgosa de `app.js` mientras se corrige branding visible y textos dinámicos.
+- Resultado:
+  - se agregó `bdi-overrides.js` cargado después de `app.js`;
+  - el nuevo script sincroniza títulos de hero y `document.title` según sección/hash;
+  - esto reduce el impacto de los problemas de encoding en `app.js` sin tocar la lógica financiera central.
+- Problemas encontrados:
+  - `app.js` continúa siendo frágil para parches extensos por encoding inconsistente.
+- Decisiones tomadas:
+  - usar overrides progresivos en vez de forzar una reescritura temprana del archivo monolítico;
+  - reservar una refactorización más limpia de `app.js` para una etapa posterior.
+- Pendientes:
+  - validar visualmente el bloque completo cuando el usuario pueda levantar la app localmente;
+  - continuar con home/navegación y luego modularización.
+- Siguiente paso sugerido:
+  - explicar al usuario cómo funciona la app a nivel básico (`index.html`, `app.js`, servidor local) y después seguir con la siguiente mejora visual/estructural.
+
+## 2026-03-25 14:32:00 -03:00
+- Acción: profundización visual de la home BDI.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: hacer que la portada se sienta más consultiva e institucional sin introducir nuevas dependencias ni romper la lógica existente.
+- Resultado:
+  - se agregaron bloques de briefing editorial en la home;
+  - se agregaron shortcuts hacia Liquidez, Renta fija ARS, CER, Soberanos y Corporativos;
+  - se mejoró la jerarquía visual de tablas, cards, subnav y contenedores.
+- Problemas encontrados: ninguno nuevo en esta pasada.
+- Decisiones tomadas:
+  - mantener la home como composición estática con enlaces hash, sin agregar lógica compleja;
+  - seguir separando identidad visual de refactor técnico profundo.
+- Pendientes:
+  - decidir si este bloque ya se toma como primer commit lógico;
+  - luego pasar a una segunda ola de reorganización de navegación y estructuras por sección.
+- Siguiente paso sugerido:
+  - preparar indicaciones simples para que el usuario pueda levantar la app localmente y validar visualmente este primer hito.
+## 2026-03-25 14:48:00 -03:00
+- AcciÃ³n: refuerzo del override BDI y actualizacion de documentacion operativa.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `rendimientos-ar/public/index.html`
+  - `README.md`
+  - `LOG.md`
+- Motivo: estabilizar rotulos BDI visibles sin tocar en exceso `app.js` y dejar la memoria del proyecto alineada con el estado real.
+- Resultado:
+  - `bdi-overrides.js` ahora reimpone nombres BDI de navegacion y subtabs;
+  - se ajustaron textos visibles del inicio;
+  - `README.md` quedo actualizado con el estado del repo propio y el avance real del Bloque 1.
+- Problemas encontrados:
+  - persisten restos de encoding inconsistente, sobre todo en `app.js`.
+- Decisiones tomadas:
+  - mantener la estrategia de overrides progresivos;
+  - reservar la limpieza profunda de encoding y refactor de `app.js` para una etapa posterior.
+- Pendientes:
+  - decidir si este bloque ya se toma como primer commit;
+  - preparar la guia simple para abrir la app localmente;
+  - validar visualmente el resultado en navegador real.
+- Siguiente paso sugerido:
+  - dejar listo el primer commit logico y luego acompaÃ±ar al usuario en la apertura local de la app para testing manual.
+
+## 2026-03-25 15:02:00 -03:00
+- AcciÃ³n: documentacion de apertura local y testing manual inicial.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: dejar dentro del proyecto una guia simple para que el usuario pueda correr la app localmente sin depender del chat.
+- Resultado:
+  - se agrego al `README.md` una guia basica para verificar `node`, instalar dependencias, iniciar el servidor local y abrir `http://localhost:3000`;
+  - se dejaron anotadas las limitaciones locales conocidas de `Mi cartera` y CER.
+- Problemas encontrados:
+  - no se pudo ejecutar la app desde esta sesion porque el entorno del agente no tiene `node` ni `npm`.
+- Decisiones tomadas:
+  - documentar primero el camino nominal de apertura local;
+  - reservar para el siguiente paso el acompanamiento del usuario durante su primer intento real.
+- Pendientes:
+  - pedir al usuario que verifique si `node -v` y `npm -v` existen en su maquina;
+  - luego acompaÃ±ar la primera apertura local y validar visualmente el hito.
+- Siguiente paso sugerido:
+  - guiar al usuario en la comprobacion de `node` y, si esta disponible, avanzar con `npm install` y `npm start`.
+
+## 2026-03-25 15:12:00 -03:00
+- AcciÃ³n: documentacion de incidencia local con PowerShell y `npm`.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario confirmo que `node` esta instalado, pero PowerShell bloquea `npm` por politica de ejecucion de scripts.
+- Resultado:
+  - se agrego al `README.md` la alternativa de usar `npm.cmd` en vez de `npm` dentro de PowerShell.
+- Problemas encontrados:
+  - `npm.ps1` esta siendo bloqueado por Windows PowerShell con `PSSecurityException`.
+- Decisiones tomadas:
+  - priorizar el camino menos invasivo para el usuario: usar `npm.cmd` sin cambiar politicas del sistema;
+  - dejar para mas adelante, solo si hace falta, una solucion basada en ExecutionPolicy.
+- Pendientes:
+  - guiar al usuario en `npm.cmd install` y `npm.cmd start`;
+  - confirmar si la app abre en `http://localhost:3000`.
+- Siguiente paso sugerido:
+  - hacer la primera ejecucion local con `npm.cmd`.
+
+## 2026-03-25 15:22:00 -03:00
+- AcciÃ³n: registro de primera prueba local exitosa de la app.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: dejar constancia del primer arranque real en la maquina del usuario y de los errores funcionales observados.
+- Resultado:
+  - la app abrio correctamente en `http://localhost:3000`;
+  - `npm.cmd install` y `npm.cmd start` funcionaron;
+  - se confirmo branding base visible en navegador real.
+- Problemas encontrados:
+  - CER falla con `ENOENT` porque falta `data_base/CER_serie.csv`;
+  - el usuario reporto errores al entrar en Renta fija ARS y Corporativos/ONs;
+  - por ahora el hito queda validado como base visual, no como estabilizacion funcional completa.
+- Decisiones tomadas:
+  - considerar este estado como buen corte para un commit de hito visual/documental, dejando claro que los arreglos funcionales van en el siguiente bloque;
+  - usar el feedback del navegador real para priorizar la siguiente ronda tecnica.
+- Pendientes:
+  - decidir si se hace commit ahora;
+  - auditar errores de CER, Renta fija ARS y Corporativos/ONs;
+  - seguir con la estabilizacion funcional del producto BDI.
+- Siguiente paso sugerido:
+  - tomar un commit del hito actual y luego abrir el bloque de correcciones tecnicas.
