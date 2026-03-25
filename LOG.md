@@ -1,0 +1,277 @@
+# LOG.md
+
+## 2026-03-25 12:28:35 -03:00
+- Acción: inspección inicial del workspace seleccionado.
+- Archivos afectados: ninguno.
+- Motivo: verificar el estado real del proyecto antes de cualquier cambio.
+- Resultado:
+  - la carpeta raíz `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` no contiene todavía un repositorio Git del producto;
+  - se detectó únicamente la carpeta `Estilo visual BDI/`;
+  - dentro de esa carpeta hay un manual de marca en PDF y un isotipo PNG.
+- Problemas encontrados:
+  - el código fuente de la app a transformar no está presente en el workspace local;
+  - `git status` en la raíz falló porque no existe repo inicializado;
+  - `rg --files` no pudo ejecutarse por acceso denegado en este entorno, por lo que la inspección local se hizo con `Get-ChildItem`.
+- Intentos fallidos:
+  - `rg --files` en la raíz del workspace.
+  - `git status --short --branch` en la raíz y en `Estilo visual BDI/`.
+- Decisiones tomadas:
+  - crear documentación operativa base antes de avanzar;
+  - dejar explícito que la auditoría del repo fuente se está haciendo de forma remota mientras no exista un clon local.
+- Pendientes:
+  - completar auditoría técnica del repositorio `rendimientos-ar`;
+  - documentar arquitectura, endpoints, dependencias y riesgos;
+  - definir estrategia de incorporación del código fuente al workspace.
+- Siguiente paso sugerido:
+  - cerrar la auditoría inicial y luego decidir si conviene clonar el repo base dentro de esta carpeta o construir una base propia inspirada en él.
+
+## 2026-03-25 12:28:35 -03:00
+- Acción: creación de documentación persistente inicial.
+- Archivos afectados:
+  - `README.md`
+  - `AGENTS.md`
+  - `LOG.md`
+- Motivo: cumplir la disciplina documental obligatoria del proyecto y dejar memoria operativa persistente.
+- Resultado:
+  - se creó `README.md` con objetivo, estado del workspace, restricciones, estructura actual y próximos pasos;
+  - se creó `AGENTS.md` con reglas operativas, alcance, TO DO y NOT DO;
+  - se creó `LOG.md` como registro cronológico del proyecto.
+- Problemas encontrados: ninguno durante la creación de estos archivos.
+- Decisiones tomadas:
+  - mantener el nombre operativo del proyecto como `BDI App Cocos` hasta definir branding definitivo del producto;
+  - registrar explícitamente que la carpeta raíz no es aún un repositorio Git.
+- Pendientes:
+  - actualizar estos archivos al finalizar la auditoría inicial con hallazgos más precisos;
+  - incorporar la estructura real del código fuente cuando exista en local.
+- Siguiente paso sugerido:
+  - terminar el diagnóstico técnico del proyecto base y convertirlo en una propuesta de migración BDI sin alterar todavía el funcionamiento.
+
+## 2026-03-25 12:28:35 -03:00
+- Acción: auditoría remota inicial del repositorio fuente `arisbdar/rendimientos-ar` y de la app publicada `rendimientos.co`.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: documentar la arquitectura actual del producto base antes de cualquier clonación o implementación local.
+- Resultado:
+  - se identificó stack basado en frontend estático + Express local + Netlify Functions;
+  - se relevaron endpoints públicos, fuentes de datos y estructura principal del repo;
+  - se detectó presencia de `supabase/` y endpoint `/api/auth-config`, lo que sugiere dependencia de auth/portfolio no documentada del todo;
+  - se confirmó que producción depende de redirects y funciones de Netlify;
+  - se dejó asentada advertencia legal por ausencia visible de archivo `LICENSE`, aunque `package.json` declara `ISC`.
+- Problemas encontrados:
+  - el código fuente no está aún en el workspace local;
+  - la inspección remota permite ver estructura y documentación, pero no reemplaza una revisión de código local completa;
+  - no fue posible validar todavía el detalle interno de todas las Netlify functions ni de `server.js`.
+- Intentos fallidos:
+  - apertura parcial de algunos archivos remotos vía raw/click que devolvieron cache miss.
+- Decisiones tomadas:
+  - basar esta primera auditoría en señales consistentes del README remoto, `package.json`, `netlify.toml` y la app publicada;
+  - no asumir compatibilidad comercial automática por la licencia hasta revisarla mejor.
+- Pendientes:
+  - decidir si se clona el repo base dentro del workspace para una auditoría local completa;
+  - revisar material de marca BDI para alimentar sistema visual;
+  - pasar a propuesta de producto BDI y plan técnico de migración.
+- Siguiente paso sugerido:
+  - definir estrategia de incorporación del código fuente al workspace y luego avanzar con la propuesta de producto/navegación BDI sobre una base auditada.
+
+## 2026-03-25 12:43:00 -03:00
+- Acción: verificación del clon local del repositorio fuente dentro del workspace.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: confirmar que el proyecto base ya está disponible localmente y actualizar el contexto operativo.
+- Resultado:
+  - se detectó la carpeta `rendimientos-ar/` dentro de `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`;
+  - el repo contiene `.git`, `public/`, `netlify/`, `supabase/`, `test/`, `server.js`, `netlify.toml` y `package.json`;
+  - `git status --short --branch` dentro del clon devolvió `## main...origin/main`, sin cambios locales.
+- Problemas encontrados: ninguno en la verificación del clon.
+- Decisiones tomadas:
+  - pasar de auditoría remota a auditoría local real;
+  - mantener la documentación raíz como fuente de contexto del proyecto contenedor.
+- Pendientes:
+  - mapear arquitectura funcional local;
+  - explicar dependencias y flujo de datos en lenguaje simple.
+- Siguiente paso sugerido:
+  - revisar archivos clave del clon: `server.js`, `public/index.html`, `public/app.js`, `netlify/functions/*`, `supabase/*`.
+
+## 2026-03-25 12:43:00 -03:00
+- Acción: auditoría local inicial de archivos clave del repo clonado.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: identificar funcionamiento real, dependencias efectivas y riesgos de mantenimiento sobre código local.
+- Resultado:
+  - se confirmó uso de `express` y `node-fetch`;
+  - se confirmó integración real con `Supabase` para login Google, tabla `holdings` y tracking `page_views`;
+  - se identificó que `public/app.js` centraliza gran parte de la lógica del producto;
+  - se verificó la existencia de 12 Netlify Functions;
+  - se detectó un posible error local: `server.js` intenta leer `data_base/CER_serie.csv`, pero la carpeta `data_base` no existe;
+  - se detectaron problemas de codificación de caracteres en varios archivos (`Ã`, `â`), probablemente por encoding inconsistente.
+- Problemas encontrados:
+  - entorno local posiblemente incompleto para CER;
+  - variables de entorno Supabase ausentes en `.env.example`.
+- Intentos fallidos:
+  - inspección de `data_base/` devolvió ruta inexistente.
+- Decisiones tomadas:
+  - marcar como riesgo obligatorio la rotura potencial de CER en local;
+  - explicar al usuario términos base como HTML y PWA en lenguaje simple.
+- Pendientes:
+  - cerrar el mapa detallado de flujo de datos;
+  - pasar luego a la propuesta BDI de producto y navegación.
+- Siguiente paso sugerido:
+  - documentar por sección qué endpoint alimenta cada bloque de la app y qué conviene conservar, aislar o refactorizar primero.
+
+## 2026-03-25 12:50:00 -03:00
+- Acción: verificación adicional de consistencia entre código, funciones y documentación; intento de ejecución de tests.
+- Archivos afectados:
+  - `LOG.md`
+- Motivo: detectar desfasajes entre README y código real, y validar el estado básico del proyecto sin editarlo.
+- Resultado:
+  - se confirmó que `README.md` del repo original quedó parcialmente desfasado respecto del código;
+  - el README menciona `visits.js` y `/api/visits`, pero esa función no existe en `netlify/functions/`;
+  - `public/app.js` busca un botón `theme-toggle`, pero `public/index.html` no lo incluye;
+  - `public/manifest.json` todavía menciona CEDEARs, aunque esa sección no está implementada en la interfaz principal;
+  - `netlify/functions/auth-config.js` restringe CORS a dominios productivos del proyecto original, lo que es relevante para el futuro rebranding/despliegue BDI;
+  - el intento de correr tests con `npm test` falló porque `npm` no está disponible en el entorno actual.
+- Problemas encontrados:
+  - documentación original inconsistente con el estado real del código;
+  - imposibilidad de ejecutar tests automáticos en este entorno por falta de `npm`.
+- Intentos fallidos:
+  - `npm test`.
+- Decisiones tomadas:
+  - considerar el README original como fuente útil pero no autoritativa;
+  - marcar los desfasajes detectados como deuda técnica/documental a corregir en la migración.
+- Pendientes:
+  - cerrar el mapa explicativo de arquitectura para el usuario;
+  - proponer luego la estructura BDI de producto.
+- Siguiente paso sugerido:
+  - entregar una auditoría técnica explicada paso a paso, separando hallazgos confirmados, riesgos y consecuencias para la migración.
+
+## 2026-03-25 12:56:00 -03:00
+- Acción: inicio de Etapa 2, propuesta de producto BDI basada en la auditoría técnica local.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: traducir el diagnóstico técnico en una propuesta concreta de navegación, jerarquía de secciones y enfoque de producto.
+- Resultado:
+  - se dejó documentado un cambio de enfoque desde comparador generalista hacia dashboard consultivo institucional;
+  - se propuso una nueva navegación BDI: Inicio, Liquidez, Renta fija ARS, Bonos CER, Renta fija USD, Corporativos y Portfolio en revisión;
+  - se diferenciaron módulos a conservar, reordenar y revisar;
+  - se documentó una propuesta inicial de tono, jerarquía editorial y home BDI.
+- Problemas encontrados: ninguno nuevo en esta etapa de propuesta.
+- Decisiones tomadas:
+  - no proponer nuevas features complejas no justificadas;
+  - mantener Portfolio como módulo opcional o secundario hasta validar su prioridad real en el producto BDI.
+- Pendientes:
+  - entregar al usuario la Etapa 2 explicada en lenguaje simple;
+  - pasar luego a Etapa 3 con sistema visual BDI.
+- Siguiente paso sugerido:
+  - definir identidad visual, paleta, tipografía, componentes y responsive design antes de tocar la UI existente.
+
+## 2026-03-25 13:05:00 -03:00
+- Acción: relevamiento de insumos de marca BDI para la Etapa 3.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: basar la propuesta visual en la marca real disponible dentro del proyecto.
+- Resultado:
+  - se verificó la existencia de `Manual de marca.pdf` y `Marca_02 Isotipo 6.png` en `Estilo visual BDI/`;
+  - se inspeccionó visualmente el isotipo, que muestra una dirección de marca sobria con blanco, verde y degradado;
+  - no fue posible extraer texto utilizable del PDF con las herramientas disponibles en este entorno;
+  - se documentó explícitamente esta limitación para no atribuir al manual reglas no confirmadas.
+- Problemas encontrados:
+  - `python`, `py` y utilidades comunes de extracción PDF no están disponibles en la sesión;
+  - el PDF parece comprimido y no devuelve texto legible con inspección simple.
+- Intentos fallidos:
+  - `python --version`
+  - `py --version`
+  - búsqueda de utilidades como `pdftotext`, `mutool`, `pdfinfo`, `magick`
+  - extracción simple de cadenas desde el PDF.
+- Decisiones tomadas:
+  - apoyar la Etapa 3 en el isotipo validado visualmente y en criterios prudentes de diseño institucional;
+  - no presentar como oficiales detalles del manual que no pudieron leerse automáticamente.
+- Pendientes:
+  - entregar propuesta visual completa BDI;
+  - cuando el entorno lo permita, contrastar implementación final con el PDF manual.
+- Siguiente paso sugerido:
+  - proponer sistema visual BDI para la app: color, tipografía, componentes, navegación y responsive design.
+
+## 2026-03-25 13:18:00 -03:00
+- Acción: incorporación de confirmaciones visuales del manual de marca aportadas por el usuario y verificación del estado Git local.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: afinar la Etapa 3 con colores confirmados y explicar por qué GitHub Desktop no muestra los archivos documentales.
+- Resultado:
+  - se confirmaron colores de marca a partir de capturas del manual:
+    - `#232323`
+    - `#157347`
+    - `#46B179`
+    - `#4CBDC2`
+    - `#EEEEEF`
+    - `#FFFFFF`
+  - se verificó que `BDI-App-Cocos` no es repo Git;
+  - se verificó que `rendimientos-ar` sí es repo Git, con remoto `origin` apuntando a `https://github.com/arisbdar/rendimientos-ar.git`;
+  - se documentó que los archivos creados en la raíz no aparecen en GitHub Desktop porque están fuera del repo abierto.
+- Problemas encontrados:
+  - la estructura actual separa documentación raíz y repo clonado, lo que genera confusión operativa en GitHub Desktop.
+- Decisiones tomadas:
+  - explicarle al usuario la causa exacta sin mover ni renombrar archivos;
+  - usar la paleta confirmada por capturas como base más confiable para la Etapa 3.
+- Pendientes:
+  - redefinir la propuesta visual final con la paleta confirmada;
+  - definir con el usuario cómo quiere estructurar el repo propio antes de implementar.
+- Siguiente paso sugerido:
+  - proponer opciones concretas para pasar de repo ajeno clonado a repo propio de BDI sin perder trazabilidad ni romper el trabajo.
+
+## 2026-03-25 13:24:00 -03:00
+- Acción: registro de decisión de avanzar hacia repo propio de BDI con independencia real.
+- Archivos afectados:
+  - `README.md`
+  - `AGENTS.md`
+  - `LOG.md`
+- Motivo: dejar asentada la dirección elegida por el usuario antes de ejecutar cambios estructurales sobre Git.
+- Resultado:
+  - se documentó que el objetivo ya no es trabajar indefinidamente sobre el clon de `arisbdar/rendimientos-ar`;
+  - se dejó asentado que la meta es convertir `BDI-App-Cocos` en la raíz principal del proyecto versionado;
+  - se registró que una independencia real requerirá actuar sobre los metadatos Git del clon interno o redefinir la estructura del proyecto.
+- Problemas encontrados:
+  - la estructura actual tiene documentación en la raíz y código dentro de un repo anidado;
+  - eso impide una experiencia clara en GitHub Desktop.
+- Decisiones tomadas:
+  - no ejecutar aún una modificación destructiva de metadatos Git sin explicar primero la consecuencia al usuario;
+  - preparar una explicación simple del paso técnico necesario.
+- Pendientes:
+  - obtener confirmación final para cortar el vínculo Git del clon interno y convertir la raíz en repo propio;
+  - luego unificar estado Git y continuar implementación.
+- Siguiente paso sugerido:
+  - explicar claramente al usuario qué significa “hacerlo propio” a nivel Git y pedir confirmación para el cambio estructural mínimo necesario.
+
+## 2026-03-25 13:32:00 -03:00
+- Acción: conversión del proyecto a repo propio de BDI.
+- Archivos afectados:
+  - metadatos Git del proyecto
+  - `README.md`
+  - `AGENTS.md`
+  - `LOG.md`
+- Motivo: materializar la independencia real del proyecto respecto del repo original clonado.
+- Resultado:
+  - se eliminó `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\.git`;
+  - se inicializó Git en `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`;
+  - `git status` en la raíz ahora muestra una sola unidad de trabajo con:
+    - `AGENTS.md`
+    - `LOG.md`
+    - `README.md`
+    - `Estilo visual BDI/`
+    - `rendimientos-ar/`
+  - `git remote -v` en la raíz no devuelve remotos, lo que confirma independencia respecto del repo anterior.
+- Problemas encontrados: ninguno durante la conversión.
+- Decisiones tomadas:
+  - mantener la estructura física actual del proyecto sin mover carpetas;
+  - unificar Git en la raíz primero y posponer cualquier reestructuración adicional.
+- Pendientes:
+  - abrir la raíz `BDI-App-Cocos` en GitHub Desktop;
+  - opcionalmente crear un remoto nuevo de BDI y vincularlo;
+  - continuar luego con Etapa 4 y la implementación.
+- Siguiente paso sugerido:
+  - explicarle al usuario cómo verificar visualmente el nuevo repo en GitHub Desktop y luego seguir con el plan técnico de implementación.
