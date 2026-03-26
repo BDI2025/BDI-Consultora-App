@@ -12,16 +12,24 @@ const CONFIG_PATH = path.join(__dirname, 'public', 'config.json');
 const CER_CSV_PATH = path.join(__dirname, 'data_base', 'CER_serie.csv');
 
 const MUNDO_SYMBOLS = [
-  { id: 'spx', symbol: 'ES%3DF', name: 'S&P 500' },
-  { id: 'nasdaq', symbol: 'NQ%3DF', name: 'Nasdaq 100' },
-  { id: 'dow', symbol: 'YM%3DF', name: 'Dow Jones' },
-  { id: 'tnx', symbol: '%5ETNX', name: 'Tasa 10Y USA' },
-  { id: 'oil', symbol: 'CL%3DF', name: 'Petroleo WTI' },
-  { id: 'brent', symbol: 'BZ%3DF', name: 'Petroleo Brent' },
-  { id: 'gold', symbol: 'GC%3DF', name: 'Oro' },
-  { id: 'btc', symbol: 'BTC-USD', name: 'Bitcoin' },
-  { id: 'eth', symbol: 'ETH-USD', name: 'Ethereum' },
-  { id: 'eurusd', symbol: 'EURUSD%3DX', name: 'EUR/USD' },
+  { id: 'spx', symbol: 'ES%3DF', name: 'S&P 500', category: 'indices', icon: 'SP' },
+  { id: 'nasdaq', symbol: 'NQ%3DF', name: 'Nasdaq 100', category: 'indices', icon: 'NQ' },
+  { id: 'dow', symbol: 'YM%3DF', name: 'Dow Jones', category: 'indices', icon: 'DJ' },
+  { id: 'tnx', symbol: '%5ETNX', name: 'Tasa 10Y USA', category: 'tasas', icon: '10Y' },
+  { id: 'fvx', symbol: '%5EFVX', name: 'Tasa 5Y USA', category: 'tasas', icon: '5Y' },
+  { id: 'tyx', symbol: '%5ETYX', name: 'Tasa 30Y USA', category: 'tasas', icon: '30Y' },
+  { id: 'oil', symbol: 'CL%3DF', name: 'Petroleo WTI', category: 'energia', icon: 'WTI' },
+  { id: 'brent', symbol: 'BZ%3DF', name: 'Petroleo Brent', category: 'energia', icon: 'BRE' },
+  { id: 'natgas', symbol: 'NG%3DF', name: 'Gas natural', category: 'energia', icon: 'GAS' },
+  { id: 'gold', symbol: 'GC%3DF', name: 'Oro', category: 'metales', icon: 'AU' },
+  { id: 'silver', symbol: 'SI%3DF', name: 'Plata', category: 'metales', icon: 'AG' },
+  { id: 'copper', symbol: 'HG%3DF', name: 'Cobre', category: 'metales', icon: 'CU' },
+  { id: 'corn', symbol: 'ZC%3DF', name: 'Maiz', category: 'agro', icon: 'MZ' },
+  { id: 'soy', symbol: 'ZS%3DF', name: 'Soja', category: 'agro', icon: 'SJ' },
+  { id: 'wheat', symbol: 'ZW%3DF', name: 'Trigo', category: 'agro', icon: 'TG' },
+  { id: 'btc', symbol: 'BTC-USD', name: 'Bitcoin', category: 'crypto', icon: 'BTC' },
+  { id: 'eth', symbol: 'ETH-USD', name: 'Ethereum', category: 'crypto', icon: 'ETH' },
+  { id: 'eurusd', symbol: 'EURUSD%3DX', name: 'EUR/USD', category: 'fx', icon: 'FX' },
 ];
 
 const NEWS_FEEDS = [

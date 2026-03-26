@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadHotMovers();
   loadCotizaciones();
   loadNewsTicker();
+  loadNewsSection();
   initSupabase();
 
   // Auth event listeners
@@ -563,6 +564,9 @@ function setupTabs() {
       loadMundo();
       loadHotMovers();
     }
+    if (!document.getElementById('news-grid')?.hasChildNodes()) {
+      loadNewsSection();
+    }
   }
 
   function switchToONs() {
@@ -711,7 +715,7 @@ async function loadPlazoFijo() {
 
     // Source note
     const source = document.querySelector('.section-source');
-    if (source) source.textContent = '';
+    if (source) source.textContent = 'Fuente: ArgentinaDatos. Tasas publicadas por banco.';
 
     // Render plazo fijo chart
     const chartItems = sorted.map(banco => {
@@ -903,9 +907,9 @@ async function loadLecaps() {
     const liveCount = items.filter(i => i.live).length;
     if (source) {
       if (hasLive) {
-        source.textContent = '';
+        source.textContent = 'Fuente: data912 para precios live + config interna para flujos y vencimientos.';
       } else {
-        source.textContent = '';
+        source.textContent = 'Fuente: config interna. No se pudieron traer precios live de data912.';
       }
     }
 
@@ -1127,7 +1131,7 @@ async function loadSoberanos() {
 
     const source = document.getElementById('soberanos-source');
     if (source) {
-      source.textContent = '';
+      source.textContent = 'Fuente: data912 para precios + config interna para flujos, ley y vencimientos.';
     }
   } catch (e) {
     console.error('Error loading soberanos:', e);
@@ -1471,16 +1475,18 @@ function drawSparkline(canvasId, data, isUp) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  const w = canvas.clientWidth;
-  const h = canvas.clientHeight;
+  const rect = canvas.getBoundingClientRect();
+  const w = Math.max(1, Math.round(rect.width || canvas.clientWidth || canvas.width || 160));
+  const h = Math.max(1, Math.round(rect.height || canvas.clientHeight || canvas.height || 52));
   canvas.width = w * dpr;
   canvas.height = h * dpr;
   ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
 
   const min = Math.min(...data);
   const max = Math.max(...data);
   const range = max - min || 1;
-  const pad = 2;
+  const pad = 4;
 
   const color = isUp ? getComputedStyle(document.documentElement).getPropertyValue('--green').trim()
                      : getComputedStyle(document.documentElement).getPropertyValue('--red').trim();
@@ -1504,6 +1510,7 @@ function drawSparkline(canvasId, data, isUp) {
   // Pulsing dot at the end — CSS overlay
   const parent = canvas.parentElement;
   parent.style.position = 'relative';
+  parent.querySelectorAll('.spark-dot').forEach((node) => node.remove());
   const dot = document.createElement('div');
   dot.className = 'spark-dot';
   dot.style.left = (lastX / w * 100) + '%';
@@ -1522,11 +1529,57 @@ async function loadMundo() {
     if (!res.ok) throw new Error(`API error: ${res.status}`);
     const { data, updated } = await res.json();
 
+    const mundoMeta = {
+      spx: { category: 'indices', icon: 'SP', unit: 'USD' },
+      nasdaq: { category: 'indices', icon: 'NQ', unit: 'USD' },
+      dow: { category: 'indices', icon: 'DJ', unit: 'USD' },
+      tnx: { category: 'tasas', icon: '10Y', unit: '%' },
+      fvx: { category: 'tasas', icon: '5Y', unit: '%' },
+      tyx: { category: 'tasas', icon: '30Y', unit: '%' },
+      oil: { category: 'energia', icon: 'WTI', unit: 'USD' },
+      brent: { category: 'energia', icon: 'BRE', unit: 'USD' },
+      natgas: { category: 'energia', icon: 'GAS', unit: 'USD' },
+      gold: { category: 'metales', icon: 'AU', unit: 'USD' },
+      silver: { category: 'metales', icon: 'AG', unit: 'USD' },
+      copper: { category: 'metales', icon: 'CU', unit: 'USD' },
+      corn: { category: 'agro', icon: 'MZ', unit: 'USD' },
+      soy: { category: 'agro', icon: 'SJ', unit: 'USD' },
+      wheat: { category: 'agro', icon: 'TG', unit: 'USD' },
+      btc: { category: 'crypto', icon: 'BTC', unit: 'USD' },
+      eth: { category: 'crypto', icon: 'ETH', unit: 'USD' },
+      eurusd: { category: 'fx', icon: 'FX', unit: 'Par' },
+    };
+
+    const categoryLabels = {
+      indices: 'Indices',
+      tasas: 'Tasas',
+      energia: 'Energia',
+      metales: 'Metales',
+      agro: 'Agro',
+      crypto: 'Crypto',
+      fx: 'FX',
+    };
+
+    const categoryDescriptions = {
+      indices: 'Referencias globales de equity',
+      tasas: 'Curva de rendimientos USA',
+      energia: 'Commodities energeticos',
+      metales: 'Metales industriales y preciosos',
+      agro: 'Referencias agricolas',
+      crypto: 'Activos digitales liquidos',
+      fx: 'Monedas y cruces',
+    };
+
+    const grouped = {};
     grid.innerHTML = '';
     data.forEach(item => {
       if (item.price === null) return;
 
-      const isRate = item.id === 'tnx';
+      const meta = mundoMeta[item.id] || {};
+      const category = item.category || meta.category || 'indices';
+      const icon = item.icon || meta.icon || item.name.slice(0, 2).toUpperCase();
+      const unit = meta.unit || '';
+      const isRate = ['tnx', 'fvx', 'tyx'].includes(item.id);
       const isUp = item.change >= 0;
       const changeColor = isUp ? 'var(--green)' : 'var(--red)';
       const arrow = isUp ? '▲' : '▼';
@@ -1542,33 +1595,72 @@ async function loadMundo() {
         priceStr = item.price.toLocaleString('es-AR', { maximumFractionDigits: 4 });
       }
 
-      const canvasId = `spark-${item.id}`;
-      const card = document.createElement('div');
-      card.className = 'mundo-card';
-      card.style.cursor = 'pointer';
-      card.addEventListener('click', () => openMundoDetail(item.id, item.name, item.icon));
-      card.innerHTML = `
-        <div class="mundo-icon">${item.icon}</div>
-        <div class="mundo-info">
-          <div class="mundo-name">${item.name}</div>
-          <div class="mundo-price">${priceStr}</div>
-        </div>
-        <div class="mundo-spark"><canvas id="${canvasId}" width="120" height="40"></canvas></div>
-        <div class="mundo-change" style="color:${changeColor}">
-          <span class="mundo-arrow">${arrow}</span>
-          <span>${Math.abs(item.change).toFixed(2)}%</span>
-        </div>
-      `;
-      grid.appendChild(card);
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push({
+        ...item,
+        category,
+        icon,
+        unit,
+        isUp,
+        arrow,
+        changeColor,
+        priceStr,
+      });
+    });
 
-      // Draw sparkline
-      if (item.sparkline && item.sparkline.length > 1) {
-        drawSparkline(canvasId, item.sparkline, isUp);
-      }
+    Object.entries(categoryLabels).forEach(([category, label]) => {
+      const items = grouped[category];
+      if (!items?.length) return;
+
+      const section = document.createElement('section');
+      section.className = 'mundo-category-section';
+      section.innerHTML = `
+        <div class="mundo-category-head">
+          <div>
+            <h3 class="mundo-category-title">${label}</h3>
+            <p class="mundo-category-desc">${categoryDescriptions[category] || ''}</p>
+          </div>
+        </div>
+        <div class="mundo-category-grid"></div>
+      `;
+
+      const categoryGrid = section.querySelector('.mundo-category-grid');
+
+      items.forEach((item) => {
+        const canvasId = `spark-${item.id}`;
+        const card = document.createElement('div');
+        card.className = 'mundo-card';
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => openMundoDetail(item.id, item.name, item.icon));
+        card.innerHTML = `
+          <div class="mundo-card-top">
+            <div class="mundo-icon">${item.icon}</div>
+            <div class="mundo-info">
+              <div class="mundo-name">${item.name}</div>
+              <div class="mundo-price">${item.priceStr}</div>
+              <div class="mundo-unit">${item.unit}</div>
+            </div>
+            <div class="mundo-change" style="color:${item.changeColor}">
+              <span class="mundo-arrow">${item.arrow}</span>
+              <span>${Math.abs(item.change).toFixed(2)}%</span>
+            </div>
+          </div>
+          <div class="mundo-card-bottom">
+            <div class="mundo-spark"><canvas id="${canvasId}" width="160" height="52"></canvas></div>
+          </div>
+        `;
+        categoryGrid.appendChild(card);
+
+        if (item.sparkline && item.sparkline.length > 1) {
+          requestAnimationFrame(() => drawSparkline(canvasId, item.sparkline, item.isUp));
+        }
+      });
+
+      grid.appendChild(section);
     });
 
     const src = document.getElementById('mundo-source');
-    if (src) src.textContent = '';
+    if (src) src.textContent = 'Fuente: Yahoo Finance. Precio, variacion diaria y sparkline intradiaria.';
   } catch (e) {
     grid.innerHTML = '<div class="loading">Error al cargar datos globales.</div>';
     console.error('Mundo error:', e);
@@ -1593,11 +1685,12 @@ async function loadHotMovers() {
     }
 
     grid.innerHTML = '';
-    data.forEach((item, i) => {
+    data.slice(0, 6).forEach((item, i) => {
       const isUp = item.change >= 0;
       const changeColor = isUp ? 'var(--green)' : 'var(--red)';
       const arrow = isUp ? '▲' : '▼';
       const sign = isUp ? '+' : '';
+      const shortName = item.name.length > 42 ? `${item.name.slice(0, 39)}...` : item.name;
 
       const card = document.createElement('div');
       card.className = 'hot-card';
@@ -1607,12 +1700,14 @@ async function loadHotMovers() {
         <div class="hot-rank">${i + 1}</div>
         <div class="hot-info">
           <div class="hot-symbol">${item.symbol}</div>
-          <div class="hot-name">${item.name}</div>
+          <div class="hot-name">${shortName}</div>
         </div>
-        <div class="hot-price">$${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-        <div class="hot-change" style="color:${changeColor}">
-          <span class="hot-arrow">${arrow}</span>
-          <span>${sign}${item.change.toFixed(2)}%</span>
+        <div class="hot-metrics">
+          <div class="hot-price">$${item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <div class="hot-change" style="color:${changeColor}">
+            <span class="hot-arrow">${arrow}</span>
+            <span>${sign}${item.change.toFixed(2)}%</span>
+          </div>
         </div>
       `;
       grid.appendChild(card);
@@ -1919,6 +2014,56 @@ async function loadNewsTicker() {
 
 // ─── Bonos CER section ───
 
+function formatNewsSectionDate(rawDate) {
+  if (!rawDate) return 'Cobertura financiera';
+  const parsed = new Date(rawDate);
+  if (Number.isNaN(parsed.getTime())) return 'Cobertura financiera';
+  return parsed.toLocaleString('es-AR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+async function loadNewsSection() {
+  const grid = document.getElementById('news-grid');
+  if (!grid) return;
+
+  grid.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando noticias financieras...</p></div>`;
+
+  try {
+    const res = await fetch('/api/news');
+    if (!res.ok) throw new Error('News section API error');
+    const { data } = await res.json();
+
+    if (!data || !data.length) {
+      grid.innerHTML = '<div class="loading">No hay noticias de mercado disponibles.</div>';
+      return;
+    }
+
+    const filtered = data.filter(item => {
+      const haystack = `${item.title || ''} ${item.source || ''}`.toLowerCase();
+      return [
+        'mercado', 'finanzas', 'bonos', 'acciones', 'wall street', 'dolar',
+        'dólar', 'riesgo país', 'riesgo pais', 'fed', 'tasas', 's&p', 'nasdaq'
+      ].some(term => haystack.includes(term));
+    });
+
+    const items = (filtered.length ? filtered : data).slice(0, 6);
+    grid.innerHTML = items.map(item => `
+      <a class="news-card" href="${item.link}" target="_blank" rel="noopener">
+        <span class="news-card-source">${item.source || 'Mercado'}</span>
+        <div class="news-card-title">${item.title}</div>
+        <div class="news-card-meta">${formatNewsSectionDate(item.pubDate)}</div>
+      </a>
+    `).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="loading">Error al cargar noticias de mercado.</div>';
+    console.error('News section error:', e);
+  }
+}
+
 async function loadCER() {
   const container = document.getElementById('cer-list');
   container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando bonos CER...</p></div>`;
@@ -2020,7 +2165,7 @@ async function loadCER() {
 
     const source = document.getElementById('cer-source');
     if (source) {
-      source.textContent = '';
+      source.textContent = 'Fuente: BCRA para CER + data912 para precios + config interna para flujos.';
     }
   } catch (e) {
     console.error('Error loading CER bonds:', e);
@@ -2281,7 +2426,7 @@ async function loadONs() {
     items.sort((a, b) => a.duration - b.duration);
     renderONsTable(container, items);
     renderONsYieldCurve(items);
-    document.getElementById('ons-source').textContent = '';
+    document.getElementById('ons-source').textContent = 'Fuente: data912 para precios + config interna para flujos y vencimientos.';
   } catch(err) {
     container.innerHTML = '<p style="color:var(--red)">Error cargando ONs: ' + err.message + '</p>';
   }

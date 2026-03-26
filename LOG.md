@@ -777,3 +777,145 @@
   - nueva validacion visual del usuario para ver si este enfoque por instrumentos y eje Y propio finalmente ordena las curvas.
 - Siguiente paso sugerido:
   - refrescar la app con `Ctrl + F5` y revisar otra vez las cuatro familias.
+
+## 2026-03-26 12:18:00 -03:00
+- Accion: reordenamiento del dashboard inicial de mercado.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario marco que la portada del proyecto de referencia tiene mejor categorizacion y mejor lectura de monitor global.
+- Resultado:
+  - `server.js` amplia `MUNDO_SYMBOLS` con mas activos y les agrega categoria e icono corto;
+  - `app.js` deja de renderizar una sola grilla plana y pasa a agrupar tarjetas por categoria;
+  - `styles.css` incorpora paneles de categoria y una tarjeta de monitor mas ordenada para home;
+  - la portada BDI gana un monitor inicial mas cercano a una terminal consultiva simplificada.
+- Decisiones tomadas:
+  - reutilizar la misma fuente `/api/mundo` en vez de introducir otra dependencia nueva;
+  - priorizar categorias utiles para lectura diaria: indices, tasas, energia, metales, agro, crypto y FX.
+- Pendientes:
+  - validacion visual del nuevo dashboard inicial en navegador real;
+  - decidir despues si conviene sumar filtros, orden interno o una capa de resumen ejecutivo arriba de cada categoria.
+- Siguiente paso sugerido:
+  - refrescar la home con `Ctrl + F5`, revisar el nuevo monitor inicial y evaluar si la jerarquia ya se acerca a la referencia funcional que busca el usuario.
+
+## 2026-03-26 12:31:00 -03:00
+- Accion: endurecimiento del monitor global del lado frontend.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario reporto que el dashboard seguia mostrando una sola categoria y que no se veian los mini graficos intradiarios.
+- Resultado:
+  - `app.js` ahora incluye un mapa local de categorias e iconos por `id`, para no depender solo de lo que devuelva `/api/mundo`;
+  - las cards del monitor global usan esos metadatos como fallback;
+  - `styles.css` hace mas visible el contenedor de sparkline y compacta la card para que el mini grafico no quede perdido.
+- Decisiones tomadas:
+  - blindar la categorizacion tambien en frontend para reducir acoplamiento con el backend;
+  - priorizar visibilidad del mini grafico antes de seguir afinando detalle fino de la home.
+- Pendientes:
+  - nueva validacion manual del dashboard inicial;
+  - si el backend sigue devolviendo un universo parcial, recordar reiniciar el server local para tomar cambios de `server.js`.
+- Siguiente paso sugerido:
+  - refrescar la app y, si no aparecen nuevas categorias, reiniciar `npm.cmd start` para asegurar que el server local este usando la version nueva de `server.js`.
+
+## 2026-03-26 12:44:00 -03:00
+- Accion: ajuste de unidad monetaria, layout de 3 columnas y blindaje de sparklines.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio sumar moneda de referencia en cada cotizacion, alinear tres activos por fila y corregir la ausencia visual de mini graficos intradiarios.
+- Resultado:
+  - `app.js` ahora asigna unidad por activo (`USD`, `%`, `Par`) y la renderiza debajo del precio principal;
+  - el mapa local de `mundoMeta` tambien define icono y unidad, reduciendo dependencia del backend para estos metadatos;
+  - `drawSparkline` ahora espera mejor al layout real del canvas, limpia el contexto y elimina dots previos antes de redibujar;
+  - `styles.css` pasa el monitor global a 3 columnas en desktop y mantiene 1 en mobile;
+  - el contenedor principal vuelve mas ancho para permitir esa lectura horizontal.
+- Pendientes:
+  - validacion manual de que ya se vean las sparklines y que el layout de 3 activos por fila quede bien;
+  - si siguieran sin verse las sparklines, revisar el contenido concreto de `item.sparkline` en el browser o reforzar el backend.
+- Siguiente paso sugerido:
+  - reiniciar servidor si hace falta, refrescar `#mundo` con `Ctrl + F5` y validar categorias, moneda y mini graficos.
+
+## 2026-03-26 12:58:00 -03:00
+- Accion: consolidacion de auditoria de fuentes de datos en documentacion persistente.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio un mapa claro de origen de precios y tasas para poder revisar confiabilidad y mantenimiento.
+- Resultado:
+  - `README.md` ahora incluye una tabla de auditoria de fuentes por seccion;
+  - se distinguen flujos automaticos, manuales y mixtos;
+  - queda explicitado que `data912` y `config.json` son puntos especialmente criticos para la renta fija.
+- Decisiones tomadas:
+  - dejar la auditoria dentro del proyecto para no depender del chat;
+  - usar una tabla simple con endpoint, fuente real, tipo de dato, mantenimiento y riesgo.
+- Pendientes:
+  - seguir con el siguiente bloque visual/funcional de la pagina;
+  - decidir luego si conviene exponer parte de esta informacion como “fuente” dentro de la propia UI.
+- Siguiente paso sugerido:
+  - continuar con home/dashboard y jerarquia de la portada BDI.
+
+## 2026-03-26 13:09:00 -03:00
+- Accion: exposicion de fuentes en la UI de secciones clave.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario pidio confirmar visualmente de donde salen precios y tasas para poder auditar confiabilidad.
+- Resultado:
+  - `Mundo`, `Plazo fijo`, `LECAPs`, `Soberanos`, `CER` y `ONs` ahora muestran texto de fuente en la propia interfaz;
+  - el origen de datos queda visible sin necesidad de abrir el codigo.
+- Pendientes:
+  - validar visualmente estos textos en navegador real;
+  - luego seguir con mejoras de jerarquia y home BDI.
+- Siguiente paso sugerido:
+  - refrescar la app y confirmar que las fuentes se vean bien debajo de cada bloque.
+
+## 2026-03-26 13:22:00 -03:00
+- Accion: incorporacion de tablero ejecutivo en la home.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: avanzar con una portada BDI mas consultiva y menos parecida a un listado plano de bloques.
+- Resultado:
+  - `index.html` suma un bloque `Tablero ejecutivo` arriba del monitor global;
+  - `styles.css` agrega la presentacion de esa fila de referencias clave;
+  - `app.js` conecta ese tablero con datos reales de `loadCotizaciones()` y `loadMundo()`;
+  - la home ahora resume primero referencias de Argentina y benchmarks globales antes de bajar al monitor por categorias.
+- Pendientes:
+  - validacion visual del nuevo bloque ejecutivo en navegador real;
+  - luego decidir si conviene reorganizar tambien `Hot Movers` o noticias.
+- Siguiente paso sugerido:
+  - refrescar `#mundo`, revisar el nuevo tablero ejecutivo y seguir luego con el pulido de portada.
+
+## 2026-03-26 13:46:00 -03:00
+- Accion: reorganizacion de la home para reducir redundancia y sumar contenido editorial.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario considero redundante el `Tablero ejecutivo` respecto de la tira superior de cotizaciones y pidio priorizar noticias financieras de mercado de capitales junto con una mejora de `Hot Movers`.
+- Resultado:
+  - la home conserva el monitor global como bloque principal;
+  - `index.html` ya expone una nueva seccion `Noticias de mercado`;
+  - `app.js` ahora dispara `loadNewsSection()` al cargar y al volver a `Mundo`;
+  - `loadNewsSection()` filtra y prioriza notas vinculadas a finanzas, bonos, acciones, dolar, tasas y mercado;
+  - `Hot Movers` queda limitado a una seleccion breve y con layout mas editorial;
+  - se confirma la eliminacion del `Tablero ejecutivo` para evitar duplicar informacion.
+- Problemas encontrados:
+  - `app.js` sigue con encoding degradado, por lo que varios parches grandes fallan si se intenta editar con demasiado contexto.
+- Decisiones tomadas:
+  - avanzar con parches chicos y controlados en la logica viva;
+  - priorizar una portada mas limpia antes de seguir afinando detalle fino de curvas.
+- Pendientes:
+  - validacion manual de la nueva seccion de noticias;
+  - revisar si `Hot Movers` necesita una segunda pasada visual o de copy.
+- Siguiente paso sugerido:
+  - refrescar `#mundo` con `Ctrl + F5`, validar noticias + movers y luego decidir el siguiente bloque de producto.

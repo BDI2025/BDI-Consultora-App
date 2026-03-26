@@ -492,6 +492,11 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
   - tipografias `IBM Plex Sans` y `IBM Plex Mono`;
   - `auth-config.js` actualizado para contemplar dominios BDI;
   - `rendimientos-ar/public/bdi-overrides.js` agregado para sostener copy y rotulos BDI sin reescribir todavia todo `app.js`.
+  - monitor global agrupado por categorias (`Indices`, `Tasas`, `Energia`, `Metales`, `Agro`, `Crypto`, `FX`);
+  - cards de `Mundo` con sparkline intradiaria, variacion diaria y unidad visible;
+  - nueva seccion `Noticias de mercado` para finanzas y mercado de capitales;
+  - `Hot Movers` compactado para lectura mas editorial;
+  - `Tablero ejecutivo` removido por redundancia con la tira superior de cotizaciones.
 
 ### Riesgo Tecnico Vigente
 - `rendimientos-ar/public/app.js` sigue siendo el archivo mas fragil por tamano, acoplamiento y problemas de encoding.
@@ -689,3 +694,39 @@ Cuando el servidor arranque, abri:
 - La parte de `Mi cartera` puede aparecer incompleta si no estan cargadas variables de Supabase.
 - La seccion CER puede tener problemas locales porque `server.js` espera un archivo `data_base/CER_serie.csv` que hoy no esta en el repo.
 - Eso no invalida probar branding, home, navegacion y muchas tablas principales.
+
+## Actualizacion De Home BDI
+- El monitor global deja de estar renderizado como una sola grilla plana.
+- La home ahora incorpora categorias de lectura:
+  - `Indices`
+  - `Tasas`
+  - `Energia`
+  - `Metales`
+  - `Agro`
+  - `Crypto`
+  - `FX`
+- La fuente de datos sigue siendo la misma capa `/api/mundo`, pero con un universo ampliado de simbolos y una presentacion mas ordenada.
+- Objetivo de este bloque:
+  - acercar la portada a un dashboard consultivo tipo research/market monitor;
+  - mejorar jerarquia y escaneabilidad sin copiar literalmente el sitio de referencia.
+
+## Auditoria De Fuentes De Datos
+
+| Seccion | Endpoint / flujo | Fuente real | Tipo de dato | Mantenimiento | Riesgo |
+|---|---|---|---|---|---|
+| Panorama global: indices, tasas, energia, metales, agro, crypto, FX | `/api/mundo` | Yahoo Finance (`query1.finance.yahoo.com`) | precios, cierre previo, cambio %, sparkline | automatico | medio |
+| Cotizaciones superiores: oficial, MEP, CCL, riesgo pais | `/api/cotizaciones` | Yahoo Finance + data912 + ArgentinaDatos | dolar oficial, bonos para MEP/CCL, riesgo pais | automatico | medio-alto |
+| Billeteras / cuentas remuneradas | `/api/config` -> `config.json` | carga manual en proyecto | tasas, limites, descripcion, condiciones | manual | alto |
+| FCIs | `/api/fci` | ArgentinaDatos | VCP, patrimonio, TNA calculada entre ultimo y penultimo dato | automatico | medio |
+| Plazo fijo | fetch directo desde frontend | ArgentinaDatos | tasas por banco, clientes / no clientes | automatico | medio |
+| LECAPs / BONCAPs | `/api/lecaps` + `/api/config` | data912 + `config.json` | precio live, flujos, vencimientos, tipo | mixto | alto |
+| Bonos CER | `/api/cer`, `/api/cer-ultimo`, `/api/cer-precios`, `/api/config` | BCRA + data912 + `config.json` | CER, ultimo CER, precios, flujos, vencimientos | mixto | alto |
+| Soberanos USD | `/api/soberanos` + `/api/config` | data912 + `config.json` | precio live, ley, flujos, vencimientos | mixto | alto |
+| ONs / Corporativos | `/api/ons` + `/api/config` | data912 + `config.json` | precio live, ticker puente, flujos, vencimientos | mixto | alto |
+| Noticias | `/api/news` | Google News RSS | titulares y links | automatico | medio |
+
+### Lectura Rapida De Riesgo
+- `Yahoo Finance`: buena para monitor global y sparklines, pero no es fuente institucional formal.
+- `ArgentinaDatos`: razonablemente confiable para datos publicos, pero hay que vigilar cambios de esquema o disponibilidad.
+- `data912`: hoy es critica para renta fija; si falla, impacta fuerte en LECAPs, CER, soberanos y ONs.
+- `config.json`: es clave porque contiene parte del “cerebro” del producto; si queda desactualizado, aunque la API viva responda, los calculos pueden quedar mal.
