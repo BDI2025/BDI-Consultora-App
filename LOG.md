@@ -475,3 +475,70 @@
   - seguir con la estabilizacion funcional del producto BDI.
 - Siguiente paso sugerido:
   - tomar un commit del hito actual y luego abrir el bloque de correcciones tecnicas.
+
+## 2026-03-25 15:38:00 -03:00
+- AcciÃ³n: rearmado del servidor local para estabilizacion funcional.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: la prueba local confirmo contratos rotos entre frontend y backend de desarrollo, especialmente en CER y ONs.
+- Resultado:
+  - se reemplazo `server.js` por una version mas consistente para desarrollo local;
+  - se agrego fallback de CER via BCRA cuando falta `data_base/CER_serie.csv`;
+  - se agrego `/api/ons` para el flujo local de Corporativos;
+  - se amplio `/api/cer-precios` para incluir bonos y letras CER;
+  - se sumaron rutas locales para `mundo` y `news`, alineando mejor el entorno local con el comportamiento esperado de la app.
+- Problemas encontrados:
+  - no se pudo correr `node --check` desde la sesion del agente porque `node` sigue sin estar disponible en este entorno, aunque si lo esta en la maquina del usuario.
+- Decisiones tomadas:
+  - priorizar una reescritura controlada de `server.js` en vez de seguir parchando un archivo incompleto y fragil;
+  - pedir una nueva validacion manual del usuario antes de avanzar con mas cambios sobre frontend.
+- Pendientes:
+  - reiniciar el servidor local y reprobar CER, Renta fija ARS y Corporativos;
+  - confirmar si persiste algun error en LECAPs;
+  - ajustar luego el frontend si algun mensaje o render sigue fallando.
+- Siguiente paso sugerido:
+  - hacer una segunda prueba local focalizada sobre las secciones que fallaron en el primer test.
+
+## 2026-03-25 15:47:00 -03:00
+- AcciÃ³n: ajuste fino de frontend para navegacion y tolerancia a Chart.js.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario reporto labels duplicados en el header y errores visibles en Soberanos/Corporativos asociados al render de curvas.
+- Resultado:
+  - `bdi-overrides.js` ahora reescribe los tabs del header de forma deterministica, evitando duplicados de texto;
+  - se agregaron guards `typeof Chart === 'undefined'` en curvas de Soberanos, CER y ONs para que la seccion no colapse si el grafico no puede renderizarse.
+- Problemas encontrados:
+  - aun falta validar en navegador real si el error de Soberanos desaparece y si Corporativos pasa de error a tabla.
+- Decisiones tomadas:
+  - seguir privilegiando tolerancia a fallos visibles por encima de refinamientos de UI en esta etapa.
+- Pendientes:
+  - nueva prueba manual focalizada en Soberanos y Corporativos;
+  - luego retomar refinamiento visual/paleta en una etapa posterior, como acordado con el usuario.
+- Siguiente paso sugerido:
+  - reiniciar el servidor local y validar otra vez Soberanos y Corporativos.
+
+## 2026-03-26 09:05:00 -03:00
+- AcciÃ³n: registro de segunda validacion manual positiva.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo: dejar constancia de que las secciones que fallaban ya cargan y definir el nuevo corte de trabajo.
+- Resultado:
+  - `Soberanos`, `Corporativos` y `Renta fija ARS` ya no presentan errores bloqueantes en la prueba manual del usuario;
+  - la duplicacion de labels del header quedo resuelta;
+  - el producto queda en estado apto para un commit de estabilizacion.
+- Problemas encontrados:
+  - no se muestran curvas/graficos de `TIR` vs `Duration` en Soberanos, Corporativos y Renta fija ARS.
+- Decisiones tomadas:
+  - tomar la recuperacion o rediseño de curvas como el siguiente bloque funcional;
+  - no usar ese faltante como bloqueo para el commit actual.
+- Pendientes:
+  - definir e implementar la version BDI de las curvas de instrumentos;
+  - luego retomar refinamiento visual de paleta y detalles de interfaz.
+- Siguiente paso sugerido:
+  - hacer commit del estado actual y abrir el siguiente bloque para graficos/curvas.

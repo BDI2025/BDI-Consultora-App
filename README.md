@@ -497,6 +497,18 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 - `rendimientos-ar/public/app.js` sigue siendo el archivo mas fragil por tamano, acoplamiento y problemas de encoding.
 - Se prioriza una estrategia de cambios visuales controlados y overrides antes de una refactorizacion profunda.
 
+### Bloque Tecnico En Curso
+- Se inicio una pasada de estabilizacion funcional sobre el servidor local.
+- Cambio aplicado en curso:
+  - `rendimientos-ar/server.js` fue rearmado para que el entorno local exponga de forma consistente las rutas que la app ya espera.
+- Objetivos de esta pasada:
+  - corregir el fallback de CER cuando falta `data_base/CER_serie.csv`;
+  - exponer `/api/ons` en local para ONs / Corporativos;
+  - ampliar `/api/cer-precios` para incluir tickers CER de bonos y letras;
+  - robustecer rutas locales de desarrollo;
+  - evitar que la ausencia de `Chart` rompa secciones enteras;
+  - corregir la duplicacion visual de labels en navegacion.
+
 ### Testing Manual
 - Aun no se realizo una prueba visual completa en navegador desde esta sesion porque el entorno del agente no tiene `node` ni `npm`.
 - La app no conviene abrirla con doble click sobre `index.html`, porque depende de endpoints y rutas que esperan un servidor local.
@@ -514,6 +526,30 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
   - CER falla localmente porque falta `data_base/CER_serie.csv`;
   - tambien hay errores al probar Renta fija ARS y Corporativos/ONs, que deben auditarse en una siguiente pasada tecnica;
   - esto confirma que el primer hito actual sirve como base visual, pero no cierra aun la estabilizacion funcional completa.
+
+### Resultado De La Segunda Prueba Local
+- `Liquidez`, `Soberanos`, `Corporativos` y `Renta fija ARS` ya cargan sin los errores bloqueantes detectados en la primera prueba.
+- La navegacion visible ya no duplica labels en el header.
+- Queda pendiente una mejora funcional de visualizacion:
+  - recuperar o rediseñar las curvas de TIR vs Duration en `Renta fija ARS`, `Soberanos` y `Corporativos`.
+- Decision vigente:
+  - el estado actual ya es apto para un commit de estabilizacion;
+  - la vuelta de curvas/graficos se toma como siguiente bloque de trabajo, no como bloqueo para este corte.
+
+### Proxima Validacion Manual
+- Reiniciar el servidor local luego de los cambios de `server.js`.
+- Probar de nuevo:
+  1. Bonos CER
+  2. Renta fija ARS
+  3. Corporativos / ONs
+- Confirmar si:
+  - desaparece el error de CER por archivo faltante;
+  - ONs deja de fallar por ausencia de endpoint local;
+  - LECAPs carga tabla y curva de forma normal.
+
+### Siguiente Bloque Funcional Sugerido
+- Reincorporar curvas de `Duration` vs `TIR` de forma estable y consistente con la identidad BDI.
+- Revisar si conviene mantener el esquema anterior de scatter plot o rediseñar los graficos con una presentacion mas consultiva e institucional.
 
 ### Proximos Pasos Actualizados
 1. Cerrar este primer hito de branding base y tomarlo como commit logico inicial.

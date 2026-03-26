@@ -1360,7 +1360,7 @@ function openSoberanoCalculator(item) {
 let soberanosChart = null;
 function renderYieldCurve(items) {
   const canvas = document.getElementById('soberanos-scatter');
-  if (!canvas) return;
+  if (!canvas || typeof Chart === 'undefined') return;
   if (soberanosChart) soberanosChart.destroy();
 
   const textColor = '#555555';
@@ -2175,7 +2175,7 @@ function openCERCalculator(item) {
 let cerChart = null;
 function renderCERCurve(items) {
   const canvas = document.getElementById('cer-scatter');
-  if (!canvas) return;
+  if (!canvas || typeof Chart === 'undefined') return;
   if (cerChart) cerChart.destroy();
 
   const textColor = '#555555';
@@ -2316,7 +2316,7 @@ function renderONsTable(container, items) {
 
 function renderONsYieldCurve(items) {
   const canvas = document.getElementById('ons-scatter');
-  if (!canvas) return;
+  if (!canvas || typeof Chart === 'undefined') return;
   if (onsChart) onsChart.destroy();
   const textColor = '#555555';
   const gridColor = '#1a1a1a';

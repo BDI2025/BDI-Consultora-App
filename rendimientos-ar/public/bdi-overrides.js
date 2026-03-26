@@ -43,11 +43,11 @@
   };
 
   const NAV_LABELS = {
-    'header-mundo': 'Inicio',
-    'header-ars': 'Liquidez',
-    'header-soberanos': 'Soberanos',
-    'header-ons': 'Corporativos',
-    'header-portfolio': 'Mi cartera',
+    'header-mundo': { flag: 'Mercado', label: 'Inicio' },
+    'header-ars': { flag: 'ARS', label: 'Liquidez' },
+    'header-soberanos': { flag: 'USD', label: 'Soberanos' },
+    'header-ons': { flag: 'USD', label: 'Corporativos' },
+    'header-portfolio': { flag: 'BDI', label: 'Mi cartera' },
     'tab-billeteras-tab': 'Liquidez',
     'tab-plazofijo-tab': 'Plazo fijo',
     'tab-lecaps-tab': 'Renta fija ARS',
@@ -60,25 +60,16 @@
   }
 
   function syncStaticLabels() {
-    Object.entries(NAV_LABELS).forEach(([id, label]) => {
+    Object.entries(NAV_LABELS).forEach(([id, value]) => {
       const node = document.getElementById(id);
       if (!node) return;
 
-      const flag = node.querySelector('.flag');
-      if (flag) {
-        const textNode = Array.from(node.childNodes).find(
-          child => child.nodeType === Node.TEXT_NODE
-        );
-
-        if (textNode) {
-          textNode.textContent = ` ${label}`;
-        } else {
-          node.appendChild(document.createTextNode(` ${label}`));
-        }
+      if (typeof value === 'object' && value.flag) {
+        node.innerHTML = `<span class="flag">${value.flag}</span> ${value.label}`;
         return;
       }
 
-      node.textContent = label;
+      node.textContent = value;
     });
   }
 
