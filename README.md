@@ -14,7 +14,7 @@ Transformar la aplicación base `rendimientos-ar` en un producto propio de BDI C
 - Carpeta de trabajo activa: `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`
 - Estado de Git/worktree:
   - la carpeta raíz `BDI-App-Cocos` ahora es el repositorio Git principal del proyecto;
-  - estado actual: `No commits yet on master`;
+  - estado actual: repo BDI inicializado y ya con commits locales de trabajo;
   - no hay remoto configurado todavía;
   - `rendimientos-ar` ya no contiene `.git` propio y quedó integrado como carpeta de código dentro del proyecto BDI.
 - Contenido detectado al inicio:
@@ -550,6 +550,58 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 ### Siguiente Bloque Funcional Sugerido
 - Reincorporar curvas de `Duration` vs `TIR` de forma estable y consistente con la identidad BDI.
 - Revisar si conviene mantener el esquema anterior de scatter plot o rediseñar los graficos con una presentacion mas consultiva e institucional.
+
+### Avance Del Bloque De Curvas
+- Se agrego `rendimientos-ar/public/bdi-charts.js` como capa propia de visualizacion para curvas de instrumentos.
+- Alcance actual:
+  - `Renta fija ARS`
+  - `Soberanos`
+  - `Bonos CER`
+  - `Corporativos`
+- Criterio de implementacion:
+  - no depender de `Chart.js` para la visualizacion principal de curvas;
+  - usar una lectura mas controlada y consistente con el producto BDI;
+  - dejar la base lista para un refinamiento visual posterior.
+- Refinamiento aplicado luego del primer feedback visual:
+  - mas altura util en los graficos;
+  - linea de tendencia suavizada;
+  - rotulado selectivo para evitar saturacion, especialmente en Corporativos;
+  - leyendas visuales para distinguir tipos de instrumentos cuando corresponde.
+- Ajuste conceptual aplicado despues del segundo feedback:
+  - la curva paso a construirse como una guia robusta, no como una linea arrastrada por outliers;
+  - para `Soberanos` se separan curvas por ley local y ley NY;
+  - las etiquetas muestran ticker y TIR actual sobre cada punto.
+- Ajuste estructural aplicado despues del tercer feedback:
+  - la trayectoria de cada curva ahora se construye con formas disciplinadas y concavidad controlada;
+  - se evita la ondulacion libre entre puntos;
+  - las curvas se apoyan en anclas robustas por mediana y reglas de forma por familia de instrumentos.
+- Ajuste adicional aplicado despues del cuarto feedback:
+  - se reemplazo el trazo anterior por una interpolacion monotona por tramos;
+  - el grafico gana mas altura util;
+  - para familias que lo requieren se usa una trayectoria de subida y posterior declive suave, evitando formas en U incorrectas.
+- Ajuste adicional aplicado despues del quinto feedback:
+  - el area util del grafico se amplio todavia mas y el contenedor blanco se redujo;
+  - las curvas ahora se construyen con puntos filtrados de outliers cuando hace falta, sin dejar de mostrar los instrumentos reales;
+  - en `Corporativos` el grafico pasa a una seleccion curada de 2-3 ONs por anio segun TIR para mejorar legibilidad.
+- Ajuste adicional aplicado despues del sexto feedback:
+  - se aumento aun mas la escala del grafico y se comprimio el encuadre blanco;
+  - la curva pasa a separarse mejor del conjunto de puntos visibles, usando puntos guia mas limpios;
+  - `LECAPs`, `Soberanos`, `CER` y `Corporativos` quedan listos para una nueva validacion visual inmediata.
+- Ajuste adicional aplicado despues del septimo feedback:
+  - se reemplazo la logica anterior de curvas por una guia mas simple y controlada, sin ondulaciones ni valles artificiales;
+  - `LECAPs` ahora usa una curva creciente y concava como guia principal;
+  - `BONCAPs`, `Soberanos ley local`, `Soberanos ley NY` y `Corporativos` pasan a una curva tipo loma suave, tomando como referencia visual la prolijidad de la curva de ley NY;
+  - `Corporativos` reduce aun mas la cantidad de ONs visibles por anio para evitar un grafico plano o saturado;
+  - el SVG gana mas espacio util y se agrandan etiquetas, ejes, puntos y leyendas.
+- Ajuste adicional aplicado despues del octavo feedback:
+  - se redujo todavia mas la distancia visual entre leyenda, grafico y descripcion;
+  - `LECAPs` y `CER` vuelven a una guia creciente y concava, pero con menos puntos guia para evitar serruchos u ondulaciones;
+  - `Soberanos` vuelve a una curva tipo loma mas contenida, buscando recuperar la prolijidad que el usuario valido antes en la familia ley NY;
+  - `Corporativos` deja de usar seleccion automatica por anio y pasa a una lista puntual de ONs preferidas indicada por el usuario.
+- Ajuste adicional aplicado despues del noveno feedback:
+  - la guia de cada curva pasa a construirse sobre instrumentos representativos elegidos por familia, en vez de apoyarse solo en percentiles u outliers;
+  - se suma un `yDomain` especifico por grafico para mejorar lectura y evitar aplanamientos innecesarios;
+  - `LECAPs`, `CER`, `Soberanos` y `Corporativos` ahora buscan pasar cerca de los tickers relevantes y no necesariamente por todos los puntos.
 
 ### Proximos Pasos Actualizados
 1. Cerrar este primer hito de branding base y tomarlo como commit logico inicial.

@@ -602,10 +602,122 @@ body {
   background: linear-gradient(180deg, #ffffff 0%, #fbfcfb 100%);
   border: 1px solid var(--border);
   border-radius: 18px;
-  padding: 14px;
-  margin-top: 8px;
-  height: 420px;
+  padding: 2px 4px 2px;
+  margin-top: 4px;
+  height: 620px;
   box-shadow: var(--shadow-sm);
+}
+
+.bdi-chart-shell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bdi-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0 0 0 2px;
+}
+
+.bdi-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.bdi-chart-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.bdi-chart-svg {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: block;
+}
+
+.bdi-chart-plot-bg {
+  fill: #fcfdfc;
+}
+
+.bdi-chart-grid {
+  stroke: #d9e4dd;
+  stroke-width: 1.15;
+}
+
+.bdi-chart-axis {
+  stroke: #7d8a84;
+  stroke-width: 1.5;
+}
+
+.bdi-chart-curve {
+  fill: none;
+  stroke: #157347;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.92;
+}
+
+.bdi-chart-tick {
+  fill: #6b7280;
+  font-size: 13px;
+  font-family: var(--font);
+}
+
+.bdi-chart-axis-label {
+  fill: #374151;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font);
+}
+
+.bdi-chart-label {
+  fill: #232323;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font);
+  paint-order: stroke;
+  stroke: rgba(255,255,255,0.96);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.bdi-chart-label-value {
+  fill: #5f6b66;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.bdi-chart-caption {
+  margin: 0 2px 0;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.bdi-chart-dot {
+  stroke: rgba(255,255,255,0.96);
+  stroke-width: 2.5px;
+}
+
+.bdi-chart-empty {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
 }
 
 .spread-positive { color: #ef4444; font-weight: 600; }
@@ -1848,6 +1960,6 @@ body {
   .lecap-table th, .soberanos-table th, .cer-table th { padding: 6px 6px; font-size: 0.58rem; }
   .lecap-table td, .soberanos-table td, .cer-table td { padding: 5px 6px; }
   .lecap-type-badge { font-size: 0.5rem; padding: 1px 4px; margin-left: 4px; }
-  .scatter-plot { height: 280px; }
+  .scatter-plot { height: 500px; padding: 4px; }
   .footer { padding: 24px 16px 40px; }
 }

@@ -542,3 +542,238 @@
   - luego retomar refinamiento visual de paleta y detalles de interfaz.
 - Siguiente paso sugerido:
   - hacer commit del estado actual y abrir el siguiente bloque para graficos/curvas.
+
+## 2026-03-26 09:18:00 -03:00
+- AcciÃ³n: implementacion de curvas propias para instrumentos.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: recuperar la visualizacion de `Duration` vs `TIR` sin depender del comportamiento de `Chart.js`.
+- Resultado:
+  - se agrego una capa propia de graficos SVG para `Renta fija ARS`, `Soberanos`, `Bonos CER` y `Corporativos`;
+  - `index.html` ahora carga `bdi-charts.js` despues de `app.js`;
+  - `styles.css` suma estilos para los nuevos graficos institucionales.
+- Decisiones tomadas:
+  - priorizar una solucion controlada y estable sobre la dependencia a librerias externas;
+  - dejar el refinamiento estetico de estos graficos para una pasada posterior.
+- Pendientes:
+  - validacion manual de las nuevas curvas en navegador real;
+  - ajustar densidad, colores y rotulos segun feedback visual del usuario.
+- Siguiente paso sugerido:
+  - reiniciar el servidor local y revisar las curvas de `Renta fija ARS`, `Soberanos` y `Corporativos`.
+
+## 2026-03-26 09:31:00 -03:00
+- AcciÃ³n: refinamiento visual de curvas propias.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario reporto que los graficos se veian chicos, con una linea poco profesional y exceso de labels.
+- Resultado:
+  - se aumento la altura util de los graficos;
+  - la linea de tendencia paso a una curva suavizada mas sobria;
+  - se redujo la cantidad de labels visibles segun densidad;
+  - se agregaron leyendas visuales en las secciones donde aportan lectura.
+- Decisiones tomadas:
+  - priorizar claridad editorial antes que mostrar absolutamente todos los labels en simultaneo;
+  - mantener la curva como lectura de tendencia y no como interpolacion exacta punto por punto.
+- Pendientes:
+  - validacion visual del usuario sobre esta segunda version de curvas;
+  - luego decidir si se hace commit de este bloque o si conviene una ultima pasada de detalle.
+- Siguiente paso sugerido:
+  - refrescar la app y comparar la nueva presentacion de `Renta fija ARS`, `Soberanos` y `Corporativos`.
+
+## 2026-03-26 09:46:00 -03:00
+- AcciÃ³n: correccion conceptual de curvas segun criterio financiero del usuario.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario indico que las curvas debian comportarse como guias crecientes/concavas o separadas por familia, y no como lineas quebradas afectadas por puntos atipicos.
+- Resultado:
+  - `bdi-charts.js` ahora construye curvas robustas a partir de anclas por mediana y restricciones de forma;
+  - `Soberanos` pasa a mostrar dos curvas: ley local y ley NY;
+  - las etiquetas visibles se reformulan a ticker + TIR actual.
+- Decisiones tomadas:
+  - privilegiar la logica de lectura financiera por sobre una interpolacion literal de todos los puntos;
+  - aceptar que la curva es una guia visual y no un ajuste estadistico exacto.
+- Pendientes:
+  - nueva validacion visual del usuario comparando contra sus referencias;
+  - decidir si este bloque ya queda listo para commit o si hace falta una ultima pasada fina.
+- Siguiente paso sugerido:
+  - refrescar la app y revisar otra vez `Renta fija ARS`, `Soberanos` y `Corporativos`.
+
+## 2026-03-26 10:02:00 -03:00
+- AcciÃ³n: rediseÃ±o de la trayectoria de curvas con forma controlada.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario indico que las curvas debian verse prolijas y profesionales, con una forma creciente/concava o equivalente, y no ondulada.
+- Resultado:
+  - las curvas ahora se construyen desde anclas robustas por mediana;
+  - se impone una forma por familia (`increasing-concave-down`, `hump-soft`, etc.);
+  - `Soberanos` conserva dos curvas separadas: ley local y ley NY.
+- Decisiones tomadas:
+  - tratar la curva como una guia financiera formal, no como una interpolacion libre;
+  - mantener ticker + TIR sobre los puntos como criterio principal de rotulado.
+- Pendientes:
+  - validacion visual del usuario sobre esta nueva generacion de curvas;
+  - decidir si hace falta una ultima pasada de detalle o si el bloque ya queda listo para commit.
+- Siguiente paso sugerido:
+  - refrescar la app y comparar otra vez con las referencias del usuario.
+
+## 2026-03-26 10:16:00 -03:00
+- AcciÃ³n: agrandado de graficos y cambio a interpolacion monotona por tramos.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio una curva mas grande y una trayectoria que una los puntos de forma natural, sin ondulaciones ni formas en U incorrectas.
+- Resultado:
+  - los graficos aumentaron de tamano;
+  - la curva ahora usa un trazado monotono por tramos en vez del esquema previo;
+  - para series como soberanos y corporativos se habilita una trayectoria de alza y eventual descenso suave cuando corresponde.
+- Pendientes:
+  - validar visualmente esta nueva iteracion contra las referencias del usuario.
+- Siguiente paso sugerido:
+  - refrescar la app y revisar otra vez las tres secciones de curvas.
+
+## 2026-03-26 10:29:00 -03:00
+- AcciÃ³n: ajuste de escala de graficos y depuracion de puntos para curvas.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio tomar la curva de ley NY como patron, reducir el cuadrante blanco y mejorar legibilidad general.
+- Resultado:
+  - el grafico ahora usa un area util mas grande y un contenedor mas ajustado;
+  - las curvas se calculan sobre puntos limpios de outliers, sin ocultar los puntos reales del scatter;
+  - `Corporativos` pasa a una version curada por anio para evitar saturacion.
+- Pendientes:
+  - nueva validacion visual del usuario sobre `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos`;
+  - decidir si hace falta una ultima iteracion o si ya queda listo para commit.
+- Siguiente paso sugerido:
+  - refrescar la app y comparar otra vez con especial foco en la curva local de soberanos y la curva de LECAPs.
+
+## 2026-03-26 10:42:00 -03:00
+- AcciÃ³n: segunda ampliacion de escala y separacion entre curva guia y puntos visibles.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario indico que el cuadrante blanco seguia grande, el grafico no ganaba suficiente presencia y algunas curvas todavia seguian mal resueltas.
+- Resultado:
+  - el grafico gana aun mas alto y ancho util;
+  - el contenedor se achica en padding;
+  - la curva se apoya en un conjunto mas limpio de puntos guia mientras los puntos reales siguen visibles;
+  - `Corporativos` mantiene la curacion por anio para no colapsar.
+- Pendientes:
+  - nueva validacion visual del usuario para confirmar si el problema de LECAPs y ley local en soberanos quedo mejor encaminado.
+- Siguiente paso sugerido:
+  - refrescar la app y revisar de nuevo `Renta fija ARS`, `Soberanos`, `CER` y `Corporativos`.
+
+## 2026-03-26 11:05:00 -03:00
+- Accion: reescritura de la capa de curvas para imponer formas mas limpias y mayor presencia visual.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario indico que la unica referencia aceptable era la curva de ley NY y que el resto seguia con formas raras, graficos chicos y demasiado margen blanco.
+- Resultado:
+  - `bdi-charts.js` fue reescrito para abandonar la logica anterior de anclas/tangentes y pasar a curvas guia mas simples y controladas;
+  - `LECAPs` ahora usa una curva creciente y concava;
+  - `BONCAPs`, `Soberanos ley local`, `Soberanos ley NY` y `Corporativos` usan una trayectoria tipo loma suave con ascenso limpio y eventual caida controlada;
+  - `Corporativos` reduce la seleccion visible a 2 ONs por anio segun TIR para evitar colapso visual;
+  - `styles.css` agranda el area util del grafico, baja padding del contenedor y aumenta tamanos de leyenda, ejes, labels y trazos.
+- Problemas encontrados:
+  - esta sesion sigue sin `node`, por lo que no se pudo verificar visualmente el resultado final desde el entorno del agente.
+- Decisiones tomadas:
+  - priorizar una guia visual estable y legible antes que un ajuste demasiado sensible a cada punto;
+  - usar la curva que el usuario aprobo como patron conceptual para el resto de las familias.
+- Pendientes:
+  - nueva validacion manual del usuario sobre `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos`;
+  - si todavia algun tramo queda raro, hacer una ultima pasada puntual sobre esa familia y no sobre todo el sistema.
+- Siguiente paso sugerido:
+  - refrescar la app con `Ctrl + F5`, revisar otra vez los graficos y comparar especificamente LECAPs, ley local de soberanos y corporativos.
+
+## 2026-03-26 11:24:00 -03:00
+- Accion: ajuste puntual de formas y copy de graficos segun feedback fino del usuario.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario marco con precision que:
+  - `LECAPs` seguia ondulada;
+  - `CER` necesitaba menos ondulacion inicial y una curva mas alta;
+  - `Soberanos` habia empeorado al romper la forma prolija de ley NY;
+  - `Corporativos` debia pasar a una lista puntual de ONs preferidas;
+  - leyenda y descripcion debian quedar mucho mas cerca del grafico.
+- Resultado:
+  - `bdi-charts.js` ahora usa menos puntos guia para reducir ondulacion y serrucho;
+  - `LECAPs` y `CER` quedan con guia creciente y concava mas simple;
+  - `Soberanos` usa una loma mas contenida para ley local y ley NY;
+  - `Corporativos` pasa a una curacion fija con tickers indicados por el usuario;
+  - captions actualizados a los textos pedidos;
+  - `styles.css` comprime aun mas el encuadre y pega leyenda/caption al grafico.
+- Problemas encontrados:
+  - sin validacion visual local desde esta sesion, todavia dependemos de la prueba manual del usuario para confirmar si la forma final ya quedo bien.
+- Decisiones tomadas:
+  - pasar de ajustes generales a cambios por familia de instrumentos;
+  - respetar la seleccion exacta de ONs preferidas provista por el usuario.
+- Pendientes:
+  - validacion manual inmediata de las cuatro familias;
+  - si algun tramo sigue mal, hacer correccion solo sobre esa curva y no sobre todo el sistema.
+- Siguiente paso sugerido:
+  - refrescar la app con `Ctrl + F5`, revisar otra vez `LECAPs`, `CER`, `Soberanos` y `Corporativos`, y comparar contra las nuevas referencias visuales.
+
+## 2026-03-26 11:39:00 -03:00
+- Accion: correccion de regresion visual en escala y deformacion de curvas.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario reporto que la iteracion anterior habia agrandado demasiado los graficos y roto varias curvas.
+- Resultado:
+  - se elimino el estiramiento del SVG;
+  - el tamano general del bloque de grafico volvio a una escala mas razonable;
+  - las curvas ahora parten de anclas superiores mas sanas para evitar que un outlier inicial deforme todo el trazado;
+  - se mantuvieron captions y filtros recientes, pero se retiro la deformacion de escala que hacia ver todo raro.
+- Problemas encontrados:
+  - seguimos necesitando validacion visual del usuario para confirmar si esta correccion ya desactiva la regresion.
+- Decisiones tomadas:
+  - priorizar volver a una base estable antes de seguir refinando detalle fino;
+  - corregir primero escala y anclaje de curvas, no sumar mas complejidad.
+- Pendientes:
+  - nueva validacion manual de `LECAPs`, `CER`, `Soberanos` y `Corporativos`.
+- Siguiente paso sugerido:
+  - refrescar la app con `Ctrl + F5` y verificar si la escala y la forma general quedaron otra vez en terreno util.
+
+## 2026-03-26 11:52:00 -03:00
+- Accion: cambio de estrategia para curvas con guias por instrumentos representativos y eje Y dedicado.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario confirmo que el tamano del grafico ya esta mejor, pero las curvas siguen sin quedar como necesita.
+- Resultado:
+  - cada familia ahora puede construir su guia con tickers representativos concretos;
+  - se agrego `yDomain` por grafico para mejorar la lectura y evitar aplastamientos;
+  - `LECAPs`, `CER`, `Soberanos` y `Corporativos` pasan a una logica donde la curva intenta pasar cerca de nombres relevantes y no forzar un ajuste global extraño.
+- Decisiones tomadas:
+  - dejar de insistir con una unica formula universal para todas las familias;
+  - usar guias curadas por instrumentos relevantes, que es mas cercano a la referencia visual que busca el usuario.
+- Pendientes:
+  - nueva validacion visual del usuario para ver si este enfoque por instrumentos y eje Y propio finalmente ordena las curvas.
+- Siguiente paso sugerido:
+  - refrescar la app con `Ctrl + F5` y revisar otra vez las cuatro familias.
