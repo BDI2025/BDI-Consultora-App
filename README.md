@@ -497,6 +497,21 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
   - nueva seccion `Noticias de mercado` para finanzas y mercado de capitales;
   - `Hot Movers` compactado para lectura mas editorial;
   - `Tablero ejecutivo` removido por redundancia con la tira superior de cotizaciones.
+  - mejora de copy y jerarquia en secciones de Liquidez, Renta fija ARS, CER, Soberanos y Corporativos;
+  - `Plazo fijo` ahora usa un `section-source` dedicado para no escribir la fuente en el bloque equivocado.
+  - nueva direccion visual inspirada en la landing de BDI:
+    - header oscuro institucional;
+    - hero con panel negro/verde;
+    - superficies mas premium y menos genericas;
+    - acentos verde/turquesa con mayor coherencia de marca.
+  - ajuste de paleta hacia la variante propuesta por BDI:
+    - fondo general `#EFEDEA`;
+    - verde principal `#137247`;
+    - turquesa de apoyo `#17BEBB`;
+    - separacion visual mas clara entre dashboard, `Hot Movers` y `Noticias de mercado`.
+  - iconos de app y favicon reemplazados por el isotipo BDI en `public/icons/icon-192.png` y `public/icons/icon-512.png`.
+  - iconos regenerados con recorte mas cerrado para que el isotipo se perciba mas grande en la pestaña del navegador.
+  - footer institucional actualizado a `BDI Consultora, elaborado por Tomás Rodríguez` con fuentes resumidas.
 
 ### Riesgo Tecnico Vigente
 - `rendimientos-ar/public/app.js` sigue siendo el archivo mas fragil por tamano, acoplamiento y problemas de encoding.
@@ -694,6 +709,62 @@ Cuando el servidor arranque, abri:
 - La parte de `Mi cartera` puede aparecer incompleta si no estan cargadas variables de Supabase.
 - La seccion CER puede tener problemas locales porque `server.js` espera un archivo `data_base/CER_serie.csv` que hoy no esta en el repo.
 - Eso no invalida probar branding, home, navegacion y muchas tablas principales.
+
+## Como Publicarla Y Compartir Un Link
+
+### Opcion Recomendada
+- Publicarla con `Netlify`.
+- Motivo:
+  - este proyecto ya trae `netlify.toml`;
+  - ya usa `netlify/functions`;
+  - es la forma mas simple de pasar de entorno local a una URL publica.
+
+### Antes De Publicar
+- Confirmar que el estado visual y funcional de la app ya este suficientemente estable.
+- Tener el proyecto subido a un repo propio de GitHub.
+- Decidir si `Mi cartera` va a quedar activa en la primera publicacion o si puede salir desactivada temporalmente.
+
+### Paso A Paso Simple
+1. Crear un repositorio nuevo en GitHub con el proyecto BDI.
+2. Subir el contenido actual de `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`.
+3. Crear una cuenta o iniciar sesion en [Netlify](https://www.netlify.com/).
+4. Elegir `Add new site` o `Import from Git`.
+5. Conectar Netlify con el repo de GitHub donde quedo este proyecto.
+6. En la configuracion del sitio, indicar como base de deploy la carpeta:
+   - `rendimientos-ar`
+7. Verificar que Netlify tome estos valores:
+   - `Publish directory`: `public`
+   - `Functions directory`: `netlify/functions`
+8. Ejecutar el primer deploy.
+9. Copiar la URL publica generada por Netlify.
+
+### Variables De Entorno A Revisar
+- Si se quiere conservar `Mi cartera`, Netlify va a necesitar:
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+- Si esas variables no estan cargadas:
+  - la parte publica puede seguir funcionando;
+  - `Mi cartera` puede quedar incompleta o sin login.
+
+### Dominio Y Auth
+- `rendimientos-ar/netlify/functions/auth-config.js` ya fue ajustado para tolerar:
+  - dominios propios de BDI;
+  - dominios `.netlify.app`;
+  - `localhost`.
+- Si se usa Supabase con login Google, tambien hay que registrar en Supabase:
+  - la URL publica de Netlify;
+  - y luego, si se quiere, el dominio propio final.
+
+### Resultado Esperado
+- Al terminar el deploy, Netlify genera una URL publica del estilo:
+  - `https://nombre-del-sitio.netlify.app`
+- Esa URL ya se puede compartir con otras personas para ver la app.
+
+### Camino Recomendado De Publicacion
+1. Publicar primero en una URL de Netlify.
+2. Revisar la app online.
+3. Corregir detalles finales.
+4. Recién despues conectar dominio propio si hace falta.
 
 ## Actualizacion De Home BDI
 - El monitor global deja de estar renderizado como una sola grilla plana.

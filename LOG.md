@@ -919,3 +919,139 @@
   - revisar si `Hot Movers` necesita una segunda pasada visual o de copy.
 - Siguiente paso sugerido:
   - refrescar `#mundo` con `Ctrl + F5`, validar noticias + movers y luego decidir el siguiente bloque de producto.
+
+## 2026-03-26 14:08:00 -03:00
+- Accion: pulido de copy y jerarquia en secciones internas.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: llevar el resto de la app a la misma altura editorial que la home, con textos mas consultivos y mejor ubicacion de fuentes.
+- Resultado:
+  - `Liquidez` gana una descripcion mas clara y una nota de fuente persistente;
+  - se suman titulos y descripciones a `Renta fija ARS`, `Soberanos USD`, `Bonos CER` y `Corporativos en USD`;
+  - cada bloque de curva ahora queda mejor contextualizado;
+  - `Plazo fijo` pasa a usar `plazofijo-source`, evitando que la fuente se escriba por error en otra seccion.
+- Decisiones tomadas:
+  - priorizar mejoras de lectura y contexto antes de seguir tocando calculos o curvas;
+  - avanzar con cambios de bajo riesgo sobre `index.html` y un ajuste puntual en `app.js`.
+- Pendientes:
+  - validacion manual de los nuevos encabezados y descripciones en navegador real;
+  - decidir despues si conviene una segunda pasada de copy mas premium o pasar a tablas/badges.
+- Siguiente paso sugerido:
+  - refrescar la app, revisar las secciones internas y luego seguir con tablas y badges.
+
+## 2026-03-26 14:28:00 -03:00
+- Accion: nueva capa visual institucional inspirada en la landing de BDI.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio acercar la app a la identidad visual de la landing oficial de BDI antes de pensar en publicarla y compartirla.
+- Resultado:
+  - la app gana un header oscuro mas alineado a marca;
+  - la tira superior de cotizaciones adopta estetica institucional oscura;
+  - el hero pasa a un panel negro/verde mas cercano a la landing;
+  - panels, cards, wrappers y graficos usan superficies mas premium y redondeos mas consistentes;
+  - la paleta pasa a sentirse mas claramente BDI y menos dashboard neutro.
+- Decisiones tomadas:
+  - mantener las tablas y datos legibles sobre fondos claros;
+  - usar el negro institucional y el verde de marca en la capa estructural, no solo en detalles.
+- Pendientes:
+  - validacion manual de esta direccion visual en navegador real;
+  - luego decidir si conviene una segunda pasada sobre botones, badges y tipografia.
+- Siguiente paso sugerido:
+  - refrescar la app y revisar la nueva identidad visual antes de preparar la guia de publicacion publica.
+
+## 2026-03-26 14:41:00 -03:00
+- Accion: ajuste fino de paleta y diferenciacion visual de bloques de home.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario detecto exceso de blanco, poco contraste en la tira superior y poca separacion entre dashboard, `Hot Movers` y noticias.
+- Resultado:
+  - el fondo general pasa a una base `#EFEDEA`;
+  - el verde principal migra a `#137247` y el turquesa a `#17BEBB`;
+  - la tira superior mejora contraste para etiquetas y valores;
+  - `Dashboard`, `Hot Movers` y `Noticias de mercado` ahora tienen superficies mas diferenciadas.
+- Decisiones tomadas:
+  - no usar el lima brillante como color estructural;
+  - reservar el turquesa como acento tecnico y de separacion visual.
+- Pendientes:
+  - validacion manual de contraste en la barra superior;
+  - decidir si el siguiente paso es otra pasada visual fina o preparar publicacion.
+- Siguiente paso sugerido:
+  - refrescar la home, revisar contraste y separacion de bloques, y luego avanzar con la guia de despliegue publico.
+
+## 2026-03-26 14:55:00 -03:00
+- Accion: preparacion de guia de publicacion publica y ajuste de auth para deploy.
+- Archivos afectados:
+  - `rendimientos-ar/netlify/functions/auth-config.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio avanzar hacia una publicacion real de la app, con link compartible y explicacion paso a paso.
+- Resultado:
+  - `auth-config.js` ahora tolera mejor origenes `localhost` y dominios `.netlify.app`, ademas de los dominios BDI;
+  - `README.md` incorpora una guia simple de deploy con Netlify;
+  - queda documentado que la opcion recomendada es publicar primero en Netlify y despues decidir dominio propio.
+- Decisiones tomadas:
+  - priorizar Netlify porque el proyecto ya trae `netlify.toml` y funciones serverless preparadas para ese flujo;
+  - separar la publicacion publica del eventual trabajo posterior sobre dominio propio y Supabase.
+- Pendientes:
+  - crear repo GitHub propio si aun no existe;
+  - hacer el primer deploy real en Netlify;
+  - cargar variables de entorno si se quiere conservar `Mi cartera`.
+- Siguiente paso sugerido:
+  - explicarle al usuario como crear el repo en GitHub y conectar Netlify sin asumir conocimiento tecnico.
+
+## 2026-03-26 15:04:00 -03:00
+- Accion: reemplazo del icono de pestaña/app por isotipo BDI.
+- Archivos afectados:
+  - `rendimientos-ar/public/icons/icon-192.png`
+  - `rendimientos-ar/public/icons/icon-512.png`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio dejar de usar el icono heredado de la app base y reemplazarlo por marca BDI visible en la pestaña del navegador y manifest.
+- Resultado:
+  - los iconos que consumen `index.html` y `manifest.json` ahora usan una version redimensionada del isotipo BDI;
+  - no hizo falta cambiar rutas porque la app ya apuntaba a esos mismos archivos.
+- Pendientes:
+  - validar visualmente el nuevo icono en Chrome;
+  - si el navegador sigue mostrando el anterior, limpiar cache o reabrir pestaña.
+- Siguiente paso sugerido:
+  - refrescar la app, comprobar el nuevo icono y luego avanzar con GitHub + Netlify paso a paso.
+
+## 2026-03-26 15:11:00 -03:00
+- Accion: ajuste del footer institucional y credito de autoria.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio explicitar `BDI Consultora, elaborado por Tomás Rodríguez` antes de publicar la app.
+- Resultado:
+  - el footer ahora deja visible la autoria;
+  - las fuentes quedan resumidas como `Fuentes consultadas`, manteniendo transparencia sobre el origen de los datos.
+- Pendientes:
+  - validacion visual del footer actualizado;
+  - luego continuar con GitHub + Netlify.
+- Siguiente paso sugerido:
+  - refrescar la app, confirmar el nuevo footer y seguir con la publicacion del repo en GitHub.
+
+## 2026-03-26 15:18:00 -03:00
+- Accion: regeneracion del favicon con recorte mas cerrado.
+- Archivos afectados:
+  - `rendimientos-ar/public/icons/icon-192.png`
+  - `rendimientos-ar/public/icons/icon-512.png`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario detecto que el isotipo BDI se veia demasiado chico en la pestaña del navegador.
+- Resultado:
+  - se recalcularon los limites utiles del PNG original;
+  - los iconos fueron regenerados con menos margen transparente y mas presencia visual.
+- Pendientes:
+  - validar en Chrome si el icono ya se percibe mas grande;
+  - si siguiera muy chico, considerar una version simplificada del isotipo solo para favicon.
+- Siguiente paso sugerido:
+  - cerrar y reabrir la pestaña o limpiar cache del icono, y luego continuar con GitHub + Netlify.

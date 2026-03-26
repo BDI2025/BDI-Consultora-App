@@ -714,7 +714,7 @@ async function loadPlazoFijo() {
     });
 
     // Source note
-    const source = document.querySelector('.section-source');
+    const source = document.getElementById('plazofijo-source');
     if (source) source.textContent = 'Fuente: ArgentinaDatos. Tasas publicadas por banco.';
 
     // Render plazo fijo chart
@@ -2439,9 +2439,9 @@ function renderONsTable(container, items) {
     const tirColor = item.ytm >= 0 ? 'var(--green)' : 'var(--red)';
     html += `<tr class="on-row" data-symbol="${item.symbol}" style="cursor:pointer">
       <td><strong style="color:var(--accent)">${item.d912Ticker}</strong></td>
-      <td style="font-size:0.8rem;color:var(--text-secondary)">${item.nombre || ''}</td>
-      <td style="font-family:var(--font-mono);text-align:right">$${item.priceUSD.toFixed(2)}</td>
-      <td class="col-duration" style="font-family:var(--font-mono);text-align:right">${item.duration.toFixed(2)}</td>
+      <td style="color:var(--text-secondary)">${item.nombre || ''}</td>
+      <td style="text-align:right">$${item.priceUSD.toFixed(2)}</td>
+      <td class="col-duration" style="text-align:right">${item.duration.toFixed(2)}</td>
       <td class="col-vto">${item.vencimiento}</td>
       <td class="lecap-tir" style="text-align:right">${item.ytm.toFixed(2)}%</td></tr>`;
   }

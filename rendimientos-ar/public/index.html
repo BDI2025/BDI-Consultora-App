@@ -174,13 +174,14 @@
     <div id="tab-billeteras" role="tabpanel" aria-labelledby="tab-billeteras-tab" style="display:none">
       <section class="section" id="billeteras-fondos">
         <h2>Liquidez en pesos</h2>
-        <p class="section-desc">Cuentas remuneradas y fondos de liquidez para ordenar caja y alternativas de corto plazo</p>
+        <p class="section-desc">Cuentas remuneradas y fondos de liquidez para ordenar caja, comparar TNA y priorizar disponibilidad inmediata.</p>
         <div class="card-list" id="main-list"></div>
+        <p class="section-source" id="liquidez-source">Fuente: cuentas y billeteras relevadas en configuracion interna; FCIs via ArgentinaDatos.</p>
       </section>
 
       <section class="section" id="chart-section">
-        <h2>Comparacion de rendimientos</h2>
-        <p class="section-desc">TNA de billeteras y fondos de liquidez ordenados por rendimiento</p>
+        <h2>Mapa de tasas</h2>
+        <p class="section-desc">Lectura visual de TNA para alternativas de liquidez en pesos, ordenadas por rendimiento nominal.</p>
         <div class="chart-wrapper" id="rendimientos-chart"></div>
       </section>
 
@@ -196,7 +197,7 @@
         <h2>Plazo fijo</h2>
         <p class="section-desc">TNA para plazo fijo de $100.000 a 30 días. Fuente de referencia: BCRA</p>
         <div class="card-list" id="plazofijo-list"></div>
-        <p class="section-source"></p>
+        <p class="section-source" id="plazofijo-source"></p>
       </section>
       <section class="section" id="pf-chart-section">
         <h2>Comparacion de tasas</h2>
@@ -207,10 +208,14 @@
 
     <div id="tab-lecaps" role="tabpanel" aria-labelledby="tab-lecaps-tab" style="display:none">
       <section class="section" id="lecaps-section">
+        <h2>Renta fija ARS</h2>
+        <p class="section-desc">LECAPs y BONCAPs para seguir precio, vencimiento, duration aproximada y TIR en pesos.</p>
         <div id="lecaps-list"></div>
         <p class="section-source" id="lecaps-source"></p>
       </section>
       <section class="section" id="lecaps-chart-section">
+        <h2>Curva de pesos</h2>
+        <p class="section-desc">Duration aproximada y TIR de instrumentos capitalizables en pesos para una lectura rapida de la curva.</p>
         <div class="scatter-plot">
           <canvas id="lecaps-scatter"></canvas>
         </div>
@@ -219,10 +224,14 @@
 
     <div id="tab-soberanos" style="display:none">
       <section class="section" id="soberanos-section">
+        <h2>Soberanos USD</h2>
+        <p class="section-desc">Bonos soberanos hard dollar con lectura por ley, duration y rendimiento estimado.</p>
         <div id="soberanos-list"></div>
         <p class="section-source" id="soberanos-source"></p>
       </section>
       <section class="section" id="soberanos-chart-section">
+        <h2>Curva soberana</h2>
+        <p class="section-desc">Comparacion visual entre ley local y ley NY para seguir forma de curva y rendimiento relativo.</p>
         <div class="scatter-plot">
           <canvas id="soberanos-scatter"></canvas>
         </div>
@@ -231,10 +240,14 @@
 
     <div id="tab-cer" role="tabpanel" aria-labelledby="tab-cer-tab" style="display:none">
       <section class="section" id="cer-section">
+        <h2>Bonos CER</h2>
+        <p class="section-desc">Instrumentos ajustados por inflacion para seguir TIR real, duration y referencias de cobertura.</p>
         <div id="cer-list"></div>
         <p class="section-source" id="cer-source"></p>
       </section>
       <section class="section" id="cer-chart-section">
+        <h2>Curva CER</h2>
+        <p class="section-desc">Lectura visual de duration y TIR real para la familia CER sobre ultima cotizacion disponible.</p>
         <div class="scatter-plot">
           <canvas id="cer-scatter"></canvas>
         </div>
@@ -243,10 +256,14 @@
 
     <div id="tab-ons" role="tabpanel" aria-labelledby="tab-ons-tab" style="display:none">
       <section class="section" id="ons-section">
+        <h2>Corporativos en USD</h2>
+        <p class="section-desc">Obligaciones negociables para comparar emisores, duration y rendimiento en dolares.</p>
         <div id="ons-list"></div>
         <p class="section-source" id="ons-source"></p>
       </section>
       <section class="section" id="ons-chart-section">
+        <h2>Curva corporativa</h2>
+        <p class="section-desc">Curva de ONs preferidas con foco en duration y TIR sobre ultima cotizacion.</p>
         <div class="scatter-plot">
           <canvas id="ons-scatter"></canvas>
         </div>
@@ -292,8 +309,8 @@
   </main>
 
   <footer class="footer">
-    <p>BDI Consultora. Seguimiento de mercado, liquidez y renta fija para Argentina.</p>
-    <p>Fuentes: CAFCI, ArgentinaDatos, BCRA, data912, Yahoo Finance y Google News.</p>
+    <p>BDI Consultora, elaborado por Tomás Rodríguez.</p>
+    <p>Fuentes consultadas: CAFCI, ArgentinaDatos, BCRA, data912, Yahoo Finance y Google News.</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
