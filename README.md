@@ -1,6 +1,6 @@
 # BDI App Cocos
 
-## Objetivo General
+## Objetivo General2
 Transformar la aplicación base `rendimientos-ar` en un producto propio de BDI Consultora, preservando las funcionalidades valiosas y redefiniendo identidad visual, experiencia, arquitectura de presentación, organización de la información, textos y branding.
 
 ## Objetivos Específicos
