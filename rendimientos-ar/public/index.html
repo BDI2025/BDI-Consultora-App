@@ -56,11 +56,24 @@
         <a href="#" class="currency-tab" id="header-ons">
           <span class="flag">USD</span> Corporativos
         </a>
+        <a href="#" class="currency-tab" id="header-optimizer">
+          <span class="flag">BDI</span> Optimizer
+        </a>
+        <a href="#" class="currency-tab" id="header-heatmap">
+          <span class="flag">USA</span> Heatmap
+        </a>
+        <a href="#" class="currency-tab" id="header-compound">
+          <span class="flag">BDI</span> Interés compuesto
+        </a>
         <a href="#" class="currency-tab" id="header-portfolio">
           <span class="flag">BDI</span> Mi cartera
         </a>
       </nav>
       <div class="auth-area" id="auth-area">
+        <div class="language-toggle" id="language-toggle" aria-label="Language toggle">
+          <button class="language-btn active" id="lang-es" type="button">ES</button>
+          <button class="language-btn" id="lang-en" type="button">EN</button>
+        </div>
         <div class="auth-user" id="auth-user" style="display:none">
           <img class="auth-avatar" id="auth-avatar" src="" alt="" referrerpolicy="no-referrer">
           <button class="auth-logout-btn" id="auth-logout-btn" title="Cerrar sesión">Salir</button>
@@ -80,8 +93,7 @@
 
   <nav class="subnav" style="display:none">
     <div class="subnav-inner" role="tablist" aria-label="Tipo de inversión">
-      <a href="#" class="subnav-tab active" data-tab="billeteras" role="tab" id="tab-billeteras-tab" aria-selected="true" aria-controls="tab-billeteras">Liquidez</a>
-      <a href="#" class="subnav-tab" data-tab="plazofijo" role="tab" id="tab-plazofijo-tab" aria-selected="false" aria-controls="tab-plazofijo">Plazo fijo</a>
+      <a href="#" class="subnav-tab active" data-tab="plazofijo" role="tab" id="tab-plazofijo-tab" aria-selected="true" aria-controls="tab-plazofijo">Plazo fijo</a>
       <a href="#" class="subnav-tab" data-tab="lecaps" role="tab" id="tab-lecaps-tab" aria-selected="false" aria-controls="tab-lecaps">Renta fija ARS</a>
       <a href="#" class="subnav-tab" data-tab="cer" role="tab" id="tab-cer-tab" aria-selected="false" aria-controls="tab-cer">Bonos CER</a>
     </div>
@@ -124,8 +136,8 @@
         <div class="shortcut-grid">
           <a class="shortcut-card" href="#ars">
             <span class="shortcut-label">Liquidez</span>
-            <strong>Cuentas remuneradas y fondos</strong>
-            <p>Alternativas de corto plazo para ordenar caja en pesos.</p>
+            <strong>Plazo fijo</strong>
+            <p>Tasas bancarias para una lectura rápida de liquidez en pesos.</p>
           </a>
           <a class="shortcut-card" href="#lecaps">
             <span class="shortcut-label">Renta fija ARS</span>
@@ -168,27 +180,6 @@
           </div>
         </div>
         <div class="news-grid" id="news-grid"></div>
-      </section>
-    </div>
-
-    <div id="tab-billeteras" role="tabpanel" aria-labelledby="tab-billeteras-tab" style="display:none">
-      <section class="section" id="billeteras-fondos">
-        <h2>Liquidez en pesos</h2>
-        <p class="section-desc">Cuentas remuneradas y fondos de liquidez para ordenar caja, comparar TNA y priorizar disponibilidad inmediata.</p>
-        <div class="card-list" id="main-list"></div>
-        <p class="section-source" id="liquidez-source">Fuente: cuentas y billeteras relevadas en configuracion interna; FCIs via ArgentinaDatos.</p>
-      </section>
-
-      <section class="section" id="chart-section">
-        <h2>Mapa de tasas</h2>
-        <p class="section-desc">Lectura visual de TNA para alternativas de liquidez en pesos, ordenadas por rendimiento nominal.</p>
-        <div class="chart-wrapper" id="rendimientos-chart"></div>
-      </section>
-
-      <section class="section" id="especiales">
-        <h2>Condiciones especiales</h2>
-        <p class="section-desc">Productos con requisitos o condiciones particulares para acceder</p>
-        <div class="card-list" id="especiales-list"></div>
       </section>
     </div>
 
@@ -270,6 +261,117 @@
       </section>
     </div>
 
+    <div id="tab-optimizer" style="display:none">
+      <section class="section" id="optimizer-section">
+        <h2>Optimizador de carteras</h2>
+        <p class="section-desc">Modelo de Markowitz para comparar frontera eficiente, portfolio de maximo Sharpe, minima volatilidad y un retorno objetivo opcional.</p>
+        <div class="optimizer-layout">
+          <div class="optimizer-panel">
+            <div class="optimizer-form-grid">
+              <label class="optimizer-field">
+                <span>Tickers</span>
+                <textarea id="optimizer-tickers" rows="4" placeholder="AAPL, MSFT, GOOGL, SPY"></textarea>
+                <small>Separados por coma, hasta 50 tickers.</small>
+              </label>
+              <label class="optimizer-field">
+                <span>Años de historia</span>
+                <input id="optimizer-years" type="number" min="1" max="10" step="1" value="5">
+              </label>
+              <label class="optimizer-field">
+                <span>Tasa libre de riesgo anual (%)</span>
+                <input id="optimizer-rf" type="number" step="0.1" value="2">
+              </label>
+              <label class="optimizer-field">
+                <span>Retorno objetivo anual (%)</span>
+                <input id="optimizer-target" type="number" step="0.1" placeholder="Opcional">
+              </label>
+              <label class="optimizer-field">
+                <span>Peso mínimo por activo (%)</span>
+                <input id="optimizer-min-weight" type="number" min="0" max="100" step="0.1" value="0">
+              </label>
+            </div>
+            <div class="optimizer-actions">
+              <button class="portfolio-add-btn" id="optimizer-run-btn" type="button">Calcular optimización</button>
+              <p class="section-source" id="optimizer-status">Fuente: Yahoo Finance via API interna para históricos ajustados.</p>
+            </div>
+          </div>
+          <div class="optimizer-summary-grid" id="optimizer-summary"></div>
+        </div>
+      </section>
+
+      <section class="section" id="optimizer-frontier-section">
+        <h2>Espacio de portfolios</h2>
+        <p class="section-desc">Mapa riesgo-retorno con portfolios aleatorios, frontera eficiente y cartera de mercado implícita.</p>
+        <div class="optimizer-empty-state" id="optimizer-frontier-empty">Corré una optimización para ver el mapa riesgo-retorno.</div>
+        <div class="scatter-plot optimizer-chart" id="optimizer-frontier-chart-wrap" style="display:none">
+          <div id="optimizer-frontier-chart"></div>
+        </div>
+      </section>
+
+      <section class="section" id="optimizer-weights-section" style="display:none">
+        <h2>Pesos óptimos</h2>
+        <p class="section-desc">Comparación de asignaciones para maximo Sharpe, minima volatilidad y retorno objetivo.</p>
+        <div id="optimizer-weights"></div>
+      </section>
+
+      <section class="section" id="optimizer-performance-section">
+        <h2>Rendimientos acumulados</h2>
+        <p class="section-desc">Evolución histórica acumulada de activos y portfolios optimizados.</p>
+        <div class="optimizer-empty-state" id="optimizer-performance-empty">Corré una optimización para ver la evolución acumulada de activos y portfolios.</div>
+        <div class="optimizer-two-col" id="optimizer-performance-grid" style="display:none">
+          <div class="chart-wrapper optimizer-chart" id="optimizer-assets-chart-wrap">
+            <div id="optimizer-assets-chart"></div>
+          </div>
+          <div class="chart-wrapper optimizer-chart" id="optimizer-portfolios-chart-wrap">
+            <div id="optimizer-portfolios-chart"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="optimizer-analytics-section" style="display:none">
+        <h2>Matriz y CAGR</h2>
+        <p class="section-desc">Lectura de correlación y CAGR anual para activos y portfolios resultantes.</p>
+        <div class="optimizer-two-col">
+          <div>
+            <div id="optimizer-cagr"></div>
+          </div>
+          <div>
+            <div id="optimizer-correlation"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="tab-heatmap" style="display:none">
+      <section class="section" id="heatmap-section">
+        <h2>Heatmap USA</h2>
+        <p class="section-desc">Mapa de mercado estilo Finviz con large caps de Estados Unidos, color por variación del período seleccionado y tamaño por market cap.</p>
+        <div class="heatmap-toolbar">
+          <p class="section-source" id="heatmap-status">Cargando heatmap...</p>
+          <div class="heatmap-controls">
+            <label class="heatmap-control" for="heatmap-start-date">
+              <span id="heatmap-start-label">Inicio</span>
+              <input type="date" id="heatmap-start-date">
+            </label>
+            <label class="heatmap-control" for="heatmap-end-date">
+              <span id="heatmap-end-label">Fin</span>
+              <input type="date" id="heatmap-end-date">
+            </label>
+            <button class="portfolio-add-btn portfolio-add-btn-secondary" id="heatmap-now-btn" type="button">Hasta hoy</button>
+            <button class="portfolio-add-btn" id="heatmap-refresh-btn" type="button">Aplicar</button>
+          </div>
+        </div>
+        <p class="section-source heatmap-period-hint" id="heatmap-period-hint">Dejá la fecha final vacía para comparar desde el inicio hasta ahora.</p>
+        <div class="heatmap-shell">
+          <div class="heatmap-chart-wrap" id="heatmap-chart-wrap">
+            <div class="optimizer-empty-state" id="heatmap-empty">Cargando universo de acciones...</div>
+            <div id="heatmap-chart"></div>
+          </div>
+        </div>
+        <p class="section-source" id="heatmap-source"></p>
+      </section>
+    </div>
+
     <div id="tab-portfolio" style="display:none">
       <div id="portfolio-login-prompt" class="section" style="text-align:center;padding:60px 20px">
         <div class="portfolio-lockup" aria-hidden="true">BDI</div>
@@ -306,6 +408,102 @@
         </section>
       </div>
     </div>
+
+    <div id="tab-compound" style="display:none">
+      <section class="section" id="compound-section">
+        <h2>Calculadora de interés compuesto</h2>
+        <p class="section-desc">Proyectá capital, aportes y crecimiento compuesto para comparar el valor invertido contra una trayectoria sin inversión.</p>
+        <div class="compound-layout">
+          <div class="compound-panel">
+            <div class="compound-step-grid">
+              <article class="compound-step-card">
+                <span class="compound-step-kicker">Paso 1</span>
+                <h3>Inversión inicial</h3>
+                <p class="compound-step-copy">Monto de dinero que tiene disponible para invertir inicialmente.</p>
+                <label class="optimizer-field">
+                  <span>Inversión inicial</span>
+                  <input id="compound-initial" type="number" min="0" step="1000" value="1000000">
+                </label>
+              </article>
+
+              <article class="compound-step-card">
+                <span class="compound-step-kicker">Paso 2</span>
+                <h3>Contribución</h3>
+                <p class="compound-step-copy">Monto que tiene previsto agregar al capital cada mes, o un número negativo para el monto que tiene previsto extraer cada mes.</p>
+                <label class="optimizer-field">
+                  <span>Contribución mensual</span>
+                  <input id="compound-contribution" type="number" step="1000" value="100000">
+                </label>
+                <label class="optimizer-field">
+                  <span>Cantidad de tiempo en años</span>
+                  <input id="compound-years" type="number" min="1" max="60" step="1" value="10">
+                </label>
+              </article>
+
+              <article class="compound-step-card">
+                <span class="compound-step-kicker">Paso 3</span>
+                <h3>Tasa de interés</h3>
+                <p class="compound-step-copy">Definí la tasa anual estimada y el rango de varianza para evaluar escenarios alrededor del caso base.</p>
+                <label class="optimizer-field">
+                  <span>Tasa de interés estimada (%)</span>
+                  <input id="compound-rate" type="number" step="0.1" value="12">
+                </label>
+                <label class="optimizer-field">
+                  <span>Rango de varianza de las tasas (%)</span>
+                  <input id="compound-variance" type="number" min="0" step="0.1" value="3">
+                </label>
+              </article>
+
+              <article class="compound-step-card">
+                <span class="compound-step-kicker">Paso 4</span>
+                <h3>Capitalización</h3>
+                <p class="compound-step-copy">Cantidad de veces por año que se capitalizará el interés.</p>
+                <label class="optimizer-field">
+                  <span>Frecuencia de capitalización</span>
+                  <select id="compound-frequency">
+                    <option value="1">Anual</option>
+                    <option value="2">Semestral</option>
+                    <option value="4">Trimestral</option>
+                    <option value="12" selected>Mensual</option>
+                    <option value="24">Quincenal</option>
+                    <option value="52">Semanal</option>
+                    <option value="365">Diaria</option>
+                  </select>
+                </label>
+              </article>
+            </div>
+
+            <div class="optimizer-actions compound-actions">
+              <button class="portfolio-add-btn" id="compound-run-btn" type="button">Calcular escenario</button>
+              <p class="section-source" id="compound-status">Ingresá los supuestos y corré la simulación para comparar escenarios.</p>
+            </div>
+          </div>
+
+          <div class="compound-summary-grid" id="compound-summary">
+            <article class="optimizer-summary-card compound-summary-placeholder">
+              <div class="label">Vista previa</div>
+              <div class="value">Sin correr</div>
+              <div class="meta">La comparación final se mostrará acá.</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="compound-chart-section">
+        <h2>Comparación de trayectorias</h2>
+        <p class="section-desc">Evolución del capital sin invertir versus escenarios con interés compuesto a lo largo del tiempo.</p>
+        <div class="optimizer-empty-state" id="compound-chart-empty">Corré la calculadora para ver el gráfico comparativo.</div>
+        <div class="scatter-plot optimizer-chart" id="compound-chart-wrap" style="display:none">
+          <div id="compound-chart"></div>
+        </div>
+      </section>
+
+      <section class="section" id="compound-breakdown-section" style="display:none">
+        <h2>Desglose final</h2>
+        <p class="section-desc">Comparación de aporte total, capital final, interés ganado y sensibilidad por tasa.</p>
+        <div id="compound-breakdown"></div>
+      </section>
+    </div>
   </main>
 
   <footer class="footer">
@@ -315,6 +513,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/bdi-ons-data.js"></script>
   <script src="/app.js"></script>
   <script src="/bdi-charts.js"></script>
   <script src="/bdi-overrides.js"></script>

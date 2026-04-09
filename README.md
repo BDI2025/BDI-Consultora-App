@@ -83,6 +83,10 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 - Bonos CER.
 - Soberanos USD.
 - ONs corporativas.
+- Herramientas de análisis propias de BDI:
+  - optimizador de carteras;
+  - heatmap de mercado tipo Finviz para large caps de Estados Unidos;
+  - calculadora de interés compuesto.
 
 ### Qué Reordenar
 - La navegación principal.
@@ -117,6 +121,13 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 - `Corporativos`
   - ONs en USD;
   - comparador institucional con filtros por emisor, duration y rendimiento.
+- `Interés compuesto`
+  - simulador de capital inicial, aportes, tasa y frecuencia de capitalización;
+  - comparación entre trayectoria sin invertir y escenarios con inversión compuesta.
+- `Heatmap USA`
+  - mapa sectorial tipo Finviz con acciones large cap de Estados Unidos;
+  - tamaño relativo por market cap y color por variación diaria.
+  - proveedor preparado para migrar de Yahoo fallback a Polygon mediante `POLYGON_API_KEY`.
 - `Mi cartera` o `Portfolio`
   - sólo si se decide preservar el módulo autenticado en la primera versión BDI.
 
@@ -217,7 +228,16 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 ## Próximo Paso Operativo En Git
 1. Abrir `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` en GitHub Desktop.
 2. Verificar que aparezcan como cambios:
-   - `AGENTS.md`
+  - `AGENTS.md`
+
+## Estado De Datos Del Heatmap
+- Fuente actual por default:
+  - `Yahoo Finance` para precio y variación diaria;
+  - escala curada de market cap para el tamaño relativo.
+- Migración preparada:
+  - si existe la variable de entorno `POLYGON_API_KEY`, el backend del heatmap prioriza `Polygon`;
+  - en ese modo, el endpoint intenta usar snapshots y referencia corporativa de Polygon para mejorar realismo en precio, variación diaria y market cap;
+  - si Polygon no está configurado o falla, el sistema vuelve automáticamente al fallback de Yahoo para no romper la visualización.
    - `LOG.md`
    - `README.md`
    - `Estilo visual BDI/`
@@ -492,6 +512,7 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
   - tipografias `IBM Plex Sans` y `IBM Plex Mono`;
   - `auth-config.js` actualizado para contemplar dominios BDI;
   - `rendimientos-ar/public/bdi-overrides.js` agregado para sostener copy y rotulos BDI sin reescribir todavia todo `app.js`.
+  - `rendimientos-ar/public/bdi-ons-data.js` agregado como capa de datos propia para el monitor institucional de ONs BDI.
   - monitor global agrupado por categorias (`Indices`, `Tasas`, `Energia`, `Metales`, `Agro`, `Crypto`, `FX`);
   - cards de `Mundo` con sparkline intradiaria, variacion diaria y unidad visible;
   - nueva seccion `Noticias de mercado` para finanzas y mercado de capitales;
@@ -512,6 +533,18 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
   - iconos de app y favicon reemplazados por el isotipo BDI en `public/icons/icon-192.png` y `public/icons/icon-512.png`.
   - iconos regenerados con recorte mas cerrado para que el isotipo se perciba mas grande en la pestaña del navegador.
   - footer institucional actualizado a `BDI Consultora, elaborado por Tomás Rodríguez` con fuentes resumidas.
+  - seccion `Corporativos` rearmada sobre una seleccion BDI de ONs para mostrar:
+    - precio en USD;
+    - precio en ARS cuando existe punta local;
+    - TC implicito;
+    - paridad;
+    - TIR USD;
+    - TIR ARS;
+    - duration;
+    - proximo pago;
+    - ficha tecnica y descripcion del emisor en modal.
+  - seccion `Liquidez` ampliada para mostrar `Duration mod.` en los FCIs cuando la ficha de CAFCI expone ese dato.
+  - toggle de idioma `ES / EN` agregado en el header para recargar la interfaz en ingles cuando el usuario lo necesite.
 
 ### Riesgo Tecnico Vigente
 - `rendimientos-ar/public/app.js` sigue siendo el archivo mas fragil por tamano, acoplamiento y problemas de encoding.
@@ -801,3 +834,43 @@ Cuando el servidor arranque, abri:
 - `ArgentinaDatos`: razonablemente confiable para datos publicos, pero hay que vigilar cambios de esquema o disponibilidad.
 - `data912`: hoy es critica para renta fija; si falla, impacta fuerte en LECAPs, CER, soberanos y ONs.
 - `config.json`: es clave porque contiene parte del “cerebro” del producto; si queda desactualizado, aunque la API viva responda, los calculos pueden quedar mal.
+## Estado Actual Del Heatmap USA
+- El modulo `Heatmap USA` ya puede trabajar con un esquema hibrido para mejorar realismo sin romper la app actual.
+- Si existe `POLYGON_API_KEY`:
+  - `Polygon` se usa para market cap y metadata corporativa de referencia.
+  - `Yahoo Finance` se mantiene para precio y variacion diaria cuando la cuenta de Polygon no tiene entitlement para snapshots de mercado.
+- Si `POLYGON_API_KEY` no existe o falla:
+  - el backend vuelve automaticamente a un fallback de `Yahoo Finance` enriquecido con `batch quote`.
+- El fallback de Yahoo ahora aprovecha mejor:
+  - `market cap`,
+  - `precio`,
+  - `variacion diaria`,
+  - `nombre corto / largo`,
+  en lugar de depender tanto de una escala curada fija.
+- El universo del heatmap tambien fue ampliado para cubrir una porcion bastante mayor del universo large-cap de Estados Unidos, con mas profundidad en tecnologia, consumo, salud, finanzas, industriales, energia, real estate y utilities.
+- El heatmap ahora tambien puede colorearse por periodo personalizado:
+  - fecha inicial + fecha final;
+  - o fecha inicial hasta el momento actual si la fecha final queda vacia.
+- Esto mejora hoy mismo el tamano relativo y la precision de los labels, aun antes de contratar un plan con snapshots completos.
+## Optimizador De Carteras
+- Se agrego una nueva solapa principal de `Optimizador` dentro de la app.
+- El modulo reutiliza `/api/mundo` para descargar historicos diarios de Yahoo Finance por ticker y periodo (`1y` a `10y`).
+- Inputs disponibles:
+  - tickers separados por coma;
+  - anios de historia;
+  - tasa libre de riesgo;
+  - retorno objetivo opcional;
+  - peso minimo por activo.
+- Salidas actuales:
+  - espacio riesgo-retorno con portfolios aleatorios y frontera eficiente aproximada;
+  - cartera de maximo Sharpe;
+  - cartera de minima volatilidad;
+  - cartera cercana a retorno objetivo si se informa;
+  - tabla de pesos;
+  - series acumuladas por activo y por portfolio;
+  - tabla de CAGR;
+  - matriz de correlacion.
+- Implementacion:
+  - el motor fue adaptado a `JavaScript`/frontend para mantener compatibilidad con la arquitectura actual de `Netlify + Node + HTML/CSS/JS`;
+  - no depende de `Python`, `scipy` ni `matplotlib` en runtime del sitio;
+  - la optimizacion usa muestreo aleatorio sobre el simplex y una frontera eficiente aproximada a partir del universo simulado.

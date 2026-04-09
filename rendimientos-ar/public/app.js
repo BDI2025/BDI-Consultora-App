@@ -2,6 +2,483 @@
 let supabaseClient = null;
 let currentUser = null;
 let _portfolioConfig = null; // cached config for portfolio use
+const LANGUAGE_STORAGE_KEY = 'bdi-language';
+let currentLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'es';
+
+const UI_TEXT = {
+  es: {
+    loading_yields: 'Cargando rendimientos...',
+    no_data: 'No se pudieron cargar los datos.',
+    loading_rates: 'Cargando tasas...',
+    rates_error: 'Error al cargar datos de plazos fijos.',
+    hot_movers_loading: 'Cargando movers...',
+    hot_movers_empty: 'Sin datos de movers disponibles.',
+    hot_movers_error: 'Error al cargar movers.',
+    official_dollar: 'Dólar Oficial',
+    ccl_dollar: 'Contado con Liqui',
+    mep_dollar: 'Dólar MEP',
+    country_risk: 'Riesgo País',
+    ars_hero_title: 'Liquidez en pesos',
+    ars_hero_desc: 'Compará rendimientos actualizados de billeteras y fondos de liquidez en Argentina.',
+    time_deposit_title: 'Plazo fijo',
+    time_deposit_desc: 'Compará tasas de plazo fijo de bancos argentinos. Datos provistos por el BCRA.',
+    lecaps_title: 'LECAPs y BONCAPs',
+    lecaps_hero_desc: 'Rendimiento implícito de letras y bonos capitalizables del Tesoro según precio de mercado.',
+    cer_title: 'Bonos CER',
+    cer_hero_desc: 'Instrumentos ajustados por inflación para analizar cobertura, duration y rendimiento real.',
+    ons_title: 'Corporativos en USD',
+    ons_hero_desc: 'Rendimiento de bonos corporativos en USD. Hacé click en cualquier ON para abrir la calculadora.',
+    world_error: 'Error al cargar datos globales.',
+    world_detail_loading: 'Cargando...',
+    world_detail_error: 'Error al cargar datos.',
+    lecaps_error: 'Error al cargar datos de LECAPs.',
+    lecaps_calc_hint: 'Click en cualquier LECAP para abrir la calculadora',
+    settlement_note: 'Liquidación T+1: {date}. Los días al vencimiento se calculan desde la fecha de liquidación.',
+    live_prices_source: 'Fuente: data912 para precios live + config interna para flujos y vencimientos.',
+    no_live_prices_source: 'Fuente: config interna. No se pudieron traer precios live de data912.',
+    lecap_col_price: 'Precio',
+    lecap_col_final_payment: 'Pago Final',
+    lecap_col_days: 'Días',
+    lecap_col_maturity: 'Vencimiento',
+    lecap_curve_label: 'Curva',
+    lecap_label: 'LECAP',
+    boncap_label: 'BONCAP',
+    lecap_tooltip: '{ticker}: TIR {tir}% - {days} días',
+    lecap_x_title: 'Días al vencimiento',
+    lecap_y_title: 'TIR (%)',
+    cer_loading: 'Cargando bonos CER...',
+    cer_empty: 'No se pudieron cargar los datos de bonos CER.',
+    cer_error: 'Error al cargar datos de bonos CER.',
+    cer_source: 'Fuente: BCRA para CER + data912 para precios + config interna para flujos.',
+    cer_calc_hint: 'Click en un bono para abrir la calculadora',
+    cer_note: 'TIR Real calculada con flujos ajustados por CER. Duration en años (Macaulay) y Duration Mod. = Duration / (1 + tasa).',
+    cer_col_price: 'PRECIO (AR$)',
+    cer_col_maturity: 'VENCIMIENTO',
+    cer_col_real_ytm: 'TIR REAL',
+    ons_loading: 'Cargando ONs...',
+    ons_empty: 'No hay cotizaciones disponibles para el monitor BDI de ONs.',
+    ons_source_short: 'Fuente: data912 para precios corporativos y /api/cotizaciones para MEP.',
+    ons_source_full: 'Fuente: data912 para precios corporativos, monitor BDI para cashflows técnicos y /api/cotizaciones para dólar MEP.',
+    ons_error: 'Error cargando ONs: {message}',
+    optimizer_empty_tickers: 'Ingresá al menos un ticker para correr la optimización.',
+    optimizer_invalid_min_weight: 'El peso mínimo es demasiado alto para la cantidad de activos seleccionados.',
+    optimizer_loading: 'Descargando históricos para {count} activos...',
+    optimizer_no_histories: 'No se encontraron históricos comparables para los tickers ingresados.',
+    optimizer_error: 'No se pudo correr el optimizador: {message}',
+    optimizer_source: 'Fuente: Yahoo Finance vía API interna. {assets} activos, {days} ruedas comparables, período {years}y.',
+    optimizer_summary_assets: 'Activos comparables',
+    optimizer_summary_max_sharpe: 'Máx Sharpe',
+    optimizer_summary_min_vol: 'Mín. volatilidad',
+    optimizer_summary_rf: 'Tasa libre de riesgo',
+    optimizer_summary_no_target: 'Sin retorno objetivo cargado',
+    optimizer_target: 'Objetivo {value}',
+    optimizer_weights_asset: 'Activo',
+    optimizer_frontier_title: 'Espacio de portfolios',
+    optimizer_frontier_desc: 'Mapa riesgo-retorno con portfolios aleatorios, frontera eficiente y cartera de mercado implícita.',
+    optimizer_frontier_empty: 'Corré una optimización para ver el mapa riesgo-retorno.',
+    optimizer_frontier_random: 'Portfolios aleatorios',
+    optimizer_frontier_line: 'Frontera eficiente',
+    optimizer_frontier_cml: 'CML',
+    optimizer_frontier_min_vol: 'Mín. Volatilidad',
+    optimizer_frontier_vol_axis: 'Volatilidad anual (%)',
+    optimizer_frontier_ret_axis: 'Rendimiento anual (%)',
+    optimizer_sharpe_ratio: 'Sharpe Ratio',
+    optimizer_assets_title: 'Activos',
+    optimizer_assets_subtitle: 'Top movers resaltados; resto del universo en segundo plano.',
+    optimizer_assets_rest: 'Resto del universo',
+    optimizer_portfolios_title: 'Portfolios óptimos',
+    optimizer_portfolios_subtitle: 'Comparación directa entre carteras optimizadas.',
+    optimizer_performance_empty: 'Corré una optimización para ver la evolución acumulada de activos y portfolios.',
+    optimizer_growth_axis: 'Crecimiento acumulado (%)',
+    optimizer_cagr_asset_portfolio: 'Activo / Portfolio',
+    optimizer_cagr_type: 'Tipo',
+    optimizer_cagr_annual: 'CAGR anual',
+    optimizer_type_asset: 'Activo',
+    optimizer_type_portfolio: 'Portfolio',
+    optimizer_corr_title: 'Matriz de correlación entre activos',
+    optimizer_ticker: 'Ticker',
+    optimizer_correlation: 'Correlación',
+    heatmap_title: 'Heatmap USA',
+    heatmap_hero_desc: 'Mapa sectorial estilo Finviz con large caps de Estados Unidos y lectura rápida por market cap y variación diaria.',
+    heatmap_loading: 'Cargando heatmap...',
+    heatmap_empty: 'No se pudieron cargar datos para el heatmap.',
+    heatmap_error: 'Error al cargar heatmap: {message}',
+    heatmap_refresh: 'Aplicar',
+    heatmap_start_label: 'Inicio',
+    heatmap_end_label: 'Fin',
+    heatmap_now: 'Hasta hoy',
+    heatmap_period_hint: 'Dejá la fecha final vacía para comparar desde el inicio hasta ahora.',
+    heatmap_source: 'Fuente: Yahoo Finance para precio y variación diaria. Tamaño relativo por market cap curado en esta primera versión BDI.',
+    heatmap_source_polygon: 'Fuente: Polygon para precio, variación diaria y referencia corporativa. Tamaño relativo usando market cap real cuando el proveedor lo devuelve.',
+    heatmap_source_polygon_reference: 'Fuente: Polygon para market cap y referencia corporativa, con precio y variación diaria desde Yahoo Finance. Mejora el realismo del tamaño relativo del mapa.',
+    heatmap_source_yahoo: 'Fuente: Yahoo Finance para precio y variación diaria. Tamaño relativo por market cap curado en esta primera versión BDI.',
+    heatmap_legend_negative: 'Caída',
+    heatmap_legend_flat: 'Neutral',
+    heatmap_legend_positive: 'Suba',
+    compound_title: 'Calculadora de interés compuesto',
+    compound_hero_desc: 'Simulá aportes, capitalización y sensibilidad de tasas para proyectar crecimiento del capital.',
+    compound_status_ready: 'Ingresá los supuestos y corré la simulación para comparar escenarios.',
+    compound_status_invalid: 'Revisá los valores ingresados. El plazo debe ser mayor a cero y la frecuencia de capitalización también.',
+    compound_chart_empty: 'Corré la calculadora para ver el gráfico comparativo.',
+    compound_chart_title: 'Comparación de trayectorias',
+    compound_chart_desc: 'Evolución del capital sin invertir versus escenarios con interés compuesto a lo largo del tiempo.',
+    compound_breakdown_title: 'Desglose final',
+    compound_breakdown_desc: 'Comparación de aporte total, capital final, interés ganado y sensibilidad por tasa.',
+    compound_summary_contributed: 'Capital aportado',
+    compound_summary_without: 'Sin invertir',
+    compound_summary_base: 'Escenario base',
+    compound_summary_range: 'Rango final',
+    compound_summary_interest: 'Interés ganado',
+    compound_low: 'Tasa baja',
+    compound_high: 'Tasa alta',
+    compound_base: 'Tasa base',
+    compound_table_scenario: 'Escenario',
+    compound_table_rate: 'Tasa anual',
+    compound_table_final: 'Capital final',
+    compound_table_interest: 'Interés ganado',
+    compound_table_vs_cash: 'Dif. vs sin invertir',
+    compound_axis_year: 'Años',
+    compound_axis_value: 'Valor acumulado',
+    compound_chart_cash: 'Sin invertir',
+    compound_chart_invested: 'Invertido',
+    compound_chart_band: 'Rango de tasas',
+    compound_frequency_label: 'Frecuencia de capitalización',
+    compound_frequency_1: 'Anual',
+    compound_frequency_2: 'Semestral',
+    compound_frequency_4: 'Trimestral',
+    compound_frequency_12: 'Mensual',
+    compound_frequency_24: 'Quincenal',
+    compound_frequency_52: 'Semanal',
+    compound_frequency_365: 'Diaria',
+    compound_step_1: 'Paso 1',
+    compound_step_2: 'Paso 2',
+    compound_step_3: 'Paso 3',
+    compound_step_4: 'Paso 4',
+    compound_step_1_title: 'Inversión inicial',
+    compound_step_2_title: 'Contribución',
+    compound_step_3_title: 'Tasa de interés',
+    compound_step_4_title: 'Capitalización',
+    compound_step_1_copy: 'Monto de dinero que tiene disponible para invertir inicialmente.',
+    compound_step_2_copy: 'Monto que tiene previsto agregar al capital cada mes, o un número negativo para el monto que tiene previsto extraer cada mes.',
+    compound_step_3_copy: 'Definí la tasa anual estimada y el rango de varianza para evaluar escenarios alrededor del caso base.',
+    compound_step_4_copy: 'Cantidad de veces por año que se capitalizará el interés.',
+    compound_initial_label: 'Inversión inicial',
+    compound_contribution_label: 'Contribución mensual',
+    compound_years_label: 'Cantidad de tiempo en años',
+    compound_rate_label: 'Tasa de interés estimada (%)',
+    compound_variance_label: 'Rango de varianza de las tasas (%)',
+    wallet: 'Billetera',
+    limit_prefix: 'Limite',
+    no_limit: 'Sin Limites',
+    assets: 'Patrimonio',
+    rate_label: 'TNA',
+    valid_since: 'TNA vigente desde el {date}',
+    between_dates: 'Entre {from} y {to}',
+    modified_duration: 'Duration mod.',
+    unavailable: 'n/d',
+    logout: 'Salir',
+  },
+  en: {
+    loading_yields: 'Loading yields...',
+    no_data: 'Data could not be loaded.',
+    wallet: 'Wallet',
+    limit_prefix: 'Limit',
+    no_limit: 'No limit',
+    assets: 'AUM',
+    rate_label: 'APR',
+    valid_since: 'APR effective since {date}',
+    between_dates: 'Between {from} and {to}',
+    modified_duration: 'Mod. duration',
+    unavailable: 'n/a',
+    logout: 'Sign out',
+    loading_rates: 'Loading rates...',
+    rates_error: 'Error loading time deposit data.',
+    hot_movers_loading: 'Loading movers...',
+    hot_movers_empty: 'No mover data available.',
+    hot_movers_error: 'Error loading movers.',
+    official_dollar: 'Official dollar',
+    ccl_dollar: 'Cash-settled with liquidation',
+    mep_dollar: 'MEP dollar',
+    country_risk: 'Country risk',
+    ars_hero_title: 'Peso liquidity',
+    ars_hero_desc: 'Compare updated yields from wallets and liquidity funds in Argentina.',
+    time_deposit_title: 'Time deposit',
+    time_deposit_desc: 'Compare time deposit rates from Argentine banks. Data provided by the BCRA.',
+    lecaps_title: 'LECAPs and BONCAPs',
+    lecaps_hero_desc: 'Implied yield on Treasury bills and capitalizing peso bonds based on market pricing.',
+    cer_title: 'CER bonds',
+    cer_hero_desc: 'Inflation-linked instruments to analyze hedge value, duration and real yield.',
+    ons_title: 'USD corporates',
+    ons_hero_desc: 'USD corporate bond yields. Click any bond to open the calculator.',
+    world_error: 'Error loading global data.',
+    world_detail_loading: 'Loading...',
+    world_detail_error: 'Error loading data.',
+    lecaps_error: 'Error loading LECAP data.',
+    lecaps_calc_hint: 'Click any LECAP to open the calculator',
+    settlement_note: 'T+1 settlement: {date}. Days to maturity are calculated from the settlement date.',
+    live_prices_source: 'Source: data912 live prices + internal config for cash flows and maturities.',
+    no_live_prices_source: 'Source: internal config. Live prices from data912 could not be retrieved.',
+    lecap_col_price: 'Price',
+    lecap_col_final_payment: 'Final payment',
+    lecap_col_days: 'Days',
+    lecap_col_maturity: 'Maturity',
+    lecap_curve_label: 'Curve',
+    lecap_label: 'LECAP',
+    boncap_label: 'BONCAP',
+    lecap_tooltip: '{ticker}: YTM {tir}% - {days} days',
+    lecap_x_title: 'Days to maturity',
+    lecap_y_title: 'YTM (%)',
+    cer_loading: 'Loading CER bonds...',
+    cer_empty: 'CER bond data could not be loaded.',
+    cer_error: 'Error loading CER bond data.',
+    cer_source: 'Source: BCRA for CER + data912 for prices + internal config for cash flows.',
+    cer_calc_hint: 'Click any bond to open the calculator',
+    cer_note: 'Real YTM is calculated using CER-adjusted cash flows. Duration is shown in years (Macaulay) and Mod. Duration = Duration / (1 + rate).',
+    cer_col_price: 'PRICE (ARS)',
+    cer_col_maturity: 'MATURITY',
+    cer_col_real_ytm: 'REAL YTM',
+    ons_loading: 'Loading corporate bonds...',
+    ons_empty: 'No quotes are available for the BDI corporate bond monitor.',
+    ons_source_short: 'Source: data912 for corporate prices and /api/cotizaciones for MEP.',
+    ons_source_full: 'Source: data912 for corporate prices, the BDI monitor for technical cash flows and /api/cotizaciones for MEP FX.',
+    ons_error: 'Error loading corporate bonds: {message}',
+    optimizer_empty_tickers: 'Enter at least one ticker to run the optimization.',
+    optimizer_invalid_min_weight: 'The minimum weight is too high for the selected number of assets.',
+    optimizer_loading: 'Downloading historical data for {count} assets...',
+    optimizer_no_histories: 'No comparable historical series were found for the selected tickers.',
+    optimizer_error: 'The optimizer could not be run: {message}',
+    optimizer_source: 'Source: Yahoo Finance via internal API. {assets} assets, {days} comparable trading days, period {years}y.',
+    optimizer_summary_assets: 'Comparable assets',
+    optimizer_summary_max_sharpe: 'Max Sharpe',
+    optimizer_summary_min_vol: 'Min volatility',
+    optimizer_summary_rf: 'Risk-free rate',
+    optimizer_summary_no_target: 'No target return loaded',
+    optimizer_target: 'Target {value}',
+    optimizer_weights_asset: 'Asset',
+    optimizer_frontier_title: 'Portfolio space',
+    optimizer_frontier_desc: 'Risk-return map with random portfolios, efficient frontier and implied market portfolio.',
+    optimizer_frontier_empty: 'Run an optimization to view the risk-return map.',
+    optimizer_frontier_random: 'Random portfolios',
+    optimizer_frontier_line: 'Efficient frontier',
+    optimizer_frontier_cml: 'CML',
+    optimizer_frontier_min_vol: 'Min volatility',
+    optimizer_frontier_vol_axis: 'Annual volatility (%)',
+    optimizer_frontier_ret_axis: 'Annual return (%)',
+    optimizer_sharpe_ratio: 'Sharpe Ratio',
+    optimizer_assets_title: 'Assets',
+    optimizer_assets_subtitle: 'Top movers highlighted; the rest of the universe is shown in the background.',
+    optimizer_assets_rest: 'Rest of universe',
+    optimizer_portfolios_title: 'Optimal portfolios',
+    optimizer_portfolios_subtitle: 'Direct comparison between optimized portfolios.',
+    optimizer_performance_empty: 'Run an optimization to view cumulative asset and portfolio performance.',
+    optimizer_growth_axis: 'Cumulative growth (%)',
+    optimizer_cagr_asset_portfolio: 'Asset / Portfolio',
+    optimizer_cagr_type: 'Type',
+    optimizer_cagr_annual: 'Annual CAGR',
+    optimizer_type_asset: 'Asset',
+    optimizer_type_portfolio: 'Portfolio',
+    optimizer_corr_title: 'Asset correlation matrix',
+    optimizer_ticker: 'Ticker',
+    optimizer_correlation: 'Correlation',
+    heatmap_title: 'USA heatmap',
+    heatmap_hero_desc: 'Finviz-style sector map with US large caps and a quick read by market cap and daily move.',
+    heatmap_loading: 'Loading heatmap...',
+    heatmap_empty: 'Heatmap data could not be loaded.',
+    heatmap_error: 'Error loading heatmap: {message}',
+    heatmap_refresh: 'Apply',
+    heatmap_start_label: 'Start',
+    heatmap_end_label: 'End',
+    heatmap_now: 'Through today',
+    heatmap_period_hint: 'Leave the end date empty to compare from the start date through now.',
+    heatmap_source: 'Source: Yahoo Finance for price and daily move. Relative size uses a curated market-cap scale in this first BDI version.',
+    heatmap_source_polygon: 'Source: Polygon for price, daily move and company reference data. Relative size uses real market cap when the provider returns it.',
+    heatmap_source_polygon_reference: 'Source: Polygon for market cap and company reference data, with price and daily move from Yahoo Finance. This improves the realism of relative block sizing.',
+    heatmap_source_yahoo: 'Source: Yahoo Finance for price and daily move. Relative size uses a curated market-cap scale in this first BDI version.',
+    heatmap_legend_negative: 'Down',
+    heatmap_legend_flat: 'Flat',
+    heatmap_legend_positive: 'Up',
+    compound_title: 'Compound interest calculator',
+    compound_hero_desc: 'Model contributions, compounding and rate sensitivity to project capital growth.',
+    compound_status_ready: 'Enter your assumptions and run the simulation to compare scenarios.',
+    compound_status_invalid: 'Please review the inputs. Time horizon and compounding frequency must be greater than zero.',
+    compound_chart_empty: 'Run the calculator to view the comparison chart.',
+    compound_chart_title: 'Trajectory comparison',
+    compound_chart_desc: 'Capital growth without investing versus compound-interest scenarios over time.',
+    compound_breakdown_title: 'Final breakdown',
+    compound_breakdown_desc: 'Comparison of total contributions, ending value, earned interest and rate sensitivity.',
+    compound_summary_contributed: 'Contributed capital',
+    compound_summary_without: 'Without investing',
+    compound_summary_base: 'Base scenario',
+    compound_summary_range: 'Ending range',
+    compound_summary_interest: 'Interest earned',
+    compound_low: 'Lower rate',
+    compound_high: 'Higher rate',
+    compound_base: 'Base rate',
+    compound_table_scenario: 'Scenario',
+    compound_table_rate: 'Annual rate',
+    compound_table_final: 'Ending value',
+    compound_table_interest: 'Interest earned',
+    compound_table_vs_cash: 'Diff. vs no investing',
+    compound_axis_year: 'Years',
+    compound_axis_value: 'Accumulated value',
+    compound_chart_cash: 'Without investing',
+    compound_chart_invested: 'Invested',
+    compound_chart_band: 'Rate range',
+    compound_frequency_label: 'Compounding frequency',
+    compound_frequency_1: 'Annual',
+    compound_frequency_2: 'Semiannual',
+    compound_frequency_4: 'Quarterly',
+    compound_frequency_12: 'Monthly',
+    compound_frequency_24: 'Biweekly',
+    compound_frequency_52: 'Weekly',
+    compound_frequency_365: 'Daily',
+    compound_step_1: 'Step 1',
+    compound_step_2: 'Step 2',
+    compound_step_3: 'Step 3',
+    compound_step_4: 'Step 4',
+    compound_step_1_title: 'Initial investment',
+    compound_step_2_title: 'Contribution',
+    compound_step_3_title: 'Interest rate',
+    compound_step_4_title: 'Compounding',
+    compound_step_1_copy: 'Amount of money available to invest at the start.',
+    compound_step_2_copy: 'Amount you plan to add each month, or a negative number if you expect to withdraw capital every month.',
+    compound_step_3_copy: 'Set the estimated annual rate and the variance band to evaluate surrounding scenarios.',
+    compound_step_4_copy: 'Number of times per year the interest will compound.',
+    compound_initial_label: 'Initial investment',
+    compound_contribution_label: 'Monthly contribution',
+    compound_years_label: 'Time horizon in years',
+    compound_rate_label: 'Estimated interest rate (%)',
+    compound_variance_label: 'Interest-rate variance range (%)',
+    market_overview: 'Market overview',
+    world_indicators: 'Key global market indicators in real time.',
+    ars_fixed_income_desc: 'Implied yield on Treasury bills and capitalizing peso bonds based on market pricing.',
+    usd_sovereign_desc: 'USD Argentine sovereign bonds with local-law and NY-law comparison.',
+    global_source: 'Source: Yahoo Finance. Price, daily move and intraday sparkline.',
+    sovereigns_loading: 'Loading sovereign bonds...',
+    sovereigns_empty: 'Sovereign bond data could not be loaded.',
+    sovereigns_error: 'Error loading sovereign bond data.',
+    sovereigns_source: 'Source: data912 for prices + internal config for cashflows, law and maturity.',
+    bond_calc_hint: 'Click any bond to open the calculator',
+    ytm_duration_note: 'YTM is calculated from discounted future cash flows. Duration is shown in years (Macaulay).',
+    market_news_empty: 'No market news available.',
+    market_news_error: 'Error loading market news.',
+    market_news_fallback_source: 'Market',
+    corporates_caption: 'corporate issuers based on the same data visible in the table',
+    category_crypto: 'Crypto',
+    category_crypto_desc: 'Liquid digital assets',
+    sovereign_curve_title: 'Sovereign curve',
+    sovereign_curve_desc: 'Visual comparison between local-law and NY-law bonds to follow curve shape and relative yield.',
+    usd_sovereigns_title: 'USD Sovereigns',
+    usd_sovereigns_desc: 'Hard-dollar sovereign bonds with law, duration and yield read-through.',
+  },
+};
+
+function t(key, replacements = {}) {
+  const dictionary = UI_TEXT[currentLanguage] || UI_TEXT.es;
+  let template = dictionary[key] || UI_TEXT.es[key] || key;
+  for (const [name, value] of Object.entries(replacements)) {
+    template = template.replaceAll(`{${name}}`, value);
+  }
+  return template;
+}
+
+function updateLanguageButtons() {
+  document.documentElement.lang = currentLanguage;
+  document.getElementById('lang-es')?.classList.toggle('active', currentLanguage === 'es');
+  document.getElementById('lang-en')?.classList.toggle('active', currentLanguage === 'en');
+  const logoutBtn = document.getElementById('auth-logout-btn');
+  if (logoutBtn) logoutBtn.textContent = t('logout');
+}
+
+function setLanguage(nextLanguage) {
+  if (!['es', 'en'].includes(nextLanguage) || nextLanguage === currentLanguage) return;
+  currentLanguage = nextLanguage;
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
+  updateLanguageButtons();
+  window.location.reload();
+}
+
+function setupLanguageToggle() {
+  updateLanguageButtons();
+  document.getElementById('lang-es')?.addEventListener('click', () => setLanguage('es'));
+  document.getElementById('lang-en')?.addEventListener('click', () => setLanguage('en'));
+}
+
+function normalizeTranslationKey(text) {
+  return String(text || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function parseMetricNumber(value) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const normalized = trimmed.includes(',') && trimmed.includes('.')
+    ? trimmed.replace(/\./g, '').replace(',', '.')
+    : trimmed.replace(',', '.');
+  const parsed = parseFloat(normalized.replace(/[^\d.-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function extractModifiedDuration(payload) {
+  let found = null;
+  const visited = new Set();
+
+  function visit(node, parentHint = '') {
+    if (found != null || !node || typeof node !== 'object') return;
+    if (visited.has(node)) return;
+    visited.add(node);
+
+    if (Array.isArray(node)) {
+      node.forEach((item) => visit(item, parentHint));
+      return;
+    }
+
+    Object.entries(node).forEach(([key, value]) => {
+      if (found != null) return;
+      const combinedHint = normalizeTranslationKey(`${parentHint}_${key}_${value?.nombre || ''}_${value?.label || ''}_${value?.descripcion || ''}`);
+      const looksLikeModifiedDuration =
+        (combinedHint.includes('duracion') || combinedHint.includes('duration')) &&
+        (combinedHint.includes('modificada') || combinedHint.includes('modified') || combinedHint.includes('modif'));
+
+      if (looksLikeModifiedDuration) {
+        const candidate = typeof value === 'object' && value !== null
+          ? parseMetricNumber(value.valor ?? value.value ?? value.dato ?? value.contenido)
+          : parseMetricNumber(value);
+        if (candidate != null) {
+          found = candidate;
+          return;
+        }
+      }
+
+      visit(value, combinedHint);
+    });
+  }
+
+  visit(payload);
+  return found;
+}
+
+async function fetchFCIModifiedDurations(activeFcis) {
+  const entries = await Promise.all(activeFcis.map(async (fund) => {
+    if (!fund.fondo_id || fund.clase_id == null) return [fund.nombre, null];
+    try {
+      const response = await fetch(`/api/cafci/ficha/${fund.fondo_id}/${fund.clase_id}`);
+      if (!response.ok) throw new Error(`CAFCI ${response.status}`);
+      const payload = await response.json();
+      return [fund.nombre, extractModifiedDuration(payload)];
+    } catch (error) {
+      return [fund.nombre, null];
+    }
+  }));
+
+  return Object.fromEntries(entries);
+}
 
 async function initSupabase() {
   try {
@@ -87,10 +564,14 @@ function updateAuthUI() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  setupLanguageToggle();
   setupThemeToggle();
   init();
   setupTabs();
   setupKeyboardNav();
+  setupOptimizer();
+  setupHeatmap();
+  setupCompoundCalculator();
   loadMundo();
   loadHotMovers();
   loadCotizaciones();
@@ -177,11 +658,14 @@ async function init() {
   const config = await fetch('/api/config').then(r => r.json());
 
   const mainList = document.getElementById('main-list');
-  mainList.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando rendimientos...</p></div>`;
+  mainList.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>${t('loading_yields')}</p></div>`;
 
   // Fetch FCI data from ArgentinaDatos (via our serverless function)
   const activeFcis = config.fcis.filter(i => i.activo);
-  const fciResults = await fetchFCIData(activeFcis);
+  const [fciResults, modifiedDurationMap] = await Promise.all([
+    fetchFCIData(activeFcis),
+    fetchFCIModifiedDurations(activeFcis),
+  ]);
 
   // Build garantizados cards data
   const garantizadosCards = config.garantizados.filter(i => i.activo).map(item => ({
@@ -194,12 +678,12 @@ async function init() {
       logo: item.logo, logoBg: item.logo_bg, logoSrc: getLogoForItem(item),
       name: item.nombre,
       tags: [
-        { text: 'Billetera', type: 'billetera' },
+        { text: t('wallet'), type: 'billetera' },
         ...(item.tipo && item.tipo !== 'Billetera' && item.tipo !== 'Cuenta Remunerada' ? [{ text: item.tipo, type: 'type' }] : []),
-        { text: item.limite === 'Sin Límites' ? 'Sin Límites' : `Límite: ${item.limite}`, type: item.limite === 'Sin Límites' ? 'limit no-limit' : 'limit' }
+        { text: item.limite === 'Sin Límites' ? t('no_limit') : `${t('limit_prefix')}: ${item.limite}`, type: item.limite === 'Sin Límites' ? 'limit no-limit' : 'limit' }
       ],
-      rate: `${item.tna.toFixed(2)}%`, rateLabel: 'TNA',
-      rateDate: `TNA vigente desde el ${item.vigente_desde}`
+      rate: `${item.tna.toFixed(2)}%`, rateLabel: t('rate_label'),
+      rateDate: t('valid_since', { date: item.vigente_desde })
     })
   }));
 
@@ -216,10 +700,12 @@ async function init() {
       name: item.nombre, entity: item.entidad,
       tags: [
         { text: item.categoria, type: 'category' },
-        { text: `Patrimonio: ${formatPatrimonio(item.patrimonio)}`, type: '' }
+        { text: `${t('assets')}: ${formatPatrimonio(item.patrimonio)}`, type: '' },
+        { text: `${t('modified_duration')}: ${modifiedDurationMap[item.nombre] != null ? formatModifiedDuration(modifiedDurationMap[item.nombre]) : t('unavailable')}`, type: '' }
       ],
-      rate: `${item.tna.toFixed(2)}%`, rateLabel: 'TNA',
-      rateDate: item.fechaDesde && item.fechaHasta ? `Entre ${item.fechaDesde} y ${item.fechaHasta}` : ''
+      rate: `${item.tna.toFixed(2)}%`, rateLabel: t('rate_label'),
+      rateDate: item.fechaDesde && item.fechaHasta ? t('between_dates', { from: item.fechaDesde, to: item.fechaHasta }) : '',
+      extraMeta: modifiedDurationMap[item.nombre] != null ? `${t('modified_duration')}: ${formatModifiedDuration(modifiedDurationMap[item.nombre])}` : ''
     })
   }));
 
@@ -228,7 +714,7 @@ async function init() {
 
   mainList.innerHTML = '';
   if (all.length === 0) {
-    mainList.innerHTML = '<div class="loading">No se pudieron cargar los datos.</div>';
+    mainList.innerHTML = `<div class="loading">${t('no_data')}</div>`;
   } else {
     all.forEach(item => mainList.appendChild(item.card));
   }
@@ -282,7 +768,7 @@ function renderRendimientosChart(items, containerId) {
   container.innerHTML = rows;
 }
 
-function createCard({ logo, logoBg, logoSrc, name, entity, description, tags, rate, rateLabel, rateDate, highlighted }) {
+function createCard({ logo, logoBg, logoSrc, name, entity, description, tags, rate, rateLabel, rateDate, highlighted, extraMeta }) {
   const card = document.createElement('div');
   card.className = 'fund-card' + (highlighted ? ' highlighted' : '');
 
@@ -294,6 +780,7 @@ function createCard({ logo, logoBg, logoSrc, name, entity, description, tags, ra
 
   const descHTML = description ? `<div class="fund-description">${description}</div>` : '';
   const entityHTML = entity ? `<div class="fund-entity">${entity}</div>` : '';
+  const extraMetaHTML = extraMeta ? `<div class="fund-extra-meta">${extraMeta}</div>` : '';
 
   // Use real logo image if available, otherwise fallback to initials
   // Fix mixed content: upgrade http:// to https:// for BCRA logos
@@ -309,6 +796,7 @@ function createCard({ logo, logoBg, logoSrc, name, entity, description, tags, ra
       ${entityHTML}
       ${descHTML}
       <div class="fund-tags">${tagsHTML}</div>
+      ${extraMetaHTML}
     </div>
     <div class="fund-rate">
       <div class="rate-value">${rate}</div>
@@ -358,6 +846,23 @@ async function fetchFCIData(activeFcis) {
   }
 }
 
+function formatModifiedDuration(value) {
+  return Number(value).toLocaleString(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function translateAppText(key) {
+  return t(key);
+}
+
+function calcModifiedDuration(duration, ratePct) {
+  const rate = Number(ratePct) / 100;
+  if (!Number.isFinite(duration) || !Number.isFinite(rate)) return null;
+  return duration / (1 + rate);
+}
+
 function renderEspeciales(items) {
   const container = document.getElementById('especiales-list');
   container.innerHTML = '';
@@ -372,11 +877,11 @@ function renderEspeciales(items) {
       description: item.descripcion,
       tags: [
         { text: item.tipo, type: 'type' },
-        { text: `Límite: ${item.limite}`, type: 'limit' }
+        { text: `${t('limit_prefix')}: ${item.limite}`, type: 'limit' }
       ],
       rate: `${item.tna.toFixed(2)}%`,
-      rateLabel: 'TNA',
-      rateDate: `TNA vigente desde el ${item.vigente_desde}`
+      rateLabel: t('rate_label'),
+      rateDate: t('valid_since', { date: item.vigente_desde })
     });
     container.appendChild(card);
   });
@@ -412,7 +917,6 @@ function setupTabs() {
       tab.classList.add('active');
       tab.setAttribute('aria-selected', 'true');
 
-      document.getElementById('tab-billeteras').style.display = target === 'billeteras' ? '' : 'none';
       document.getElementById('tab-plazofijo').style.display = target === 'plazofijo' ? '' : 'none';
       document.getElementById('tab-lecaps').style.display = target === 'lecaps' ? '' : 'none';
       document.getElementById('tab-cer').style.display = target === 'cer' ? '' : 'none';
@@ -420,29 +924,26 @@ function setupTabs() {
 
       const hero = document.getElementById('hero');
       if (target === 'plazofijo') {
-        hero.querySelector('h1').textContent = 'Tasas de Plazo Fijo';
-        hero.querySelector('p').textContent = 'Compará tasas de plazo fijo de bancos argentinos. Datos provistos por el BCRA.';
+        hero.querySelector('h1').textContent = t('time_deposit_title');
+        hero.querySelector('p').textContent = t('time_deposit_desc');
         if (!document.getElementById('plazofijo-list').hasChildNodes()) {
           loadPlazoFijo();
         }
       } else if (target === 'lecaps') {
-        hero.querySelector('h1').textContent = 'LECAPs y BONCAPs';
-        hero.querySelector('p').textContent = 'Rendimiento implícito de letras y bonos capitalizables del Tesoro según precio de mercado.';
+      hero.querySelector('h1').textContent = t('lecaps_title');
+        hero.querySelector('p').textContent = t('lecaps_hero_desc');
         if (!document.getElementById('lecaps-list').hasChildNodes()) {
           loadLecaps();
         }
       } else if (target === 'cer') {
-        hero.querySelector('h1').textContent = 'Bonos CER';
-        hero.querySelector('p').textContent = 'Rendimiento real de bonos ajustados por CER en pesos argentinos.';
+        hero.querySelector('h1').textContent = t('cer_title');
+        hero.querySelector('p').textContent = t('cer_hero_desc');
         if (!document.getElementById('cer-list').hasChildNodes()) {
           loadCER();
         }
-      } else {
-        hero.querySelector('h1').textContent = 'Rendimientos de Fondos y Billeteras';
-        hero.querySelector('p').textContent = 'Compará rendimientos actualizados de billeteras y fondos de liquidez en Argentina.';
       }
       // Update hash for sub-tabs
-      location.hash = target === 'billeteras' ? 'ars' : target;
+      location.hash = target === 'plazofijo' ? 'ars' : target;
     });
   });
 
@@ -453,32 +954,41 @@ function setupTabs() {
 
   const headerSoberanos = document.getElementById('header-soberanos');
   const headerONs = document.getElementById('header-ons');
+  const headerOptimizer = document.getElementById('header-optimizer');
+  const headerHeatmap = document.getElementById('header-heatmap');
+  const headerCompound = document.getElementById('header-compound');
   const headerMundo = document.getElementById('header-mundo');
 
   const headerPortfolio = document.getElementById('header-portfolio');
 
   function hideAllTabs() {
-    document.getElementById('tab-billeteras').style.display = 'none';
     document.getElementById('tab-plazofijo').style.display = 'none';
     document.getElementById('tab-lecaps').style.display = 'none';
     document.getElementById('tab-cer').style.display = 'none';
     document.getElementById('tab-ons').style.display = 'none';
+    document.getElementById('tab-optimizer').style.display = 'none';
+    document.getElementById('tab-heatmap').style.display = 'none';
+    document.getElementById('tab-compound').style.display = 'none';
     document.getElementById('tab-soberanos').style.display = 'none';
     document.getElementById('section-mundo').style.display = 'none';
     document.getElementById('tab-portfolio').style.display = 'none';
-    [headerArs, headerSoberanos, headerONs, headerMundo, headerPortfolio].forEach(b => b && b.classList.remove('active'));
+    [headerArs, headerSoberanos, headerONs, headerOptimizer, headerHeatmap, headerCompound, headerMundo, headerPortfolio].forEach(b => b && b.classList.remove('active'));
     hero.style.display = '';
   }
 
   function updatePageTitle(section) {
     const base = 'BDI Consultora';
     const titles = {
-      mundo: 'Panorama de mercado',
-      ars: 'Liquidez',
-      bonos: 'Renta fija USD',
-      plazofijo: 'Plazo fijo',
-      lecaps: 'Renta fija ARS',
-      portfolio: 'Mi cartera'
+      mundo: currentLanguage === 'en' ? 'Market overview' : 'Panorama de mercado',
+      ars: currentLanguage === 'en' ? 'Liquidity' : 'Liquidez',
+      bonos: currentLanguage === 'en' ? 'USD fixed income' : 'Renta fija USD',
+      plazofijo: t('time_deposit_title'),
+      lecaps: currentLanguage === 'en' ? 'ARS fixed income' : 'Renta fija ARS',
+      ons: t('ons_title'),
+      optimizer: currentLanguage === 'en' ? 'Portfolio optimizer' : 'Optimizador de carteras',
+      heatmap: t('heatmap_title'),
+      compound: t('compound_title'),
+      portfolio: currentLanguage === 'en' ? 'My portfolio' : 'Mi cartera'
     };
     document.title = titles[section] ? `${titles[section]} — ${base}` : base;
   }
@@ -510,33 +1020,31 @@ function setupTabs() {
     const activeTab = document.querySelector('.subnav-tab.active');
     if (activeTab) {
       const target = activeTab.dataset.tab;
-      document.getElementById('tab-billeteras').style.display = target === 'billeteras' ? '' : 'none';
       document.getElementById('tab-plazofijo').style.display = target === 'plazofijo' ? '' : 'none';
       document.getElementById('tab-lecaps').style.display = target === 'lecaps' ? '' : 'none';
       document.getElementById('tab-cer').style.display = target === 'cer' ? '' : 'none';
     } else {
-      document.getElementById('tab-billeteras').style.display = '';
-      document.getElementById('tab-plazofijo').style.display = 'none';
+      document.getElementById('tab-plazofijo').style.display = '';
       document.getElementById('tab-lecaps').style.display = 'none';
       document.getElementById('tab-cer').style.display = 'none';
     }
     // Restore hero
     const activeSubtab = document.querySelector('.subnav-tab.active');
     if (activeSubtab && activeSubtab.dataset.tab === 'plazofijo') {
-      hero.querySelector('h1').textContent = 'Plazo fijo';
-      hero.querySelector('p').textContent = 'Compará tasas de plazo fijo de bancos argentinos. Datos provistos por el BCRA.';
+      hero.querySelector('h1').textContent = t('time_deposit_title');
+      hero.querySelector('p').textContent = t('time_deposit_desc');
     } else if (activeSubtab && activeSubtab.dataset.tab === 'lecaps') {
-      hero.querySelector('h1').textContent = 'Renta fija ARS';
-      hero.querySelector('p').textContent = 'Rendimiento implícito de letras y bonos capitalizables del Tesoro según precio de mercado.';
+      hero.querySelector('h1').textContent = currentLanguage === 'en' ? 'ARS fixed income' : 'Renta fija ARS';
+      hero.querySelector('p').textContent = t('lecaps_hero_desc');
     } else if (activeSubtab && activeSubtab.dataset.tab === 'cer') {
-      hero.querySelector('h1').textContent = 'Bonos CER';
-      hero.querySelector('p').textContent = 'Instrumentos ajustados por inflacion para analizar cobertura, duration y rendimiento real.';
+      hero.querySelector('h1').textContent = t('cer_title');
+      hero.querySelector('p').textContent = t('cer_hero_desc');
     } else {
-      hero.querySelector('h1').textContent = 'Liquidez en pesos';
-      hero.querySelector('p').textContent = 'Compará rendimientos actualizados de billeteras y fondos de liquidez en Argentina.';
+      hero.querySelector('h1').textContent = t('time_deposit_title');
+      hero.querySelector('p').textContent = t('time_deposit_desc');
     }
-    const sub = document.querySelector('.subnav-tab.active')?.dataset.tab || 'ars';
-    updatePageTitle(sub === 'billeteras' ? 'ars' : sub);
+    const sub = document.querySelector('.subnav-tab.active')?.dataset.tab || 'plazofijo';
+    updatePageTitle(sub === 'plazofijo' ? 'ars' : sub);
   }
 
   function switchToSoberanos() {
@@ -544,8 +1052,10 @@ function setupTabs() {
     headerSoberanos.classList.add('active');
     subnav.style.display = 'none';
     document.getElementById('tab-soberanos').style.display = 'block';
-    hero.querySelector('h1').textContent = 'Renta fija USD';
-    hero.querySelector('p').textContent = 'Rendimiento de bonos soberanos argentinos en dólares. Ley local y ley extranjera.';
+    hero.querySelector('h1').textContent = currentLanguage === 'en' ? translateAppText('usd_sovereigns_title') : 'Renta fija USD';
+    hero.querySelector('p').textContent = currentLanguage === 'en'
+      ? translateAppText('usd_sovereigns_desc')
+      : 'Rendimiento de bonos soberanos argentinos en dólares. Ley local y ley extranjera.';
     updatePageTitle('bonos');
     if (!document.getElementById('soberanos-list').hasChildNodes()) {
       loadSoberanos();
@@ -557,8 +1067,10 @@ function setupTabs() {
     headerMundo.classList.add('active');
     subnav.style.display = 'none';
     document.getElementById('section-mundo').style.display = '';
-    hero.querySelector('h1').textContent = 'Panorama de mercado';
-    hero.querySelector('p').textContent = 'Principales indicadores del mercado mundial en tiempo real.';
+    hero.querySelector('h1').textContent = currentLanguage === 'en' ? translateAppText('market_overview') : 'Panorama de mercado';
+    hero.querySelector('p').textContent = currentLanguage === 'en'
+      ? translateAppText('world_indicators')
+      : 'Principales indicadores del mercado mundial en tiempo real.';
     updatePageTitle('mundo');
     if (!document.getElementById('mundo-grid').hasChildNodes()) {
       loadMundo();
@@ -574,17 +1086,55 @@ function setupTabs() {
     headerONs.classList.add('active');
     subnav.style.display = 'none';
     document.getElementById('tab-ons').style.display = 'block';
-    hero.querySelector('h1').textContent = 'Corporativos en USD';
-    hero.querySelector('p').textContent = 'Rendimiento de bonos corporativos en USD. Hacé click en cualquier ON para abrir la calculadora.';
+    hero.querySelector('h1').textContent = t('ons_title');
+    hero.querySelector('p').textContent = t('ons_hero_desc');
     updatePageTitle('ons');
     if (!document.getElementById('ons-list').hasChildNodes()) {
       loadONs();
     }
   }
 
+  function switchToOptimizer() {
+    hideAllTabs();
+    headerOptimizer.classList.add('active');
+    subnav.style.display = 'none';
+    document.getElementById('tab-optimizer').style.display = 'block';
+    hero.querySelector('h1').textContent = currentLanguage === 'en' ? 'Portfolio optimizer' : 'Optimizador de carteras';
+    hero.querySelector('p').textContent = currentLanguage === 'en'
+      ? 'Run a Markowitz allocation model with custom tickers, efficient frontier and optimized portfolio comparisons.'
+      : 'Corre un modelo de Markowitz con tickers propios, frontera eficiente y comparacion de carteras optimizadas.';
+    updatePageTitle('optimizer');
+  }
+
+  function switchToCompound() {
+    hideAllTabs();
+    headerCompound.classList.add('active');
+    subnav.style.display = 'none';
+    document.getElementById('tab-compound').style.display = 'block';
+    hero.querySelector('h1').textContent = t('compound_title');
+    hero.querySelector('p').textContent = t('compound_hero_desc');
+    updatePageTitle('compound');
+  }
+
+  function switchToHeatmap() {
+    hideAllTabs();
+    headerHeatmap.classList.add('active');
+    subnav.style.display = 'none';
+    document.getElementById('tab-heatmap').style.display = 'block';
+    hero.querySelector('h1').textContent = t('heatmap_title');
+    hero.querySelector('p').textContent = t('heatmap_hero_desc');
+    updatePageTitle('heatmap');
+    if (!document.getElementById('heatmap-chart')?.hasChildNodes()) {
+      loadHeatmap();
+    }
+  }
+
   if (headerArs) headerArs.addEventListener('click', (e) => { e.preventDefault(); switchToArs(); location.hash = 'ars'; });
   if (headerSoberanos) headerSoberanos.addEventListener('click', (e) => { e.preventDefault(); switchToSoberanos(); location.hash = 'bonos'; });
   if (headerONs) headerONs.addEventListener('click', (e) => { e.preventDefault(); switchToONs(); location.hash = 'ons'; });
+  if (headerOptimizer) headerOptimizer.addEventListener('click', (e) => { e.preventDefault(); switchToOptimizer(); location.hash = 'optimizer'; });
+  if (headerHeatmap) headerHeatmap.addEventListener('click', (e) => { e.preventDefault(); switchToHeatmap(); location.hash = 'heatmap'; });
+  if (headerCompound) headerCompound.addEventListener('click', (e) => { e.preventDefault(); switchToCompound(); location.hash = 'compound'; });
   if (headerMundo) headerMundo.addEventListener('click', (e) => { e.preventDefault(); switchToMundo(); location.hash = 'mundo'; });
   if (headerPortfolio) headerPortfolio.addEventListener('click', (e) => { e.preventDefault(); switchToPortfolio(); location.hash = 'portfolio'; });
   window._switchToPortfolio = switchToPortfolio;
@@ -597,6 +1147,9 @@ function setupTabs() {
   else if (initialHash === 'lecaps') { switchToArs(); document.querySelector('.subnav-tab[data-tab="lecaps"]')?.click(); }
   else if (initialHash === 'cer') { switchToArs(); document.querySelector('.subnav-tab[data-tab="cer"]')?.click(); }
   else if (initialHash === 'ons') switchToONs();
+  else if (initialHash === 'optimizer') switchToOptimizer();
+  else if (initialHash === 'heatmap') switchToHeatmap();
+  else if (initialHash === 'compound') switchToCompound();
   else if (initialHash === 'portfolio') switchToPortfolio();
 
   // Handle back/forward navigation (skip if subnav tab already active)
@@ -611,6 +1164,9 @@ function setupTabs() {
     else if (h === 'lecaps') { switchToArs(); document.querySelector('.subnav-tab[data-tab="lecaps"]')?.click(); }
     else if (h === 'cer') { switchToArs(); document.querySelector('.subnav-tab[data-tab="cer"]')?.click(); }
     else if (h === 'ons') switchToONs();
+    else if (h === 'optimizer') switchToOptimizer();
+    else if (h === 'heatmap') switchToHeatmap();
+    else if (h === 'compound') switchToCompound();
     else if (h === 'portfolio') switchToPortfolio();
     else switchToMundo();
     _hashChanging = false;
@@ -646,14 +1202,14 @@ function setupKeyboardNav() {
 // ─── Plazo Fijo section ───
 async function loadPlazoFijo() {
   const container = document.getElementById('plazofijo-list');
-  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando tasas...</p></div>`;
+  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>${t('loading_rates')}</p></div>`;
 
   try {
     const res = await fetch('https://api.argentinadatos.com/v1/finanzas/tasas/plazoFijo');
     if (!res.ok) throw new Error(`API error: ${res.status}`);
     const bancos = await res.json();
     if (!bancos || !bancos.length) {
-      container.innerHTML = '<div class="loading">No se pudieron cargar los datos.</div>';
+      container.innerHTML = `<div class="loading">${t('no_data')}</div>`;
       return;
     }
 
@@ -715,7 +1271,9 @@ async function loadPlazoFijo() {
 
     // Source note
     const source = document.getElementById('plazofijo-source');
-    if (source) source.textContent = 'Fuente: ArgentinaDatos. Tasas publicadas por banco.';
+    if (source) source.textContent = currentLanguage === 'en'
+      ? 'Source: ArgentinaDatos. Rates published by each bank.'
+      : 'Fuente: ArgentinaDatos. Tasas publicadas por banco.';
 
     // Render plazo fijo chart
     const chartItems = sorted.map(banco => {
@@ -731,7 +1289,7 @@ async function loadPlazoFijo() {
     renderRendimientosChart(chartItems, 'plazofijo-chart');
   } catch (e) {
     console.error('Error loading plazo fijo:', e);
-    container.innerHTML = '<div class="loading">Error al cargar datos de plazos fijos.</div>';
+    container.innerHTML = `<div class="loading">${t('rates_error')}</div>`;
   }
 }
 
@@ -843,7 +1401,9 @@ async function loadLecaps() {
       const ganancia = l.pago_final / precio;
       const tna = (ganancia - 1) * (365 / dias) * 100;
       const tir = (Math.pow(ganancia, 365 / dias) - 1) * 100;
-      return { ...l, precio, dias, tna, tir, live: !!livePrices[l.ticker] };
+      const duration = dias / 365;
+      const modifiedDuration = calcModifiedDuration(duration, tir);
+      return { ...l, precio, dias, tna, tir, duration, modifiedDuration, live: !!livePrices[l.ticker] };
     });
 
     // Sort by days to maturity (ascending)
@@ -864,6 +1424,8 @@ async function loadLecaps() {
         <td>${l.pago_final.toFixed(3)}</td>
         <td>${l.dias}</td>
         <td>${vtoStr}</td>
+        <td class="col-duration">${l.duration.toFixed(2)}</td>
+        <td class="col-mod-duration">${l.modifiedDuration.toFixed(2)}</td>
         <td class="lecap-tna">${l.tna.toFixed(2)}%</td>
         <td class="lecap-tir">${l.tir.toFixed(2)}%</td>
       </tr>`;
@@ -875,10 +1437,12 @@ async function loadLecaps() {
           <thead>
             <tr>
               <th class="col-ticker">Ticker</th>
-              <th class="col-precio">Precio</th>
-              <th class="col-pago">Pago Final</th>
-              <th class="col-dias">Días</th>
-              <th class="col-vto">Vencimiento</th>
+              <th class="col-precio">${t('lecap_col_price')}</th>
+              <th class="col-pago">${t('lecap_col_final_payment')}</th>
+              <th class="col-dias">${t('lecap_col_days')}</th>
+              <th class="col-vto">${t('lecap_col_maturity')}</th>
+              <th class="col-duration">Duration</th>
+              <th class="col-mod-duration">Duration Mod.</th>
               <th class="col-tna">TNA</th>
               <th class="col-tir">TIR</th>
             </tr>
@@ -886,8 +1450,8 @@ async function loadLecaps() {
           <tbody>${rows}</tbody>
         </table>
       </div>
-      <p class="calc-hint">💡 <span>Click</span> en cualquier LECAP para abrir la calculadora</p>
-      <p style="font-size:0.7rem;color:var(--text-tertiary);margin-top:6px">Liquidación T+1: ${settlStr}. Los días al vencimiento se calculan desde la fecha de liquidación.</p>`;
+      <p class="calc-hint">💡 ${t('lecaps_calc_hint')}</p>
+      <p style="font-size:0.7rem;color:var(--text-tertiary);margin-top:6px">${t('settlement_note', { date: settlStr })}</p>`;
 
     // Make table sortable
     const table = container.querySelector('.lecap-table');
@@ -907,9 +1471,9 @@ async function loadLecaps() {
     const liveCount = items.filter(i => i.live).length;
     if (source) {
       if (hasLive) {
-        source.textContent = 'Fuente: data912 para precios live + config interna para flujos y vencimientos.';
+        source.textContent = t('live_prices_source');
       } else {
-        source.textContent = 'Fuente: config interna. No se pudieron traer precios live de data912.';
+        source.textContent = t('no_live_prices_source');
       }
     }
 
@@ -917,7 +1481,7 @@ async function loadLecaps() {
     renderLecapScatter(items);
   } catch (e) {
     console.error('Error loading LECAPs:', e);
-    container.innerHTML = '<div class="loading">Error al cargar datos de LECAPs.</div>';
+    container.innerHTML = `<div class="loading">${t('lecaps_error')}</div>`;
   }
 }
 
@@ -940,7 +1504,7 @@ function renderLecapScatter(items) {
     data: {
       datasets: [
         {
-          label: 'Curva',
+          label: t('lecap_curve_label'),
           data: curve,
           type: 'line',
           borderColor: isDark ? 'rgba(160,160,168,0.4)' : 'rgba(0,0,0,0.15)',
@@ -953,7 +1517,7 @@ function renderLecapScatter(items) {
           order: 2,
         },
         {
-          label: 'LECAP',
+          label: t('lecap_label'),
           data: lecapData.map(l => ({ x: l.dias, y: l.tir, ticker: l.ticker })),
           backgroundColor: '#00d26a',
           borderColor: '#00d26a',
@@ -962,7 +1526,7 @@ function renderLecapScatter(items) {
           order: 1,
         },
         {
-          label: 'BONCAP',
+          label: t('boncap_label'),
           data: boncapData.map(l => ({ x: l.dias, y: l.tir, ticker: l.ticker })),
           backgroundColor: '#4da6ff',
           borderColor: '#4da6ff',
@@ -982,27 +1546,27 @@ function renderLecapScatter(items) {
           labels: {
             color: textColor,
             font: { family: "'Inter', sans-serif", size: 12 },
-            filter: (item) => item.text !== 'Curva'
+            filter: (item) => item.text !== t('lecap_curve_label')
           }
         },
         tooltip: {
-          filter: (item) => item.dataset.label !== 'Curva',
+          filter: (item) => item.dataset.label !== t('lecap_curve_label'),
           callbacks: {
             label: (ctx) => {
               const p = ctx.raw;
-              return `${p.ticker}: TIR ${p.y.toFixed(2)}% — ${p.x} días`;
+              return t('lecap_tooltip', { ticker: p.ticker, tir: p.y.toFixed(2), days: p.x });
             }
           }
         }
       },
       scales: {
         x: {
-          title: { display: true, text: 'Días al vencimiento', color: textColor, font: { family: "'Inter', sans-serif", size: 12 } },
+          title: { display: true, text: t('lecap_x_title'), color: textColor, font: { family: "'Inter', sans-serif", size: 12 } },
           grid: { color: gridColor },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif" } }
         },
         y: {
-          title: { display: true, text: 'TIR (%)', color: textColor, font: { family: "'Inter', sans-serif", size: 12 } },
+          title: { display: true, text: t('lecap_y_title'), color: textColor, font: { family: "'Inter', sans-serif", size: 12 } },
           grid: { color: gridColor },
           ticks: { color: textColor, font: { family: "'Inter', sans-serif" }, callback: v => v.toFixed(1) + '%' }
         }
@@ -1064,7 +1628,7 @@ function fitPolyCurve(points, degree, n) {
 
 async function loadSoberanos() {
   const container = document.getElementById('soberanos-list');
-  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando bonos soberanos...</p></div>`;
+  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>${currentLanguage === 'en' ? translateAppText('sovereigns_loading') : 'Cargando bonos soberanos...'}</p></div>`;
 
   try {
     const [config, apiRes] = await Promise.all([
@@ -1076,7 +1640,7 @@ async function loadSoberanos() {
     const bondPrices = apiRes.data || [];
 
     if (!bondPrices.length) {
-      container.innerHTML = '<div class="loading">No se pudieron cargar los datos de bonos soberanos.</div>';
+      container.innerHTML = `<div class="loading">${currentLanguage === 'en' ? translateAppText('sovereigns_empty') : 'No se pudieron cargar los datos de bonos soberanos.'}</div>`;
       return;
     }
 
@@ -1131,11 +1695,13 @@ async function loadSoberanos() {
 
     const source = document.getElementById('soberanos-source');
     if (source) {
-      source.textContent = 'Fuente: data912 para precios + config interna para flujos, ley y vencimientos.';
+      source.textContent = currentLanguage === 'en'
+        ? translateAppText('sovereigns_source')
+        : 'Fuente: data912 para precios + config interna para flujos, ley y vencimientos.';
     }
   } catch (e) {
     console.error('Error loading soberanos:', e);
-    container.innerHTML = '<div class="loading">Error al cargar datos de bonos soberanos.</div>';
+    container.innerHTML = `<div class="loading">${currentLanguage === 'en' ? translateAppText('sovereigns_error') : 'Error al cargar datos de bonos soberanos.'}</div>`;
   }
 }
 
@@ -1225,9 +1791,9 @@ function renderSoberanosTable(container, items) {
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <p class="calc-hint">📊 Click en cualquier bono para abrir la calculadora</p>
+    <p class="calc-hint">📊 ${currentLanguage === 'en' ? translateAppText('bond_calc_hint') : 'Click en cualquier bono para abrir la calculadora'}</p>
     <p style="font-size:0.7rem;color:var(--text-tertiary);margin-top:6px">
-      TIR (YTM) calculada con flujos de fondos futuros descontados. Duration en años (Macaulay).
+      ${currentLanguage === 'en' ? translateAppText('ytm_duration_note') : 'TIR (YTM) calculada con flujos de fondos futuros descontados. Duration en años (Macaulay).'}
     </p>`;
 
   container.querySelectorAll('tr[data-sob-idx]').forEach(tr => {
@@ -1550,25 +2116,45 @@ async function loadMundo() {
       eurusd: { category: 'fx', icon: 'FX', unit: 'Par' },
     };
 
-    const categoryLabels = {
-      indices: 'Indices',
-      tasas: 'Tasas',
-      energia: 'Energia',
-      metales: 'Metales',
-      agro: 'Agro',
-      crypto: 'Crypto',
-      fx: 'FX',
-    };
+    const categoryLabels = currentLanguage === 'en'
+      ? {
+          indices: 'Equities',
+          tasas: 'Rates',
+          energia: 'Energy',
+          metales: 'Metals',
+          agro: 'Agri',
+          crypto: translateAppText('category_crypto'),
+          fx: 'FX',
+        }
+      : {
+          indices: 'Indices',
+          tasas: 'Tasas',
+          energia: 'Energia',
+          metales: 'Metales',
+          agro: 'Agro',
+          crypto: 'Crypto',
+          fx: 'FX',
+        };
 
-    const categoryDescriptions = {
-      indices: 'Referencias globales de equity',
-      tasas: 'Curva de rendimientos USA',
-      energia: 'Commodities energeticos',
-      metales: 'Metales industriales y preciosos',
-      agro: 'Referencias agricolas',
-      crypto: 'Activos digitales liquidos',
-      fx: 'Monedas y cruces',
-    };
+    const categoryDescriptions = currentLanguage === 'en'
+      ? {
+          indices: 'Global equity benchmarks',
+          tasas: 'US rates curve',
+          energia: 'Energy commodities',
+          metales: 'Industrial and precious metals',
+          agro: 'Agricultural references',
+          crypto: translateAppText('category_crypto_desc'),
+          fx: 'Currencies and crosses',
+        }
+      : {
+          indices: 'Referencias globales de equity',
+          tasas: 'Curva de rendimientos USA',
+          energia: 'Commodities energeticos',
+          metales: 'Metales industriales y preciosos',
+          agro: 'Referencias agricolas',
+          crypto: 'Activos digitales liquidos',
+          fx: 'Monedas y cruces',
+        };
 
     const grouped = {};
     grid.innerHTML = '';
@@ -1660,9 +2246,11 @@ async function loadMundo() {
     });
 
     const src = document.getElementById('mundo-source');
-    if (src) src.textContent = 'Fuente: Yahoo Finance. Precio, variacion diaria y sparkline intradiaria.';
+    if (src) src.textContent = currentLanguage === 'en'
+      ? translateAppText('global_source')
+      : 'Fuente: Yahoo Finance. Precio, variacion diaria y sparkline intradiaria.';
   } catch (e) {
-    grid.innerHTML = '<div class="loading">Error al cargar datos globales.</div>';
+    grid.innerHTML = `<div class="loading">${t('world_error')}</div>`;
     console.error('Mundo error:', e);
   }
 }
@@ -1672,7 +2260,7 @@ async function loadMundo() {
 async function loadHotMovers() {
   const grid = document.getElementById('hot-grid');
   if (!grid) return;
-  grid.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando movers...</p></div>`;
+  grid.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>${t('hot_movers_loading')}</p></div>`;
 
   try {
     const res = await fetch('/api/hot-movers');
@@ -1680,7 +2268,7 @@ async function loadHotMovers() {
     const { data } = await res.json();
 
     if (!data || !data.length) {
-      grid.innerHTML = '<div class="loading">Sin datos de movers disponibles.</div>';
+      grid.innerHTML = `<div class="loading">${t('hot_movers_empty')}</div>`;
       return;
     }
 
@@ -1713,7 +2301,7 @@ async function loadHotMovers() {
       grid.appendChild(card);
     });
   } catch (e) {
-    grid.innerHTML = '<div class="loading">Error al cargar movers.</div>';
+    grid.innerHTML = `<div class="loading">${t('hot_movers_error')}</div>`;
     console.error('Hot movers error:', e);
   }
 }
@@ -1805,7 +2393,7 @@ async function openMundoDetail(id, name, icon, ticker) {
       <div class="mundo-modal-body">
         <canvas id="mundo-detail-chart"></canvas>
       </div>
-      <div class="mundo-modal-loading" id="mundo-modal-loading">Cargando...</div>
+      <div class="mundo-modal-loading" id="mundo-modal-loading">${t('world_detail_loading')}</div>
     </div>
   `;
   document.body.appendChild(modal);
@@ -1931,7 +2519,7 @@ async function loadMundoChart(buildUrl, range) {
       mundoDetailChart.draw();
     });
   } catch (e) {
-    if (loading) loading.textContent = 'Error al cargar datos.';
+    if (loading) loading.textContent = t('world_detail_error');
     console.error('Detail chart error:', e);
   }
 }
@@ -1950,16 +2538,16 @@ async function loadCotizaciones() {
     const items = [];
 
     if (data.oficial) {
-      items.push({ label: 'Dólar Oficial', price: `$${formatCotizPrice(data.oficial.price)}` });
+      items.push({ label: t('official_dollar'), price: `$${formatCotizPrice(data.oficial.price)}` });
     }
     if (data.ccl) {
-      items.push({ label: 'Contado con Liqui', price: `$${formatCotizPrice(data.ccl.price)}` });
+      items.push({ label: t('ccl_dollar'), price: `$${formatCotizPrice(data.ccl.price)}` });
     }
     if (data.mep) {
-      items.push({ label: 'Dólar MEP', price: `$${formatCotizPrice(data.mep.price)}` });
+      items.push({ label: t('mep_dollar'), price: `$${formatCotizPrice(data.mep.price)}` });
     }
     if (data.riesgoPais) {
-      items.push({ label: 'Riesgo País', price: data.riesgoPais.value.toLocaleString('es-AR') });
+      items.push({ label: t('country_risk'), price: data.riesgoPais.value.toLocaleString(currentLanguage === 'en' ? 'en-US' : 'es-AR') });
     }
 
     if (items.length === 0) return;
@@ -1982,7 +2570,7 @@ function formatCotizPrice(val) {
 // ─── News Ticker ───
 async function loadNewsTicker() {
   try {
-    const res = await fetch('/api/news');
+    const res = await fetch(`/api/news?lang=${currentLanguage}`);
     if (!res.ok) throw new Error('News API error');
     const { data } = await res.json();
     if (!data || !data.length) return;
@@ -2015,10 +2603,10 @@ async function loadNewsTicker() {
 // ─── Bonos CER section ───
 
 function formatNewsSectionDate(rawDate) {
-  if (!rawDate) return 'Cobertura financiera';
+  if (!rawDate) return currentLanguage === 'en' ? 'Financial coverage' : 'Cobertura financiera';
   const parsed = new Date(rawDate);
-  if (Number.isNaN(parsed.getTime())) return 'Cobertura financiera';
-  return parsed.toLocaleString('es-AR', {
+  if (Number.isNaN(parsed.getTime())) return currentLanguage === 'en' ? 'Financial coverage' : 'Cobertura financiera';
+  return parsed.toLocaleString(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',
@@ -2030,43 +2618,43 @@ async function loadNewsSection() {
   const grid = document.getElementById('news-grid');
   if (!grid) return;
 
-  grid.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando noticias financieras...</p></div>`;
+  grid.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>${currentLanguage === 'en' ? 'Loading financial news...' : 'Cargando noticias financieras...'}</p></div>`;
 
   try {
-    const res = await fetch('/api/news');
+    const res = await fetch(`/api/news?lang=${currentLanguage}`);
     if (!res.ok) throw new Error('News section API error');
     const { data } = await res.json();
 
     if (!data || !data.length) {
-      grid.innerHTML = '<div class="loading">No hay noticias de mercado disponibles.</div>';
+      grid.innerHTML = `<div class="loading">${currentLanguage === 'en' ? translateAppText('market_news_empty') : 'No hay noticias de mercado disponibles.'}</div>`;
       return;
     }
 
     const filtered = data.filter(item => {
       const haystack = `${item.title || ''} ${item.source || ''}`.toLowerCase();
-      return [
-        'mercado', 'finanzas', 'bonos', 'acciones', 'wall street', 'dolar',
-        'dólar', 'riesgo país', 'riesgo pais', 'fed', 'tasas', 's&p', 'nasdaq'
-      ].some(term => haystack.includes(term));
+      const terms = currentLanguage === 'en'
+        ? ['market', 'finance', 'bond', 'stock', 'wall street', 'bitcoin', 'fed', 'rates', 's&p', 'nasdaq', 'treasury']
+        : ['mercado', 'finanzas', 'bonos', 'acciones', 'wall street', 'dolar', 'dólar', 'riesgo país', 'riesgo pais', 'fed', 'tasas', 's&p', 'nasdaq'];
+      return terms.some(term => haystack.includes(term));
     });
 
     const items = (filtered.length ? filtered : data).slice(0, 6);
     grid.innerHTML = items.map(item => `
       <a class="news-card" href="${item.link}" target="_blank" rel="noopener">
-        <span class="news-card-source">${item.source || 'Mercado'}</span>
+        <span class="news-card-source">${item.source || (currentLanguage === 'en' ? translateAppText('market_news_fallback_source') : 'Mercado')}</span>
         <div class="news-card-title">${item.title}</div>
         <div class="news-card-meta">${formatNewsSectionDate(item.pubDate)}</div>
       </a>
     `).join('');
   } catch (e) {
-    grid.innerHTML = '<div class="loading">Error al cargar noticias de mercado.</div>';
+    grid.innerHTML = `<div class="loading">${currentLanguage === 'en' ? translateAppText('market_news_error') : 'Error al cargar noticias de mercado.'}</div>`;
     console.error('News section error:', e);
   }
 }
 
 async function loadCER() {
   const container = document.getElementById('cer-list');
-  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>Cargando bonos CER...</p></div>`;
+  container.innerHTML = `<div class="loading"><div class="loading-spinner"></div><p>${t('cer_loading')}</p></div>`;
 
   try {
     const [config, cerData, cerUltimo, preciosData] = await Promise.all([
@@ -2083,7 +2671,7 @@ async function loadCER() {
     const bondPrices = preciosData.data || [];
 
     if (!cerActual || !bondPrices.length) {
-      container.innerHTML = '<div class="loading">No se pudieron cargar los datos de bonos CER.</div>';
+      container.innerHTML = `<div class="loading">${t('cer_empty')}</div>`;
       return;
     }
 
@@ -2139,12 +2727,14 @@ async function loadCER() {
 
       // Calcular duration
       const duration = calcDuration(precioNormalizado, flujosAjustados, today, ytm);
+      const modifiedDuration = calcModifiedDuration(duration, ytm);
 
       items.push({
         symbol: bp.symbol,
         priceArs: precioARS,
         ytm,
         duration,
+        modifiedDuration,
         vencimiento: bondConfig.vencimiento,
         volume: bp.v || 0,
         flujosAjustados,
@@ -2165,11 +2755,11 @@ async function loadCER() {
 
     const source = document.getElementById('cer-source');
     if (source) {
-      source.textContent = 'Fuente: BCRA para CER + data912 para precios + config interna para flujos.';
+      source.textContent = t('cer_source');
     }
   } catch (e) {
     console.error('Error loading CER bonds:', e);
-    container.innerHTML = '<div class="loading">Error al cargar datos de bonos CER.</div>';
+    container.innerHTML = `<div class="loading">${t('cer_error')}</div>`;
   }
 }
 
@@ -2181,29 +2771,31 @@ function renderCERTable(container, items) {
       <td><span class="soberano-ticker">${item.symbol}</span></td>
       <td>$${item.priceArs.toFixed(2)}</td>
       <td class="col-duration">${item.duration.toFixed(1)}</td>
+      <td class="col-duration">${item.modifiedDuration.toFixed(1)}</td>
       <td class="col-vto">${item.vencimiento}</td>
       <td class="lecap-tir">${item.ytm.toFixed(2)}%</td>
     </tr>`;
   }).join('');
 
   container.innerHTML = `
-    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:8px">📊 Click en un bono para abrir la calculadora</p>
+    <p style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:8px">📊 ${t('cer_calc_hint')}</p>
     <div class="soberanos-table-wrap">
       <table class="soberanos-table cer-table">
         <thead>
           <tr>
             <th>TICKER</th>
-            <th>PRECIO (AR$)</th>
+            <th>${t('cer_col_price')}</th>
             <th class="col-duration">DURATION</th>
-            <th class="col-vto">VENCIMIENTO</th>
-            <th>TIR REAL</th>
+            <th class="col-duration">DURATION MOD.</th>
+            <th class="col-vto">${t('cer_col_maturity')}</th>
+            <th>${t('cer_col_real_ytm')}</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
       </table>
     </div>
     <p style="font-size:0.7rem;color:var(--text-tertiary);margin-top:6px">
-      TIR Real calculada con flujos ajustados por CER. Duration en años (Macaulay).
+      ${t('cer_note')}
     </p>`;
   container.querySelectorAll('tr[data-cer-idx]').forEach(tr => {
     tr.addEventListener('click', () => {
@@ -2334,7 +2926,7 @@ function renderCERCurve(items) {
 
   if (curve.length) {
     datasets.push({
-      label: 'Bonos CER (curva)',
+      label: currentLanguage === 'en' ? 'CER bonds (curve)' : 'Bonos CER (curva)',
       data: curve,
       borderColor: '#ff9500',
       borderWidth: 1.5,
@@ -2347,7 +2939,7 @@ function renderCERCurve(items) {
   }
 
   datasets.push({
-    label: 'Bonos CER',
+    label: currentLanguage === 'en' ? 'CER bonds' : 'Bonos CER',
     data: items.map(i => ({ x: i.duration, y: i.ytm, label: i.symbol })),
     backgroundColor: '#00d26a',
     borderColor: '#00d26a',
@@ -2395,58 +2987,201 @@ function renderCERCurve(items) {
 
 // ─── ONs (Obligaciones Negociables) section ───
 let onsChart = null;
+const BDI_ON_MONITOR = window.BDI_ON_MONITOR || {};
+
+function formatOnNumber(value, digits = 2) {
+  if (value == null || !isFinite(value)) return '—';
+  return Number(value).toLocaleString('es-AR', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+}
+
+function formatOnPercent(value, digits = 2) {
+  if (value == null || !isFinite(value)) return '—';
+  return `${formatOnNumber(value, digits)}%`;
+}
+
+function formatOnDate(dateValue) {
+  if (!dateValue) return '—';
+  const date = dateValue instanceof Date ? dateValue : parseLocalDate(dateValue);
+  return isNaN(date.getTime()) ? '—' : date.toLocaleDateString('es-AR');
+}
+
+function calcConvexity(flows, settlementDate, ytmPct) {
+  const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
+  const r = ytmPct / 100;
+  let pvTotal = 0;
+  let convexity = 0;
+  for (const flow of flows) {
+    const t = (flow.fecha - settlementDate) / MS_PER_YEAR;
+    if (t <= 0) continue;
+    const pv = flow.monto / Math.pow(1 + r, t);
+    pvTotal += pv;
+    convexity += pv * (t * t + t);
+  }
+  return pvTotal > 0 ? convexity / (pvTotal * Math.pow(1 + r, 2)) : 0;
+}
+
+function getPrevCouponDate(schedule, today) {
+  const pastDates = schedule
+    .map((flow) => parseLocalDate(flow.date))
+    .filter((date) => date < today);
+  if (!pastDates.length) return null;
+  return new Date(Math.max(...pastDates.map((date) => date.getTime())));
+}
+
+function normalizeOnPrice(rawPrice) {
+  if (!rawPrice || !isFinite(rawPrice)) return null;
+  return rawPrice < 10 ? rawPrice * 100 : rawPrice;
+}
+
+function buildBDIOnItems(prices, mepPrice) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const priceLookup = {};
+  for (const item of prices) {
+    if (!item?.symbol) continue;
+    priceLookup[item.symbol] = parseFloat(item.c || item.price || 0);
+  }
+
+  const items = [];
+  for (const [symbol, meta] of Object.entries(BDI_ON_MONITOR)) {
+    const priceUSD = normalizeOnPrice(priceLookup[meta.usdTicker]);
+    if (!priceUSD || priceUSD <= 0) continue;
+
+    const priceARS = normalizeOnPrice(priceLookup[meta.arsTicker]);
+    const normalizedFlows = meta.cashflows
+      .map((flow) => ({ fecha: parseLocalDate(flow.date), monto: flow.amount / 100 }))
+      .filter((flow) => flow.fecha >= today);
+    if (!normalizedFlows.length) continue;
+
+    const pricePer100 = priceUSD;
+    const pricePer1VN = pricePer100 / 100;
+    const ytm = calcYTM(pricePer1VN, normalizedFlows, today);
+    if (!isFinite(ytm)) continue;
+
+    const duration = calcDuration(pricePer1VN, normalizedFlows, today, ytm);
+    const convexity = calcConvexity(normalizedFlows, today, ytm);
+    const implicitFx = priceARS && priceUSD ? priceARS / priceUSD : null;
+    const costArsInUsd = implicitFx && mepPrice ? pricePer1VN * (implicitFx / mepPrice) : null;
+    const ytmArs = costArsInUsd ? calcYTM(costArsInUsd, normalizedFlows, today) : null;
+
+    const prevCouponDate = getPrevCouponDate(meta.cashflows, today);
+    const daysAccrued = prevCouponDate ? Math.round((today - prevCouponDate) / 86400000) : 0;
+    const accruedInterest = meta.parValue * (meta.couponAnnual / 100) * (daysAccrued / 365);
+    const technicalValue = meta.parValue + accruedInterest;
+    const parity = technicalValue > 0 ? (pricePer100 / technicalValue) * 100 : null;
+
+    const nextPaymentRaw = meta.cashflows.find((flow) => parseLocalDate(flow.date) >= today);
+    const nextPaymentLabel = nextPaymentRaw
+      ? `${formatOnDate(nextPaymentRaw.date)} (US$${formatOnNumber(nextPaymentRaw.amount, 2)})`
+      : '—';
+
+    items.push({
+      symbol,
+      d912Ticker: meta.usdTicker,
+      arsTicker: meta.arsTicker,
+      company: meta.company,
+      rating: meta.rating,
+      law: meta.law,
+      lotSize: meta.lotSize,
+      description: meta.description,
+      couponAnnual: meta.couponAnnual,
+      priceUSD: pricePer100,
+      priceARS,
+      implicitFx,
+      parity,
+      ytm,
+      ytmArs,
+      duration,
+      convexity,
+      vencimiento: formatOnDate(meta.cashflows[meta.cashflows.length - 1]?.date),
+      nextPaymentLabel,
+      mepPrice,
+      flujos: normalizedFlows,
+    });
+  }
+
+  return items.sort((a, b) => b.ytm - a.ytm);
+}
+
 async function loadONs() {
   const container = document.getElementById('ons-list');
-  container.innerHTML = '<p style="text-align:center;color:var(--text-secondary)">Cargando ONs...</p>';
+  container.innerHTML = `<p style="text-align:center;color:var(--text-secondary)">${t('ons_loading')}</p>`;
   try {
-    const [configRes, pricesRes] = await Promise.all([
-      fetch('/api/config').then(r => r.json()),
-      fetch('/api/ons').then(r => r.json())
+    const [pricesRes, cotizacionesRes] = await Promise.all([
+      fetch('/api/ons').then(r => r.json()),
+      fetch('/api/cotizaciones').then(r => r.json())
     ]);
-    const onsConfig = configRes.ons || {};
     const prices = (pricesRes.data || []);
-    const today = new Date();
-    const items = [];
-    const priceLookup = {};
-    for (const p of prices) { priceLookup[p.symbol] = p; }
-    for (const [key, bond] of Object.entries(onsConfig)) {
-      const d912Ticker = bond.ticker_d912;
-      const priceData = priceLookup[d912Ticker];
-      if (!priceData || !priceData.c || priceData.c <= 0) continue;
-      const priceUSD = priceData.c;
-      const futureFlows = bond.flujos
-        .map(f => ({ fecha: parseLocalDate(f.fecha), monto: f.monto }))
-        .filter(f => f.fecha > today);
-      if (futureFlows.length === 0) continue;
-      const ytm = calcYTM(priceUSD / 100, futureFlows, today);
-      if (isNaN(ytm) || !isFinite(ytm)) continue;
-      const duration = calcDuration(priceUSD / 100, futureFlows, today, ytm);
-      items.push({ symbol: key, d912Ticker, nombre: bond.nombre || '', priceUSD, ytm, duration, vencimiento: bond.vencimiento, volume: priceData.v || 0, flujos: futureFlows });
+    const mepPrice = cotizacionesRes?.mep?.price || null;
+    const items = buildBDIOnItems(prices, mepPrice);
+    if (!items.length) {
+      container.innerHTML = `<p style="text-align:center;color:var(--text-secondary)">${t('ons_empty')}</p>`;
+      document.getElementById('ons-source').textContent = t('ons_source_short');
+      renderONsYieldCurve([]);
+      return;
     }
-    items.sort((a, b) => a.duration - b.duration);
     renderONsTable(container, items);
     renderONsYieldCurve(items);
-    document.getElementById('ons-source').textContent = 'Fuente: data912 para precios + config interna para flujos y vencimientos.';
+    document.getElementById('ons-source').textContent = t('ons_source_full');
   } catch(err) {
-    container.innerHTML = '<p style="color:var(--red)">Error cargando ONs: ' + err.message + '</p>';
+    container.innerHTML = `<p style="color:var(--red)">${t('ons_error', { message: err.message })}</p>`;
   }
 }
 
 function renderONsTable(container, items) {
-  let html = `<div style="overflow-x:auto"><table class="soberanos-table">
-    <thead><tr><th>TICKER</th><th>EMISOR</th><th>PRECIO</th><th class="col-duration">DURATION</th><th class="col-vto">VENCIMIENTO</th><th>TIR</th></tr></thead><tbody>`;
+  const mep = items[0]?.mepPrice || null;
+  const best = items.reduce((acc, item) => item.ytm > (acc?.ytm ?? -Infinity) ? item : acc, null);
+  const avgTir = items.reduce((sum, item) => sum + item.ytm, 0) / items.length;
+  const pricedInArs = items.filter((item) => item.priceARS != null).length;
+
+  const summaryCards = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px">
+      <div style="padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+        <div style="font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Dolar MEP</div>
+        <div style="margin-top:6px;font-size:1.5rem;font-weight:700;color:var(--accent)">$${formatOnNumber(mep, 2)}</div>
+      </div>
+      <div style="padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+        <div style="font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Emisores con punta ARS</div>
+        <div style="margin-top:6px;font-size:1.5rem;font-weight:700;color:var(--text)">${pricedInArs}/${items.length}</div>
+      </div>
+      <div style="padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+        <div style="font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">TIR promedio</div>
+        <div style="margin-top:6px;font-size:1.5rem;font-weight:700;color:var(--text)">${formatOnPercent(avgTir, 2)}</div>
+      </div>
+      <div style="padding:14px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+        <div style="font-size:0.75rem;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.06em">Mejor TIR</div>
+        <div style="margin-top:6px;font-size:1.5rem;font-weight:700;color:var(--green)">${best ? `${best.symbol} · ${formatOnPercent(best.ytm, 2)}` : '—'}</div>
+      </div>
+    </div>`;
+
+  let html = `<div class="bdi-ons-table-wrap"><table class="soberanos-table bdi-ons-table">
+    <thead><tr><th>TICKER</th><th>EMISOR</th><th class="col-ley">LEY</th><th>ARS</th><th>USD</th><th>TC IMPL.</th><th>PARIDAD</th><th>TIR USD</th><th>TIR ARS</th><th class="col-duration">DURATION</th><th class="col-vto">PROX. PAGO</th><th class="col-vto">VTO.</th></tr></thead><tbody>`;
   for (const item of items) {
-    const tirColor = item.ytm >= 0 ? 'var(--green)' : 'var(--red)';
     html += `<tr class="on-row" data-symbol="${item.symbol}" style="cursor:pointer">
-      <td><strong style="color:var(--accent)">${item.d912Ticker}</strong></td>
-      <td style="color:var(--text-secondary)">${item.nombre || ''}</td>
-      <td style="text-align:right">$${item.priceUSD.toFixed(2)}</td>
-      <td class="col-duration" style="text-align:right">${item.duration.toFixed(2)}</td>
-      <td class="col-vto">${item.vencimiento}</td>
-      <td class="lecap-tir" style="text-align:right">${item.ytm.toFixed(2)}%</td></tr>`;
+      <td>
+        <strong style="color:var(--accent)">${item.symbol}</strong>
+        <div style="font-size:0.72rem;color:var(--text-secondary)">${item.d912Ticker}${item.arsTicker ? ` / ${item.arsTicker}` : ''}</div>
+      </td>
+      <td>
+        <div>${item.company || ''}</div>
+        <div style="font-size:0.72rem;color:var(--text-secondary)">Calif.: ${item.rating || '—'} · Lamina: ${item.lotSize || '—'}</div>
+      </td>
+      <td>${item.law || '—'}</td>
+      <td style="text-align:right">${item.priceARS != null ? `$${formatOnNumber(item.priceARS, 2)}` : '—'}</td>
+      <td style="text-align:right">US$${formatOnNumber(item.priceUSD, 2)}</td>
+      <td style="text-align:right">${item.implicitFx != null ? `$${formatOnNumber(item.implicitFx, 2)}` : '—'}</td>
+      <td style="text-align:right">${formatOnPercent(item.parity, 2)}</td>
+      <td class="lecap-tir" style="text-align:right">${formatOnPercent(item.ytm, 2)}</td>
+      <td style="text-align:right">${formatOnPercent(item.ytmArs, 2)}</td>
+      <td class="col-duration" style="text-align:right">${formatOnNumber(item.duration, 2)}</td>
+      <td class="col-vto bdi-ons-next-payment">${item.nextPaymentLabel}</td>
+      <td class="col-vto bdi-ons-maturity">${item.vencimiento}</td></tr>`;
   }
-  html += '</tbody></table></div><p class="calc-hint">💡 <span>Click</span> en cualquier ON para abrir la calculadora</p>';
-  container.innerHTML = html;
+  html += '</tbody></table></div><p class="calc-hint">💡 <span>Click</span> en cualquier ON para abrir la calculadora y revisar sensibilidad, flujos y ficha tecnica.</p>';
+  container.innerHTML = summaryCards + html;
   // Make sortable
   const table = container.querySelector('.soberanos-table');
   if (table) makeSortable(table);
@@ -2463,9 +3198,12 @@ function renderONsYieldCurve(items) {
   const canvas = document.getElementById('ons-scatter');
   if (!canvas || typeof Chart === 'undefined') return;
   if (onsChart) onsChart.destroy();
+  if (!items.length) return;
   const textColor = '#555555';
   const gridColor = '#1a1a1a';
-  const points = items.map(i => ({ x: i.duration, y: i.ytm, label: i.d912Ticker }));
+  const points = [...items]
+    .sort((a, b) => a.duration - b.duration)
+    .map(i => ({ x: i.duration, y: i.ytm, label: i.symbol }));
   const curvePoints = points.length >= 3 ? fitPolyCurve(points.map(p => [p.x, p.y]), 2, 200) : [];
   const datasets = [{
     label: 'ONs', data: points, backgroundColor: '#00d26a', borderColor: '#00d26a',
@@ -2498,11 +3236,19 @@ function openONCalculator(item) {
   overlay.innerHTML = `
     <div class="mundo-modal">
       <div class="mundo-modal-header">
-        <div><h3 style="margin:0">${item.d912Ticker} — Calculadora</h3>
-        <p style="margin:4px 0 0;color:var(--text-secondary);font-size:0.85rem">Vencimiento: ${item.vencimiento}</p></div>
+        <div><h3 style="margin:0">${item.symbol} — ${item.company || item.d912Ticker}</h3>
+        <p style="margin:4px 0 0;color:var(--text-secondary);font-size:0.85rem">${item.d912Ticker}${item.arsTicker ? ` / ${item.arsTicker}` : ''} · Vencimiento: ${item.vencimiento}</p></div>
         <button class="mundo-modal-close">&times;</button>
       </div>
       <div class="mundo-modal-body" style="padding:16px">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+          <span style="padding:6px 10px;border-radius:999px;background:rgba(19,114,71,0.12);color:var(--accent);font-size:0.78rem;font-weight:700">Ley ${item.law || '—'}</span>
+          <span style="padding:6px 10px;border-radius:999px;background:var(--bg-subtle);color:var(--text-secondary);font-size:0.78rem;font-weight:700">Calif. ${item.rating || '—'}</span>
+          <span style="padding:6px 10px;border-radius:999px;background:var(--bg-subtle);color:var(--text-secondary);font-size:0.78rem;font-weight:700">Lamina ${item.lotSize || '—'}</span>
+          <span style="padding:6px 10px;border-radius:999px;background:var(--bg-subtle);color:var(--text-secondary);font-size:0.78rem;font-weight:700">Paridad ${formatOnPercent(item.parity, 2)}</span>
+          <span style="padding:6px 10px;border-radius:999px;background:var(--bg-subtle);color:var(--text-secondary);font-size:0.78rem;font-weight:700">Prox. pago ${item.nextPaymentLabel || '—'}</span>
+        </div>
+        ${item.description ? `<p style="margin:0 0 14px;color:var(--text-secondary);line-height:1.55">${item.description}</p>` : ''}
         <div style="display:flex;gap:20px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
           <div><label style="font-size:0.8rem;color:var(--text-secondary)">Precio USD</label>
             <input type="number" id="on-calc-price" value="${item.priceUSD.toFixed(2)}" step="0.01" style="${inputStyle}"></div>
@@ -2512,6 +3258,13 @@ function openONCalculator(item) {
             <div id="on-calc-tir" style="font-size:1.5rem;font-weight:700;color:${item.ytm >= 0 ? 'var(--green)' : 'var(--red)'}">${item.ytm.toFixed(2)}%</div></div>
           <div><label style="font-size:0.8rem;color:var(--text-secondary)">Duration</label>
             <div id="on-calc-duration" style="font-size:1.2rem;font-weight:600;color:var(--text)">${item.duration.toFixed(2)} años</div></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;flex-wrap:wrap;padding:8px 12px;background:var(--bg-subtle);border-radius:6px">
+          <span style="font-size:0.75rem;color:var(--text-secondary);font-weight:600">Referencia BDI:</span>
+          <span style="font-size:0.82rem;color:var(--text-secondary)">Precio ARS: <strong style="color:var(--text)">${item.priceARS != null ? `$${formatOnNumber(item.priceARS, 2)}` : '—'}</strong></span>
+          <span style="font-size:0.82rem;color:var(--text-secondary)">TC implicito: <strong style="color:var(--text)">${item.implicitFx != null ? `$${formatOnNumber(item.implicitFx, 2)}` : '—'}</strong></span>
+          <span style="font-size:0.82rem;color:var(--text-secondary)">TIR ARS: <strong style="color:var(--text)">${formatOnPercent(item.ytmArs, 2)}</strong></span>
+          <span style="font-size:0.82rem;color:var(--text-secondary)">Convexity: <strong style="color:var(--text)">${formatOnNumber(item.convexity, 2)}</strong></span>
         </div>
         <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;flex-wrap:wrap;padding:8px 12px;background:var(--bg-subtle);border-radius:6px">
           <span style="font-size:0.75rem;color:var(--text-secondary);font-weight:600">Costos:</span>
@@ -2749,14 +3502,14 @@ function openLecapCalculator(item) {
 const MONTH_NAMES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 
 const ASSET_TYPES = {
-  soberano: { label: 'Soberanos', emoji: '🏛️', currency: 'USD', qtyLabel: 'Valor Nominal (VN)' },
-  on: { label: 'ONs', emoji: '🏢', currency: 'USD', qtyLabel: 'Valor Nominal (VN)' },
-  cer: { label: 'Bonos CER', emoji: '📊', currency: 'ARS', qtyLabel: 'Valor Nominal (VN)' },
-  lecap: { label: 'LECAPs', emoji: '📈', currency: 'ARS', qtyLabel: 'Valor Nominal (VN)' },
-  fci: { label: 'FCIs', emoji: '💰', currency: 'ARS', qtyLabel: 'Cuotapartes' },
-  garantizado: { label: 'Billeteras', emoji: '🏦', currency: 'ARS', qtyLabel: 'Monto (ARS)' },
-  cash: { label: 'Cash', emoji: '💵', currency: 'USD', qtyLabel: 'Monto' },
-  custom: { label: 'Otro', emoji: '⭐', currency: 'USD', qtyLabel: 'Cantidad' },
+  soberano: { label: currentLanguage === 'en' ? 'Sovereigns' : 'Soberanos', emoji: '🏛️', currency: 'USD', qtyLabel: currentLanguage === 'en' ? 'Face value (VN)' : 'Valor Nominal (VN)' },
+  on: { label: currentLanguage === 'en' ? 'Corporate bonds' : 'ONs', emoji: '🏢', currency: 'USD', qtyLabel: currentLanguage === 'en' ? 'Face value (VN)' : 'Valor Nominal (VN)' },
+  cer: { label: currentLanguage === 'en' ? 'CER bonds' : 'Bonos CER', emoji: '📊', currency: 'ARS', qtyLabel: currentLanguage === 'en' ? 'Face value (VN)' : 'Valor Nominal (VN)' },
+  lecap: { label: 'LECAPs', emoji: '📈', currency: 'ARS', qtyLabel: currentLanguage === 'en' ? 'Face value (VN)' : 'Valor Nominal (VN)' },
+  fci: { label: 'FCIs', emoji: '💰', currency: 'ARS', qtyLabel: currentLanguage === 'en' ? 'Fund units' : 'Cuotapartes' },
+  garantizado: { label: currentLanguage === 'en' ? 'Wallets' : 'Billeteras', emoji: '🏦', currency: 'ARS', qtyLabel: currentLanguage === 'en' ? 'Amount (ARS)' : 'Monto (ARS)' },
+  cash: { label: 'Cash', emoji: '💵', currency: 'USD', qtyLabel: currentLanguage === 'en' ? 'Amount' : 'Monto' },
+  custom: { label: currentLanguage === 'en' ? 'Other' : 'Otro', emoji: '⭐', currency: 'USD', qtyLabel: currentLanguage === 'en' ? 'Quantity' : 'Cantidad' },
 };
 
 // ─── PPP & Operations helpers ───
@@ -3621,4 +4374,1610 @@ function renderCashflowChart(months) {
       }
     }
   });
+}
+
+// ─── PORTFOLIO OPTIMIZER ───
+let optimizerFrontierChart = null;
+let optimizerAssetsChart = null;
+let optimizerPortfoliosChart = null;
+
+function formatCompoundCurrency(value) {
+  return new Intl.NumberFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value || 0);
+}
+
+function formatMarketCapCompact(value) {
+  const locale = currentLanguage === 'en' ? 'en-US' : 'es-AR';
+  if (value >= 1_000_000_000_000) return `${(value / 1_000_000_000_000).toLocaleString(locale, { maximumFractionDigits: 1 })}T`;
+  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toLocaleString(locale, { maximumFractionDigits: 0 })}B`;
+  return `${(value / 1_000_000).toLocaleString(locale, { maximumFractionDigits: 0 })}M`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatHeatmapPrice(value) {
+  return new Intl.NumberFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: value >= 100 ? 0 : 2,
+    maximumFractionDigits: value >= 100 ? 0 : 2,
+  }).format(value || 0);
+}
+
+function buildHeatmapTooltip(tile) {
+  const isEnglish = currentLanguage === 'en';
+  return `
+    <div class="heatmap-tooltip-head">
+      <div>
+        <div class="heatmap-tooltip-ticker">${escapeHtml(tile.ticker)}</div>
+        <div class="heatmap-tooltip-name">${escapeHtml(tile.name || tile.ticker)}</div>
+      </div>
+      <div class="heatmap-tooltip-change ${Number(tile.change || 0) >= 0 ? 'positive' : 'negative'}">${Number(tile.change || 0) >= 0 ? '+' : ''}${Number(tile.change || 0).toFixed(2)}%</div>
+    </div>
+    <div class="heatmap-tooltip-grid">
+      <div><span>${isEnglish ? 'Price' : 'Precio'}</span><strong>${formatHeatmapPrice(Number(tile.price || 0))}</strong></div>
+      <div><span>${isEnglish ? 'Market cap' : 'Market cap'}</span><strong>${formatMarketCapCompact(Number(tile.marketCap || 0))}</strong></div>
+      <div><span>${isEnglish ? 'Sector' : 'Sector'}</span><strong>${escapeHtml(tile.sector || '-')}</strong></div>
+      <div><span>${isEnglish ? 'Industry' : 'Industria'}</span><strong>${escapeHtml(tile.industry || '-')}</strong></div>
+    </div>
+  `;
+}
+
+function setupHeatmapTooltip(container) {
+  const shell = container.querySelector('.optimizer-svg-shell');
+  const tooltip = container.querySelector('.heatmap-tooltip');
+  const frame = container.querySelector('.optimizer-svg-frame');
+  if (!shell || !tooltip || !frame) return;
+
+  const positionTooltip = (event) => {
+    if (tooltip.hidden) return;
+    const shellRect = shell.getBoundingClientRect();
+    const offsetX = event.clientX - shellRect.left + 18;
+    const offsetY = event.clientY - shellRect.top + 18;
+    const maxX = shellRect.width - tooltip.offsetWidth - 8;
+    const maxY = shellRect.height - tooltip.offsetHeight - 8;
+    const x = Math.max(8, Math.min(offsetX, maxX));
+    const y = Math.max(8, Math.min(offsetY, maxY));
+    tooltip.style.transform = `translate(${x}px, ${y}px)`;
+  };
+
+  const showTooltip = (target, event) => {
+    tooltip.innerHTML = buildHeatmapTooltip(target.dataset);
+    tooltip.hidden = false;
+    positionTooltip(event);
+  };
+
+  const hideTooltip = () => {
+    tooltip.hidden = true;
+  };
+
+  frame.querySelectorAll('[data-heatmap-tile="true"]').forEach((tile) => {
+    tile.addEventListener('mouseenter', (event) => showTooltip(tile, event));
+    tile.addEventListener('mousemove', positionTooltip);
+    tile.addEventListener('mouseleave', hideTooltip);
+  });
+  frame.addEventListener('mouseleave', hideTooltip);
+}
+
+function sliceDiceLayout(items, x, y, width, height, horizontal = true) {
+  const total = items.reduce((sum, item) => sum + Math.max(item.value || 0, 0), 0) || 1;
+  let cursor = horizontal ? x : y;
+  return items.map((item, index) => {
+    const fraction = (Math.max(item.value || 0, 0)) / total;
+    const isLast = index === items.length - 1;
+    if (horizontal) {
+      const itemWidth = isLast ? (x + width - cursor) : width * fraction;
+      const rect = { ...item, x: cursor, y, width: itemWidth, height };
+      cursor += itemWidth;
+      return rect;
+    }
+    const itemHeight = isLast ? (y + height - cursor) : height * fraction;
+    const rect = { ...item, x, y: cursor, width, height: itemHeight };
+    cursor += itemHeight;
+    return rect;
+  });
+}
+
+function splitTreemapItems(items) {
+  const total = items.reduce((sum, item) => sum + Math.max(item.value || 0, 0), 0) || 1;
+  let running = 0;
+  let splitIndex = 0;
+  for (let i = 0; i < items.length; i += 1) {
+    running += Math.max(items[i].value || 0, 0);
+    splitIndex = i + 1;
+    if (running >= total / 2) break;
+  }
+  if (splitIndex <= 0 || splitIndex >= items.length) {
+    splitIndex = Math.max(1, Math.floor(items.length / 2));
+  }
+  const first = items.slice(0, splitIndex);
+  const second = items.slice(splitIndex);
+  const firstValue = first.reduce((sum, item) => sum + Math.max(item.value || 0, 0), 0);
+  return { first, second, firstValue, total };
+}
+
+function balancedTreemapLayout(items, x, y, width, height) {
+  const filtered = items.filter((item) => (item.value || 0) > 0);
+  if (!filtered.length) return [];
+  if (filtered.length === 1) return [{ ...filtered[0], x, y, width, height }];
+
+  const { first, second, firstValue, total } = splitTreemapItems(filtered);
+  const ratio = total > 0 ? firstValue / total : 0.5;
+
+  if (width >= height) {
+    const firstWidth = width * ratio;
+    return [
+      ...balancedTreemapLayout(first, x, y, firstWidth, height),
+      ...balancedTreemapLayout(second, x + firstWidth, y, Math.max(0, width - firstWidth), height),
+    ];
+  }
+
+  const firstHeight = height * ratio;
+  return [
+    ...balancedTreemapLayout(first, x, y, width, firstHeight),
+    ...balancedTreemapLayout(second, x, y + firstHeight, width, Math.max(0, height - firstHeight)),
+  ];
+}
+
+function partitionHeatmapRows(items, rowCount = 2) {
+  const total = items.reduce((sum, item) => sum + item.value, 0) || 1;
+  const rows = Array.from({ length: rowCount }, () => []);
+  const rowTotals = Array.from({ length: rowCount }, () => 0);
+  items.forEach((item) => {
+    const target = rowTotals.indexOf(Math.min(...rowTotals));
+    rows[target].push(item);
+    rowTotals[target] += item.value;
+  });
+  return rows
+    .map((row, index) => ({ items: row, value: rowTotals[index] }))
+    .filter((row) => row.items.length > 0)
+    .map((row) => ({ ...row, ratio: row.value / total }));
+}
+
+function heatmapColor(change) {
+  const clamped = Math.max(-6, Math.min(6, change || 0));
+  if (Math.abs(clamped) < 0.25) return 'rgb(78, 82, 96)';
+  if (clamped > 0) {
+    const intensity = clamped / 6;
+    const red = Math.round(28 + intensity * 14);
+    const green = Math.round(92 + intensity * 98);
+    const blue = Math.round(40 + intensity * 22);
+    return `rgb(${red}, ${green}, ${blue})`;
+  }
+  const intensity = Math.abs(clamped) / 6;
+  const red = Math.round(126 + intensity * 110);
+  const green = Math.round(42 + intensity * 16);
+  const blue = Math.round(50 + intensity * 16);
+  return `rgb(${red}, ${green}, ${blue})`;
+}
+
+function renderHeatmap(data) {
+  const container = document.getElementById('heatmap-chart');
+  const empty = document.getElementById('heatmap-empty');
+  if (!container || !empty) return;
+
+  const width = 1380;
+  const height = 820;
+  const sectorHeader = 28;
+  const industryHeader = 16;
+  const innerGap = 3;
+  const outerGap = 10;
+
+  const sectors = Array.from(data.reduce((map, item) => {
+    if (!map.has(item.sector)) map.set(item.sector, []);
+    map.get(item.sector).push(item);
+    return map;
+  }, new Map()).entries()).map(([sector, items]) => ({
+    sector,
+    value: items.reduce((sum, item) => sum + item.marketCap, 0),
+    items: items.slice().sort((a, b) => b.marketCap - a.marketCap),
+  })).sort((a, b) => b.value - a.value);
+  const totalMarketCap = sectors.reduce((sum, sector) => sum + sector.value, 0) || 1;
+
+  const rowGroups = partitionHeatmapRows(sectors, 4);
+  let rowCursorY = outerGap;
+  const sectorRects = [];
+  rowGroups.forEach((row, rowIndex) => {
+    const rowHeight = (height - outerGap * (rowGroups.length + 1)) * row.ratio;
+    const effectiveRowHeight = rowIndex === rowGroups.length - 1 ? height - rowCursorY - outerGap : rowHeight;
+    const rowRects = sliceDiceLayout(row.items, outerGap, rowCursorY, width - outerGap * 2, effectiveRowHeight, true);
+    sectorRects.push(...rowRects);
+    rowCursorY += effectiveRowHeight + outerGap;
+  });
+
+  const sectorSvg = sectorRects.map((sectorRect, sectorIndex) => {
+    const sx = sectorRect.x;
+    const sy = sectorRect.y;
+    const sw = Math.max(80, sectorRect.width);
+    const sh = Math.max(90, sectorRect.height);
+      const sectorInnerX = sx + 4;
+      const sectorInnerY = sy + sectorHeader + 4;
+      const sectorInnerW = Math.max(20, sw - 8);
+      const sectorInnerH = Math.max(20, sh - sectorHeader - 8);
+
+    const industries = Array.from(sectorRect.items.reduce((map, item) => {
+      if (!map.has(item.industry)) map.set(item.industry, []);
+      map.get(item.industry).push(item);
+      return map;
+    }, new Map()).entries()).map(([industry, items]) => ({
+      industry,
+      value: items.reduce((sum, item) => sum + item.marketCap, 0),
+      items: items.slice().sort((a, b) => b.marketCap - a.marketCap),
+    })).sort((a, b) => b.value - a.value);
+
+    const industryRects = balancedTreemapLayout(
+      industries.map((industry) => ({ ...industry, value: industry.value })),
+      sectorInnerX,
+      sectorInnerY,
+      sectorInnerW,
+      sectorInnerH
+    );
+
+    const industrySvg = industryRects.map((industryRect, industryIndex) => {
+        const ix = industryRect.x + 2;
+        const iy = industryRect.y + 2;
+        const iw = Math.max(12, industryRect.width - 4);
+        const ih = Math.max(12, industryRect.height - 4);
+        const showIndustryHeader = iw * ih > 16500 && iw > 120 && ih > 72;
+
+      const tileRects = balancedTreemapLayout(
+        industryRect.items.map((item) => ({ ...item, value: item.marketCap })),
+        ix,
+        iy + (showIndustryHeader ? industryHeader : 0),
+        iw,
+        Math.max(10, ih - (showIndustryHeader ? industryHeader : 0))
+      );
+
+        const tileSvg = tileRects.map((tile) => {
+          const tx = tile.x + innerGap / 2;
+          const ty = tile.y + innerGap / 2;
+          const tw = Math.max(8, tile.width - innerGap);
+          const th = Math.max(8, tile.height - innerGap);
+        const area = tw * th;
+          const huge = area > 32000;
+          const large = area > 17500;
+          const medium = area > 8400;
+          const small = area > 3800;
+          const tiny = area > 1850;
+          const baseSymbolSize = huge ? 40 : large ? 26 : medium ? 16 : small ? 11 : 9;
+          const symbolSize = Math.max(8, Math.min(baseSymbolSize, Math.floor(tw / Math.max(tile.ticker.length * 0.55, 2.8))));
+          const changeSize = huge ? 15 : large ? 12 : medium ? 10 : 8;
+          const showTicker = tw > 28 && th > 18;
+          const showChange = small && th > 32 && tw > 42;
+          const showLabelBlock = medium && tw > 92 && th > 58;
+          const showMiniTicker = !showLabelBlock && tiny && tw > 44 && th > 24;
+          const tileStroke = area > 6000 ? 'rgba(6, 10, 18, 0.56)' : 'rgba(6, 10, 18, 0.42)';
+          const labelShadow = 'paint-order: stroke; stroke: rgba(8, 12, 20, 0.22); stroke-width: 1.3;';
+          return `
+            <g class="heatmap-tile" data-heatmap-tile="true" data-ticker="${escapeHtml(tile.ticker)}" data-name="${escapeHtml(tile.name || tile.ticker)}" data-sector="${escapeHtml(tile.sector || '')}" data-industry="${escapeHtml(tile.industry || '')}" data-price="${tile.price || 0}" data-change="${tile.change || 0}" data-market-cap="${tile.marketCap || 0}">
+              <rect class="heatmap-tile-main" x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" width="${tw.toFixed(2)}" height="${th.toFixed(2)}" rx="4.5" fill="${heatmapColor(tile.change)}" stroke="${tileStroke}" stroke-width="0.9"></rect>
+              <rect class="heatmap-tile-sheen" x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" width="${tw.toFixed(2)}" height="${Math.max(5, th * 0.16).toFixed(2)}" rx="4.5" fill="rgba(255,255,255,0.04)"></rect>
+              ${showLabelBlock ? `
+                <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 - 4).toFixed(2)}" text-anchor="middle" font-size="${symbolSize}" font-weight="700" fill="#ffffff" style="${labelShadow}">${tile.ticker}</text>
+                <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 + (huge ? 24 : 16)).toFixed(2)}" text-anchor="middle" font-size="${changeSize}" font-weight="700" fill="rgba(255,255,255,0.96)" style="${labelShadow}">${tile.change > 0 ? '+' : ''}${tile.change.toFixed(1)}%</text>
+              ` : showMiniTicker && showTicker ? `
+                <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 + 3).toFixed(2)}" text-anchor="middle" font-size="${symbolSize}" font-weight="700" fill="#ffffff" style="${labelShadow}">${tile.ticker}</text>
+              ` : ''}
+              ${showChange && !showLabelBlock ? `<text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th - 7).toFixed(2)}" text-anchor="middle" font-size="7.8" font-weight="700" fill="rgba(255,255,255,0.94)" style="${labelShadow}">${tile.change > 0 ? '+' : ''}${tile.change.toFixed(1)}%</text>` : ''}
+            </g>
+          `;
+        }).join('');
+
+        return `
+          <g>
+            ${showIndustryHeader ? `
+              <rect x="${ix.toFixed(2)}" y="${iy.toFixed(2)}" width="${Math.min(iw, Math.max(96, iw * 0.58)).toFixed(2)}" height="${(industryHeader - 3).toFixed(2)}" rx="4" fill="rgba(255,255,255,0.045)" stroke="rgba(255,255,255,0.065)" stroke-width="0.6"></rect>
+              <text x="${(ix + 7).toFixed(2)}" y="${(iy + 10.8).toFixed(2)}" font-size="7.8" font-weight="700" letter-spacing="0.34" fill="rgba(255,255,255,0.72)">${industryRect.industry.toUpperCase()}</text>
+            ` : ''}
+            ${tileSvg}
+          </g>
+        `;
+      }).join('');
+
+      const sectorHeaderVisible = sw > 120 && sh > 52;
+      const sectorShare = `${((sectorRect.value / totalMarketCap) * 100).toFixed(sw > 190 ? 1 : 0)}%`;
+
+      return `
+        <g>
+          <rect x="${sx.toFixed(2)}" y="${sy.toFixed(2)}" width="${sw.toFixed(2)}" height="${sh.toFixed(2)}" rx="12" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.075)" stroke-width="0.9"></rect>
+          ${sectorHeaderVisible ? `<rect x="${sx.toFixed(2)}" y="${sy.toFixed(2)}" width="${sw.toFixed(2)}" height="${sectorHeader}" rx="12" fill="rgba(255,255,255,0.055)"></rect>` : ''}
+          ${sectorHeaderVisible ? `<line x1="${sx.toFixed(2)}" y1="${(sy + sectorHeader).toFixed(2)}" x2="${(sx + sw).toFixed(2)}" y2="${(sy + sectorHeader).toFixed(2)}" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"></line>` : ''}
+          ${sectorHeaderVisible ? `<text x="${(sx + 12).toFixed(2)}" y="${(sy + 18).toFixed(2)}" font-size="11" font-weight="700" letter-spacing="0.5" fill="#f8fafc">${sectorRect.sector.toUpperCase()}</text>` : ''}
+          ${sectorHeaderVisible && sw > 180 ? `<text x="${(sx + sw - 12).toFixed(2)}" y="${(sy + 18).toFixed(2)}" text-anchor="end" font-size="8.8" font-weight="700" letter-spacing="0.24" fill="rgba(255,255,255,0.54)">${sectorShare}</text>` : ''}
+          ${industrySvg}
+        </g>
+      `;
+    }).join('');
+
+  container.innerHTML = `
+    <div class="optimizer-svg-shell">
+      <div class="optimizer-svg-frame">
+        <svg class="optimizer-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${t('heatmap_title')}">
+          <defs>
+            <linearGradient id="heatmapBg" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#232633"></stop>
+              <stop offset="100%" stop-color="#171922"></stop>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="${width}" height="${height}" fill="url(#heatmapBg)"></rect>
+          <rect x="7" y="7" width="${width - 14}" height="${height - 14}" rx="18" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="1"></rect>
+          ${sectorSvg}
+        </svg>
+      </div>
+      <div class="optimizer-legend" style="justify-content:center">
+        <span class="optimizer-legend-item"><span class="optimizer-legend-swatch" style="background:${heatmapColor(-3.5)}"></span>${t('heatmap_legend_negative')}</span>
+        <span class="optimizer-legend-item"><span class="optimizer-legend-swatch" style="background:${heatmapColor(0)}"></span>${t('heatmap_legend_flat')}</span>
+        <span class="optimizer-legend-item"><span class="optimizer-legend-swatch" style="background:${heatmapColor(3.5)}"></span>${t('heatmap_legend_positive')}</span>
+        <span class="optimizer-legend-item">${currentLanguage === 'en' ? 'Size by market cap' : 'Tamaño por market cap'}</span>
+      </div>
+      <div class="heatmap-tooltip" hidden></div>
+    </div>
+  `;
+
+  empty.style.display = 'none';
+  setupHeatmapTooltip(container);
+}
+
+async function loadHeatmap() {
+  const statusEl = document.getElementById('heatmap-status');
+  const sourceEl = document.getElementById('heatmap-source');
+  const emptyEl = document.getElementById('heatmap-empty');
+  const chartEl = document.getElementById('heatmap-chart');
+  const startInput = document.getElementById('heatmap-start-date');
+  const endInput = document.getElementById('heatmap-end-date');
+  const start = startInput?.value || '';
+  const end = endInput?.value || '';
+  if (statusEl) statusEl.textContent = t('heatmap_loading');
+  if (sourceEl) sourceEl.textContent = resolveHeatmapSource('yahoo-fallback');
+  if (emptyEl) emptyEl.style.display = '';
+  if (chartEl) chartEl.innerHTML = '';
+
+  try {
+    const params = new URLSearchParams();
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+    const response = await fetch(`/api/heatmap${params.toString() ? `?${params.toString()}` : ''}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const payload = await response.json();
+    const data = Array.isArray(payload?.data) ? payload.data : [];
+    if (!data.length) {
+      if (statusEl) statusEl.textContent = t('heatmap_empty');
+      if (emptyEl) emptyEl.textContent = t('heatmap_empty');
+      return;
+    }
+    renderHeatmap(data);
+    if (statusEl) {
+      statusEl.textContent = `${data.length} ${currentLanguage === 'en' ? 'stocks loaded' : 'acciones cargadas'} · ${describeHeatmapPeriod(start, end)} · ${currentLanguage === 'en' ? 'updated' : 'actualizado'} ${new Date(payload.updated || Date.now()).toLocaleTimeString(currentLanguage === 'en' ? 'en-US' : 'es-AR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    if (sourceEl) sourceEl.textContent = resolveHeatmapSource(payload.provider);
+  } catch (error) {
+    if (statusEl) statusEl.textContent = t('heatmap_error', { message: error.message });
+    if (emptyEl) emptyEl.textContent = t('heatmap_empty');
+  }
+}
+
+function setupHeatmap() {
+  document.getElementById('heatmap-refresh-btn')?.addEventListener('click', loadHeatmap);
+  document.getElementById('heatmap-now-btn')?.addEventListener('click', () => {
+    const endInput = document.getElementById('heatmap-end-date');
+    if (endInput) endInput.value = '';
+    loadHeatmap();
+  });
+  const statusEl = document.getElementById('heatmap-status');
+  const sourceEl = document.getElementById('heatmap-source');
+  const emptyEl = document.getElementById('heatmap-empty');
+  const startLabel = document.getElementById('heatmap-start-label');
+  const endLabel = document.getElementById('heatmap-end-label');
+  const periodHint = document.getElementById('heatmap-period-hint');
+  if (statusEl) statusEl.textContent = t('heatmap_loading');
+  if (sourceEl) sourceEl.textContent = resolveHeatmapSource('yahoo-fallback');
+  if (emptyEl) emptyEl.textContent = currentLanguage === 'en' ? 'Load the map to view the sector layout.' : 'Cargá el mapa para ver la distribución sectorial.';
+  if (startLabel) startLabel.textContent = t('heatmap_start_label');
+  if (endLabel) endLabel.textContent = t('heatmap_end_label');
+  if (periodHint) periodHint.textContent = t('heatmap_period_hint');
+  document.getElementById('heatmap-now-btn')?.replaceChildren(document.createTextNode(t('heatmap_now')));
+  document.getElementById('heatmap-refresh-btn')?.replaceChildren(document.createTextNode(t('heatmap_refresh')));
+}
+
+function resolveHeatmapSource(provider) {
+  if (provider === 'polygon-reference+yahoo') return t('heatmap_source_polygon_reference');
+  if (provider === 'polygon') return t('heatmap_source_polygon');
+  return t('heatmap_source_yahoo');
+}
+
+function formatHeatmapDateLabel(value) {
+  if (!value) return currentLanguage === 'en' ? 'now' : 'ahora';
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, (month || 1) - 1, day || 1);
+  return date.toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function describeHeatmapPeriod(start, end) {
+  if (!start) return currentLanguage === 'en' ? 'daily move' : 'variación diaria';
+  if (!end) return currentLanguage === 'en'
+    ? `from ${formatHeatmapDateLabel(start)} to now`
+    : `desde ${formatHeatmapDateLabel(start)} hasta ahora`;
+  return currentLanguage === 'en'
+    ? `from ${formatHeatmapDateLabel(start)} to ${formatHeatmapDateLabel(end)}`
+    : `desde ${formatHeatmapDateLabel(start)} hasta ${formatHeatmapDateLabel(end)}`;
+}
+
+function formatCompoundAxisCurrency(value) {
+  const abs = Math.abs(value || 0);
+  const sign = value < 0 ? '-' : '';
+  const locale = currentLanguage === 'en' ? 'en-US' : 'es-AR';
+  if (abs >= 1_000_000) {
+    return `${sign}US$ ${(abs / 1_000_000).toLocaleString(locale, { maximumFractionDigits: 1 })}M`;
+  }
+  if (abs >= 1_000) {
+    return `${sign}US$ ${(abs / 1_000).toLocaleString(locale, { maximumFractionDigits: 1 })}K`;
+  }
+  return `${sign}${formatCompoundCurrency(abs)}`;
+}
+
+function formatCompoundPercent(value) {
+  return `${(value || 0).toFixed(1)}%`;
+}
+
+function buildCompoundLabel(monthIndex) {
+  const years = monthIndex / 12;
+  if (currentLanguage === 'en') {
+    return years === 1 ? '1 year' : `${years.toFixed(years % 1 === 0 ? 0 : 1)} years`;
+  }
+  return years === 1 ? '1 año' : `${years.toFixed(years % 1 === 0 ? 0 : 1)} años`;
+}
+
+function getEffectiveMonthlyRate(annualRatePct, frequencyPerYear) {
+  const annualRate = annualRatePct / 100;
+  if (!Number.isFinite(annualRate) || !Number.isFinite(frequencyPerYear) || frequencyPerYear <= 0) return 0;
+  if (annualRate <= -1) return -1;
+  const effectiveAnnual = Math.pow(1 + annualRate / frequencyPerYear, frequencyPerYear) - 1;
+  return Math.pow(1 + effectiveAnnual, 1 / 12) - 1;
+}
+
+function runCompoundScenario({ initial, contribution, years, annualRatePct, frequency }) {
+  const months = Math.max(1, Math.round(years * 12));
+  const monthlyRate = getEffectiveMonthlyRate(annualRatePct, frequency);
+  const series = [];
+  let cashOnly = initial;
+  let invested = initial;
+
+  series.push({ month: 0, cash: cashOnly, invested });
+
+  for (let month = 1; month <= months; month += 1) {
+    cashOnly += contribution;
+    invested = invested * (1 + monthlyRate) + contribution;
+    series.push({ month, cash: cashOnly, invested });
+  }
+
+  const contributed = initial + contribution * months;
+  const finalValue = series[series.length - 1]?.invested || 0;
+  const finalCash = series[series.length - 1]?.cash || 0;
+
+  return {
+    annualRatePct,
+    contributed,
+    finalCash,
+    finalValue,
+    earnedInterest: finalValue - contributed,
+    diffVsCash: finalValue - finalCash,
+    series,
+  };
+}
+
+function renderCompoundSummary(results) {
+  const summaryEl = document.getElementById('compound-summary');
+  if (!summaryEl) return;
+  summaryEl.innerHTML = `
+    <article class="compound-summary-card">
+      <div class="label">${t('compound_summary_contributed')}</div>
+      <div class="value">${formatCompoundCurrency(results.base.contributed)}</div>
+      <div class="meta">${results.years} ${currentLanguage === 'en' ? 'years horizon' : 'años de horizonte'}</div>
+    </article>
+    <article class="compound-summary-card">
+      <div class="label">${t('compound_summary_without')}</div>
+      <div class="value">${formatCompoundCurrency(results.base.finalCash)}</div>
+      <div class="meta">${t('compound_chart_cash')}</div>
+    </article>
+    <article class="compound-summary-card">
+      <div class="label">${t('compound_summary_base')}</div>
+      <div class="value">${formatCompoundCurrency(results.base.finalValue)}</div>
+      <div class="meta">${formatCompoundPercent(results.base.annualRatePct)} · ${t('compound_summary_interest')}: ${formatCompoundCurrency(results.base.earnedInterest)}</div>
+    </article>
+    <article class="compound-summary-card">
+      <div class="label">${t('compound_summary_range')}</div>
+      <div class="value">${formatCompoundCurrency(results.low.finalValue)} - ${formatCompoundCurrency(results.high.finalValue)}</div>
+      <div class="meta">${formatCompoundPercent(results.low.annualRatePct)} / ${formatCompoundPercent(results.high.annualRatePct)}</div>
+    </article>
+  `;
+}
+
+function renderCompoundBreakdown(results) {
+  const breakdownEl = document.getElementById('compound-breakdown');
+  const sectionEl = document.getElementById('compound-breakdown-section');
+  if (!breakdownEl || !sectionEl) return;
+
+  const rows = [
+    { label: t('compound_chart_cash'), annualRatePct: 0, finalValue: results.base.finalCash, earnedInterest: results.base.finalCash - results.base.contributed, diffVsCash: 0 },
+    { label: t('compound_low'), annualRatePct: results.low.annualRatePct, finalValue: results.low.finalValue, earnedInterest: results.low.earnedInterest, diffVsCash: results.low.diffVsCash },
+    { label: t('compound_base'), annualRatePct: results.base.annualRatePct, finalValue: results.base.finalValue, earnedInterest: results.base.earnedInterest, diffVsCash: results.base.diffVsCash },
+    { label: t('compound_high'), annualRatePct: results.high.annualRatePct, finalValue: results.high.finalValue, earnedInterest: results.high.earnedInterest, diffVsCash: results.high.diffVsCash },
+  ];
+
+  breakdownEl.innerHTML = `
+    <div class="compound-breakdown-wrap">
+      <table class="optimizer-table">
+        <thead>
+          <tr>
+            <th>${t('compound_table_scenario')}</th>
+            <th>${t('compound_table_rate')}</th>
+            <th>${t('compound_summary_contributed')}</th>
+            <th>${t('compound_table_final')}</th>
+            <th>${t('compound_table_interest')}</th>
+            <th>${t('compound_table_vs_cash')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map((row) => `
+            <tr>
+              <td>${row.label}</td>
+              <td>${formatCompoundPercent(row.annualRatePct)}</td>
+              <td>${formatCompoundCurrency(results.base.contributed)}</td>
+              <td>${formatCompoundCurrency(row.finalValue)}</td>
+              <td>${formatCompoundCurrency(row.earnedInterest)}</td>
+              <td>${formatCompoundCurrency(row.diffVsCash)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <p class="compound-chart-note">${t('compound_frequency_label')}: ${t(`compound_frequency_${results.frequency}`)}</p>
+    </div>
+  `;
+
+  sectionEl.style.display = 'block';
+}
+
+function renderCompoundChart(results) {
+  const container = document.getElementById('compound-chart');
+  const wrap = document.getElementById('compound-chart-wrap');
+  const empty = document.getElementById('compound-chart-empty');
+  if (!container || !wrap || !empty) return;
+
+  const width = 920;
+  const height = 520;
+  const margin = { top: 22, right: 24, bottom: 58, left: 96 };
+  const plotWidth = width - margin.left - margin.right;
+  const plotHeight = height - margin.top - margin.bottom;
+
+  const allSeries = results.base.series.map((point, idx) => ({
+    month: point.month,
+    cash: point.cash,
+    low: results.low.series[idx]?.invested ?? point.invested,
+    base: point.invested,
+    high: results.high.series[idx]?.invested ?? point.invested,
+  }));
+
+  const maxMonth = allSeries[allSeries.length - 1]?.month || 1;
+  const allValues = allSeries.flatMap((point) => [point.cash, point.low, point.base, point.high]);
+  const minValue = Math.min(...allValues);
+  const maxValue = Math.max(...allValues);
+  const pad = Math.max((maxValue - minValue) * 0.08, Math.abs(maxValue) * 0.04, 1);
+  const yMin = Math.min(0, minValue - pad);
+  const yMax = maxValue + pad;
+
+  const xScale = (month) => margin.left + (month / maxMonth) * plotWidth;
+  const yScale = (value) => margin.top + plotHeight - ((value - yMin) / (yMax - yMin || 1)) * plotHeight;
+
+  const cashPath = buildSmoothSvgPath(allSeries.map((point) => ({ x: xScale(point.month), y: yScale(point.cash) })));
+  const basePath = buildSmoothSvgPath(allSeries.map((point) => ({ x: xScale(point.month), y: yScale(point.base) })));
+  const lowPath = buildSmoothSvgPath(allSeries.map((point) => ({ x: xScale(point.month), y: yScale(point.low) })));
+  const highPath = buildSmoothSvgPath(allSeries.map((point) => ({ x: xScale(point.month), y: yScale(point.high) })));
+  const areaPath = [
+    `M ${xScale(allSeries[0].month)} ${yScale(allSeries[0].high)}`,
+    ...allSeries.slice(1).map((point) => `L ${xScale(point.month)} ${yScale(point.high)}`),
+    ...allSeries.slice().reverse().map((point) => `L ${xScale(point.month)} ${yScale(point.low)}`),
+    'Z',
+  ].join(' ');
+
+  const xTicks = Array.from({ length: Math.min(results.years, 6) + 1 }, (_, idx) => {
+    const year = Math.round((idx * maxMonth) / Math.min(results.years, 6));
+    return Math.min(maxMonth, year);
+  }).filter((value, idx, arr) => idx === 0 || value !== arr[idx - 1]);
+
+  const yTicks = Array.from({ length: 5 }, (_, idx) => yMin + ((yMax - yMin) / 4) * idx);
+  const lastPoint = allSeries[allSeries.length - 1];
+  const endX = xScale(lastPoint.month);
+  const endCashY = yScale(lastPoint.cash);
+  const endBaseY = yScale(lastPoint.base);
+
+  const legendItems = [
+    { color: '#64748b', label: t('compound_chart_cash') },
+    { color: '#94a3b8', label: t('compound_chart_band'), dashed: true },
+    { color: '#157347', label: `${t('compound_chart_invested')} · ${t('compound_base')}` },
+  ];
+
+  container.innerHTML = `
+    <div class="optimizer-svg-shell">
+      <div class="optimizer-svg-frame">
+        <svg class="optimizer-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${t('compound_chart_title')}">
+          <defs>
+            <linearGradient id="compound-area-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(70,177,121,0.22)"></stop>
+              <stop offset="100%" stop-color="rgba(70,177,121,0.04)"></stop>
+            </linearGradient>
+          </defs>
+          <rect class="bdi-chart-plot-bg" x="${margin.left}" y="${margin.top}" width="${plotWidth}" height="${plotHeight}" rx="18"></rect>
+          ${yTicks.map((tick) => `
+            <g>
+              <line class="bdi-chart-grid" x1="${margin.left}" y1="${yScale(tick)}" x2="${width - margin.right}" y2="${yScale(tick)}"></line>
+              <text class="bdi-chart-tick" x="${margin.left - 10}" y="${yScale(tick) + 4}" text-anchor="end">${formatCompoundAxisCurrency(tick)}</text>
+            </g>
+          `).join('')}
+          ${xTicks.map((tick) => `
+            <g>
+              <line class="bdi-chart-grid" x1="${xScale(tick)}" y1="${margin.top}" x2="${xScale(tick)}" y2="${height - margin.bottom}"></line>
+              <text class="bdi-chart-tick" x="${xScale(tick)}" y="${height - margin.bottom + 24}" text-anchor="middle">${buildCompoundLabel(tick)}</text>
+            </g>
+          `).join('')}
+          <path d="${areaPath}" fill="url(#compound-area-fill)" stroke="none"></path>
+          <path d="${lowPath}" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.9"></path>
+          <path d="${highPath}" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.9"></path>
+          <path d="${cashPath}" fill="none" stroke="#64748b" stroke-width="2.6"></path>
+          <path d="${basePath}" fill="none" stroke="#157347" stroke-width="3.2"></path>
+          <circle cx="${endX}" cy="${endCashY}" r="4.2" fill="#64748b" stroke="#ffffff" stroke-width="2"></circle>
+          <circle cx="${endX}" cy="${endBaseY}" r="4.8" fill="#157347" stroke="#ffffff" stroke-width="2"></circle>
+          <text x="${Math.min(width - margin.right - 8, endX - 12)}" y="${endCashY - 10}" text-anchor="end" font-size="11" font-weight="600" fill="#475569">${t('compound_chart_cash')}</text>
+          <text x="${Math.min(width - margin.right - 8, endX - 12)}" y="${endBaseY - 12}" text-anchor="end" font-size="11" font-weight="700" fill="#157347">${t('compound_base')}</text>
+          <line class="bdi-chart-axis" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}"></line>
+          <line class="bdi-chart-axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}"></line>
+          <text class="bdi-chart-label" x="${margin.left + plotWidth / 2}" y="${height - 12}" text-anchor="middle">${t('compound_axis_year')}</text>
+          <text class="bdi-chart-label" transform="translate(24 ${margin.top + plotHeight / 2}) rotate(-90)" text-anchor="middle">${t('compound_axis_value')}</text>
+        </svg>
+      </div>
+      <div class="optimizer-legend">
+        ${legendItems.map((item) => `
+          <span class="optimizer-legend-item">
+            <span class="optimizer-legend-swatch ${item.dashed ? 'line' : ''}" style="color:${item.color};background:${item.dashed ? 'transparent' : item.color};border-top:${item.dashed ? `2px dashed ${item.color}` : 'none'}"></span>
+            ${item.label}
+          </span>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  empty.style.display = 'none';
+  wrap.style.display = 'block';
+}
+
+function runCompoundCalculator() {
+  const initial = parseFloat(document.getElementById('compound-initial')?.value || '0');
+  const contribution = parseFloat(document.getElementById('compound-contribution')?.value || '0');
+  const years = parseFloat(document.getElementById('compound-years')?.value || '0');
+  const rate = parseFloat(document.getElementById('compound-rate')?.value || '0');
+  const variance = Math.max(0, parseFloat(document.getElementById('compound-variance')?.value || '0'));
+  const frequency = parseInt(document.getElementById('compound-frequency')?.value || '12', 10);
+  const statusEl = document.getElementById('compound-status');
+
+  if (!Number.isFinite(initial) || !Number.isFinite(contribution) || !Number.isFinite(years) || years <= 0 || !Number.isFinite(rate) || !Number.isFinite(frequency) || frequency <= 0) {
+    if (statusEl) statusEl.textContent = t('compound_status_invalid');
+    return;
+  }
+
+  const lowRate = Math.max(-99.9, rate - variance);
+  const highRate = Math.max(lowRate, rate + variance);
+
+  const results = {
+    years,
+    frequency,
+    low: runCompoundScenario({ initial, contribution, years, annualRatePct: lowRate, frequency }),
+    base: runCompoundScenario({ initial, contribution, years, annualRatePct: rate, frequency }),
+    high: runCompoundScenario({ initial, contribution, years, annualRatePct: highRate, frequency }),
+  };
+
+  renderCompoundSummary(results);
+  renderCompoundChart(results);
+  renderCompoundBreakdown(results);
+
+  if (statusEl) {
+    statusEl.textContent = `${t('compound_frequency_label')}: ${t(`compound_frequency_${frequency}`)} · ${currentLanguage === 'en' ? 'Base rate' : 'Tasa base'} ${formatCompoundPercent(rate)} · ${currentLanguage === 'en' ? 'Variance' : 'Varianza'} ±${formatCompoundPercent(variance)}`;
+  }
+}
+
+function syncCompoundFrequencyLabels() {
+  const select = document.getElementById('compound-frequency');
+  if (!select) return;
+  Array.from(select.options).forEach((option) => {
+    option.textContent = t(`compound_frequency_${option.value}`);
+  });
+}
+
+function updateCompoundStaticText() {
+  const setText = (selector, value) => {
+    const node = document.querySelector(selector);
+    if (node) node.textContent = value;
+  };
+
+  const stepCards = Array.from(document.querySelectorAll('#compound-section .compound-step-card'));
+  const mappings = [
+    ['compound_step_1', 'compound_step_1_title', 'compound_step_1_copy'],
+    ['compound_step_2', 'compound_step_2_title', 'compound_step_2_copy'],
+    ['compound_step_3', 'compound_step_3_title', 'compound_step_3_copy'],
+    ['compound_step_4', 'compound_step_4_title', 'compound_step_4_copy'],
+  ];
+
+  stepCards.forEach((card, index) => {
+    const [kickerKey, titleKey, copyKey] = mappings[index] || [];
+    const kicker = card.querySelector('.compound-step-kicker');
+    const title = card.querySelector('h3');
+    const copy = card.querySelector('.compound-step-copy');
+    if (kicker && kickerKey) kicker.textContent = t(kickerKey);
+    if (title && titleKey) title.textContent = t(titleKey);
+    if (copy && copyKey) copy.textContent = t(copyKey);
+  });
+
+  setText('#compound-run-btn', currentLanguage === 'en' ? 'Run scenario' : 'Calcular escenario');
+
+  const labels = {
+    '#compound-initial': 'compound_initial_label',
+    '#compound-contribution': 'compound_contribution_label',
+    '#compound-years': 'compound_years_label',
+    '#compound-rate': 'compound_rate_label',
+    '#compound-variance': 'compound_variance_label',
+    '#compound-frequency': 'compound_frequency_label',
+  };
+
+  Object.entries(labels).forEach(([selector, key]) => {
+    const input = document.querySelector(selector);
+    const labelSpan = input?.closest('label')?.querySelector('span');
+    if (labelSpan) labelSpan.textContent = t(key);
+  });
+}
+
+function setupCompoundCalculator() {
+  document.getElementById('compound-run-btn')?.addEventListener('click', runCompoundCalculator);
+  updateCompoundStaticText();
+  syncCompoundFrequencyLabels();
+  const statusEl = document.getElementById('compound-status');
+  const emptyEl = document.getElementById('compound-chart-empty');
+  const summaryEl = document.getElementById('compound-summary');
+  if (summaryEl) {
+    summaryEl.innerHTML = `
+      <article class="optimizer-summary-card compound-summary-placeholder">
+        <div class="label">${currentLanguage === 'en' ? 'Preview' : 'Vista previa'}</div>
+        <div class="value">${currentLanguage === 'en' ? 'Not run yet' : 'Sin correr'}</div>
+        <div class="meta">${currentLanguage === 'en' ? 'The final comparison will appear here.' : 'La comparación final se mostrará acá.'}</div>
+      </article>
+    `;
+  }
+  if (statusEl) statusEl.textContent = t('compound_status_ready');
+  if (emptyEl) emptyEl.textContent = t('compound_chart_empty');
+}
+
+function setupOptimizer() {
+  document.getElementById('optimizer-run-btn')?.addEventListener('click', runPortfolioOptimizer);
+  setOptimizerResultsVisible(false);
+  setOptimizerChartVisibility(false);
+}
+
+function forceOptimizerSectionState(id, visible) {
+  const node = document.getElementById(id);
+  if (!node) return;
+  node.hidden = !visible;
+  if (visible) {
+    node.style.setProperty('display', 'block', 'important');
+    node.style.setProperty('visibility', 'visible', 'important');
+    node.style.setProperty('opacity', '1', 'important');
+  } else {
+    node.style.setProperty('display', 'none', 'important');
+  }
+}
+
+function setOptimizerResultsVisible(visible) {
+  [
+    'optimizer-weights-section',
+    'optimizer-analytics-section',
+  ].forEach((id) => {
+    forceOptimizerSectionState(id, visible);
+  });
+}
+
+function setOptimizerChartVisibility(visible) {
+  const frontierEmpty = document.getElementById('optimizer-frontier-empty');
+  const frontierWrap = document.getElementById('optimizer-frontier-chart-wrap');
+  const performanceEmpty = document.getElementById('optimizer-performance-empty');
+  const performanceGrid = document.getElementById('optimizer-performance-grid');
+
+  if (frontierEmpty) frontierEmpty.style.display = visible ? 'none' : '';
+  if (frontierWrap) frontierWrap.style.display = visible ? 'block' : 'none';
+  if (performanceEmpty) performanceEmpty.style.display = visible ? 'none' : '';
+  if (performanceGrid) performanceGrid.style.display = visible ? 'grid' : 'none';
+}
+
+function prepareOptimizerCanvas(canvasId, height = 420) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return null;
+  const parent = canvas.parentElement;
+  if (parent) {
+    parent.style.removeProperty('height');
+    parent.style.removeProperty('min-height');
+  }
+  canvas.style.removeProperty('height');
+  canvas.style.setProperty('width', '100%', 'important');
+  return canvas;
+}
+
+async function runPortfolioOptimizer() {
+  const tickersRaw = document.getElementById('optimizer-tickers')?.value || '';
+  const years = Math.min(10, Math.max(1, parseInt(document.getElementById('optimizer-years')?.value || '5', 10) || 5));
+  const rf = (parseFloat(String(document.getElementById('optimizer-rf')?.value || '2').replace(',', '.')) || 0) / 100;
+  const targetInput = String(document.getElementById('optimizer-target')?.value || '').trim();
+  const targetReturn = targetInput ? (parseFloat(targetInput.replace(',', '.')) || 0) / 100 : null;
+  const minWeight = Math.max(0, (parseFloat(String(document.getElementById('optimizer-min-weight')?.value || '0').replace(',', '.')) || 0) / 100);
+  const tickers = Array.from(new Set(
+    tickersRaw
+      .split(',')
+      .map((ticker) => ticker.trim().toUpperCase())
+      .filter(Boolean)
+  )).slice(0, 50);
+
+  const statusEl = document.getElementById('optimizer-status');
+  const summaryEl = document.getElementById('optimizer-summary');
+  const weightsEl = document.getElementById('optimizer-weights');
+  const cagrEl = document.getElementById('optimizer-cagr');
+  const corrEl = document.getElementById('optimizer-correlation');
+
+  if (tickers.length === 0) {
+    setOptimizerResultsVisible(false);
+    setOptimizerChartVisibility(false);
+    if (statusEl) statusEl.textContent = t('optimizer_empty_tickers');
+    return;
+  }
+
+  if (tickers.length * minWeight > 1) {
+    setOptimizerResultsVisible(false);
+    setOptimizerChartVisibility(false);
+    if (statusEl) statusEl.textContent = t('optimizer_invalid_min_weight');
+    return;
+  }
+
+  setOptimizerResultsVisible(false);
+  setOptimizerChartVisibility(false);
+  if (statusEl) statusEl.textContent = t('optimizer_loading', { count: tickers.length });
+  if (summaryEl) summaryEl.innerHTML = '';
+  if (weightsEl) weightsEl.innerHTML = '';
+  if (cagrEl) cagrEl.innerHTML = '';
+  if (corrEl) corrEl.innerHTML = '';
+
+  try {
+    const histories = await fetchOptimizerHistories(tickers, years);
+    const prepared = prepareOptimizerDataset(histories);
+    if (!prepared || prepared.assets.length === 0) {
+      throw new Error(t('optimizer_no_histories'));
+    }
+
+    const model = buildOptimizerModel(prepared, rf, minWeight, targetReturn);
+    setOptimizerResultsVisible(true);
+    setOptimizerChartVisibility(true);
+    renderOptimizerSummary(model);
+    renderOptimizerWeights(model);
+    renderOptimizerCagr(model);
+    renderOptimizerCorrelation(model);
+    await new Promise((resolve) => setTimeout(resolve, 80));
+    renderOptimizerFrontier(model);
+    renderOptimizerPerformance(model);
+
+    if (statusEl) {
+      statusEl.textContent = t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years });
+    }
+  } catch (error) {
+    setOptimizerResultsVisible(false);
+    setOptimizerChartVisibility(false);
+    if (statusEl) statusEl.textContent = t('optimizer_error', { message: error.message });
+    console.error('Optimizer error:', error);
+  }
+}
+
+async function fetchOptimizerHistories(tickers, years) {
+  const responses = await Promise.all(
+    tickers.map(async (ticker) => {
+      const res = await fetch(`/api/mundo?ticker=${encodeURIComponent(ticker)}&range=${years}y`);
+      if (!res.ok) throw new Error(`Error trayendo ${ticker}`);
+      const payload = await res.json();
+      return { ticker, points: payload.points || [] };
+    })
+  );
+
+  return responses.filter((item) => item.points.length > 10);
+}
+
+function prepareOptimizerDataset(histories) {
+  const seriesMaps = histories.map((history) => {
+    const byDate = new Map();
+    history.points.forEach((point) => {
+      if (!Number.isFinite(point.v)) return;
+      const iso = new Date(point.t).toISOString().slice(0, 10);
+      byDate.set(iso, point.v);
+    });
+    return { ticker: history.ticker, byDate };
+  });
+
+  if (!seriesMaps.length) return null;
+
+  let commonDates = Array.from(seriesMaps[0].byDate.keys());
+  for (const series of seriesMaps.slice(1)) {
+    const set = new Set(series.byDate.keys());
+    commonDates = commonDates.filter((date) => set.has(date));
+  }
+
+  commonDates.sort();
+  if (commonDates.length < 40) return null;
+
+  const assets = seriesMaps.map((series) => series.ticker);
+  const priceMatrix = seriesMaps.map((series) => commonDates.map((date) => series.byDate.get(date)));
+  const returnsByAsset = priceMatrix.map((prices) => {
+    const values = [];
+    for (let i = 1; i < prices.length; i++) {
+      values.push(prices[i - 1] > 0 ? (prices[i] / prices[i - 1]) - 1 : 0);
+    }
+    return values;
+  });
+
+  const returnDates = commonDates.slice(1);
+  const dailyReturnsMatrix = returnDates.map((_, index) => returnsByAsset.map((assetReturns) => assetReturns[index]));
+  return { assets, priceDates: commonDates, prices: priceMatrix, dates: returnDates, returnsByAsset, dailyReturnsMatrix };
+}
+
+function buildOptimizerModel(prepared, rf, minWeight, targetReturn) {
+  const { assets, dates, prices, returnsByAsset, dailyReturnsMatrix } = prepared;
+  const numAssets = assets.length;
+  const meanReturns = returnsByAsset.map((series) => average(series) * 252);
+  const covMatrix = covarianceMatrix(returnsByAsset, 252);
+  const randomCount = numAssets === 1 ? 1 : 18000;
+  const randomPortfolios = [];
+
+  for (let i = 0; i < randomCount; i++) {
+    const weights = generateRandomWeights(numAssets, minWeight);
+    const stats = portfolioStats(weights, meanReturns, covMatrix, rf);
+    randomPortfolios.push({ weights, ...stats });
+  }
+
+  const minVol = optimizeMinVariancePortfolio(meanReturns, covMatrix, rf, minWeight);
+  const frontierSolutions = buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, minVol.ret);
+  const maxSharpe = frontierSolutions.reduce((best, item) => item.sharpe > best.sharpe ? item : best, frontierSolutions[0] || minVol);
+
+  let targetPortfolio = null;
+  if (targetReturn != null) {
+    targetPortfolio = optimizeTargetReturnPortfolio(meanReturns, covMatrix, rf, minWeight, targetReturn);
+  }
+
+  const frontier = frontierSolutions.map((item) => ({ x: item.vol * 100, y: item.ret * 100 }));
+  const assetSeries = assets.map((asset, index) => ({ label: asset, values: cumulativeSeries(returnsByAsset[index]) }));
+  const optimizedPortfolios = [
+    { key: 'max_sharpe', label: 'Máx Sharpe', color: '#e0b100', data: maxSharpe },
+    { key: 'min_vol', label: 'Mín. Vol', color: '#e25555', data: minVol },
+  ];
+  if (targetPortfolio) {
+    optimizedPortfolios.push({ key: 'target', label: `Objetivo ${formatPct(targetReturn * 100, 1)}`, color: '#157347', data: targetPortfolio });
+  }
+
+  const portfolioSeries = optimizedPortfolios.map((portfolio) => ({
+    ...portfolio,
+    values: cumulativeSeries(computePortfolioDailyReturns(dailyReturnsMatrix, portfolio.data.weights)),
+  }));
+
+  const cagrRows = [
+    ...assetSeries.map((series) => ({ label: series.label, type: 'Activo', cagr: calcSeriesCagr(series.values, dates) })),
+    ...portfolioSeries.map((series) => ({ label: series.label, type: 'Portfolio', cagr: calcSeriesCagr(series.values, dates) })),
+  ];
+
+  return {
+    assets, dates, prices, returnsByAsset, dailyReturnsMatrix, rf, minWeight, targetReturn, meanReturns, covMatrix,
+    randomPortfolios, frontier, maxSharpe, minVol, targetPortfolio, assetSeries, portfolioSeries, optimizedPortfolios,
+    cagrRows, correlation: correlationMatrix(returnsByAsset),
+  };
+}
+
+function average(values) {
+  return values.reduce((sum, value) => sum + value, 0) / (values.length || 1);
+}
+
+function covarianceMatrix(seriesByAsset, annualFactor = 1) {
+  return seriesByAsset.map((seriesA) => seriesByAsset.map((seriesB) => covariance(seriesA, seriesB) * annualFactor));
+}
+
+function covariance(a, b) {
+  const meanA = average(a);
+  const meanB = average(b);
+  let sum = 0;
+  for (let i = 0; i < a.length; i++) sum += (a[i] - meanA) * (b[i] - meanB);
+  return sum / Math.max(1, a.length - 1);
+}
+
+function correlationMatrix(seriesByAsset) {
+  return seriesByAsset.map((seriesA, i) =>
+    seriesByAsset.map((seriesB, j) => {
+      if (i === j) return 1;
+      const cov = covariance(seriesA, seriesB);
+      const stdA = Math.sqrt(Math.max(covariance(seriesA, seriesA), 0));
+      const stdB = Math.sqrt(Math.max(covariance(seriesB, seriesB), 0));
+      return stdA && stdB ? cov / (stdA * stdB) : 0;
+    })
+  );
+}
+
+function generateRandomWeights(numAssets, minWeight = 0) {
+  if (numAssets === 1) return [1];
+  const values = Array.from({ length: numAssets }, () => -Math.log(Math.random()));
+  const rawSum = values.reduce((sum, value) => sum + value, 0);
+  const raw = values.map((value) => value / rawSum);
+  if (!minWeight) return raw;
+  const residual = 1 - minWeight * numAssets;
+  return raw.map((value) => minWeight + value * residual);
+}
+
+function portfolioStats(weights, meanReturns, covMatrix, rf) {
+  const ret = dot(weights, meanReturns);
+  const variance = quadraticForm(weights, covMatrix);
+  const vol = Math.sqrt(Math.max(variance, 0));
+  const sharpe = vol > 0 ? (ret - rf) / vol : 0;
+  return { ret, vol, sharpe };
+}
+
+function dot(a, b) {
+  return a.reduce((sum, value, index) => sum + value * b[index], 0);
+}
+
+function quadraticForm(weights, matrix) {
+  let total = 0;
+  for (let i = 0; i < weights.length; i++) {
+    for (let j = 0; j < weights.length; j++) total += weights[i] * matrix[i][j] * weights[j];
+  }
+  return total;
+}
+
+function approximateFrontier(portfolios) {
+  const valid = portfolios.filter((item) => Number.isFinite(item.ret) && Number.isFinite(item.vol)).sort((a, b) => a.ret - b.ret);
+  if (!valid.length) return [];
+  const minRet = valid[0].ret;
+  const maxRet = valid[valid.length - 1].ret;
+  const buckets = 30;
+  const step = buckets > 1 ? (maxRet - minRet) / (buckets - 1 || 1) : 0;
+  const frontier = [];
+
+  for (let i = 0; i < buckets; i++) {
+    const target = minRet + step * i;
+    const candidates = valid.filter((item) => Math.abs(item.ret - target) <= Math.max(step * 0.65, 0.0025));
+    const best = (candidates.length ? candidates : valid).slice().sort((a, b) => Math.abs(a.ret - target) - Math.abs(b.ret - target) || a.vol - b.vol)[0];
+    if (!best) continue;
+    const last = frontier[frontier.length - 1];
+    if (!last || Math.abs(last.vol - best.vol) > 0.0005 || Math.abs(last.ret - best.ret) > 0.0005) {
+      frontier.push({ x: best.vol * 100, y: best.ret * 100 });
+    }
+  }
+
+  return frontier;
+}
+
+function optimizeMinVariancePortfolio(meanReturns, covMatrix, rf, minWeight) {
+  const numAssets = meanReturns.length;
+  let weights = Array(numAssets).fill(1 / numAssets);
+  let best = { weights: weights.slice(), ...portfolioStats(weights, meanReturns, covMatrix, rf) };
+  let step = 0.12;
+
+  for (let iter = 0; iter < 2400; iter++) {
+    const gradient = covarianceGradient(weights, covMatrix);
+    const candidate = projectWeightsToBounds(weights.map((value, index) => value - step * gradient[index]), minWeight);
+    const stats = portfolioStats(candidate, meanReturns, covMatrix, rf);
+    if (stats.vol < best.vol) best = { weights: candidate.slice(), ...stats };
+    weights = candidate;
+    step *= 0.997;
+  }
+
+  return best;
+}
+
+function optimizeTargetReturnPortfolio(meanReturns, covMatrix, rf, minWeight, targetReturn) {
+  const numAssets = meanReturns.length;
+  let weights = Array(numAssets).fill(1 / numAssets);
+  let best = null;
+  let step = 0.08;
+  const penalty = 1400;
+
+  for (let iter = 0; iter < 3200; iter++) {
+    const ret = dot(weights, meanReturns);
+    const baseGradient = covarianceGradient(weights, covMatrix);
+    const penaltyGradient = meanReturns.map((value) => 2 * penalty * (ret - targetReturn) * value);
+    const gradient = baseGradient.map((value, index) => value + penaltyGradient[index]);
+    const candidate = projectWeightsToBounds(weights.map((value, index) => value - step * gradient[index]), minWeight);
+    const stats = portfolioStats(candidate, meanReturns, covMatrix, rf);
+    const score = stats.vol + Math.abs(stats.ret - targetReturn) * 20;
+    if (!best || score < best.score) {
+      best = { weights: candidate.slice(), score, ...stats };
+    }
+    weights = candidate;
+    step *= 0.998;
+  }
+
+  return best || { weights: Array(numAssets).fill(1 / numAssets), ...portfolioStats(Array(numAssets).fill(1 / numAssets), meanReturns, covMatrix, rf) };
+}
+
+function buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, minVolReturn) {
+  const minTarget = Math.min(...meanReturns);
+  const maxTarget = Math.max(...meanReturns);
+  const count = 72;
+  const frontier = [];
+
+  for (let i = 0; i < count; i++) {
+    const target = minTarget + ((maxTarget - minTarget) * i / (count - 1));
+    const solution = optimizeTargetReturnPortfolio(meanReturns, covMatrix, rf, minWeight, target);
+    if (!Number.isFinite(solution?.vol) || !Number.isFinite(solution?.ret)) continue;
+    const last = frontier[frontier.length - 1];
+    if (!last || Math.abs(last.vol - solution.vol) > 0.0003 || Math.abs(last.ret - solution.ret) > 0.0003) {
+      frontier.push(solution);
+    }
+  }
+
+  frontier.sort((a, b) => a.ret - b.ret || a.vol - b.vol);
+  return frontier.filter((item) => item.ret >= (minVolReturn - 0.08));
+}
+
+function covarianceGradient(weights, covMatrix) {
+  const gradient = Array(weights.length).fill(0);
+  for (let i = 0; i < weights.length; i++) {
+    let total = 0;
+    for (let j = 0; j < weights.length; j++) total += covMatrix[i][j] * weights[j];
+    gradient[i] = 2 * total;
+  }
+  return gradient;
+}
+
+function projectWeightsToBounds(values, minWeight) {
+  const n = values.length;
+  const floor = minWeight || 0;
+  const residual = 1 - floor * n;
+  if (residual < 0) return Array(n).fill(1 / n);
+  const shifted = values.map((value) => value - floor);
+  const projected = projectToSimplex(shifted, residual);
+  const weights = projected.map((value) => value + floor);
+  const sum = weights.reduce((acc, value) => acc + value, 0) || 1;
+  return weights.map((value) => value / sum);
+}
+
+function projectToSimplex(values, targetSum = 1) {
+  const sorted = [...values].sort((a, b) => b - a);
+  let cumulative = 0;
+  let rho = 0;
+  for (let i = 0; i < sorted.length; i++) {
+    cumulative += sorted[i];
+    const threshold = (cumulative - targetSum) / (i + 1);
+    if (sorted[i] - threshold > 0) rho = i + 1;
+  }
+  const theta = (sorted.slice(0, rho).reduce((sum, value) => sum + value, 0) - targetSum) / Math.max(rho, 1);
+  return values.map((value) => Math.max(value - theta, 0));
+}
+
+function computePortfolioDailyReturns(dailyReturnsMatrix, weights) {
+  return dailyReturnsMatrix.map((row) => dot(row, weights));
+}
+
+function cumulativeSeries(dailyReturns) {
+  let acc = 1;
+  return dailyReturns.map((value) => {
+    acc *= (1 + value);
+    return (acc - 1) * 100;
+  });
+}
+
+function calcSeriesCagr(cumulativePercentSeries, dates) {
+  if (!cumulativePercentSeries.length || dates.length < 2) return 0;
+  const start = new Date(dates[0]);
+  const end = new Date(dates[dates.length - 1]);
+  const years = (end - start) / (365.25 * 24 * 60 * 60 * 1000);
+  if (years <= 0) return 0;
+  const totalReturn = 1 + (cumulativePercentSeries[cumulativePercentSeries.length - 1] / 100);
+  return Math.pow(Math.max(totalReturn, 0.0001), 1 / years) - 1;
+}
+
+function formatPct(value, digits = 2) {
+  return `${Number(value).toLocaleString('es-AR', { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
+}
+
+function renderOptimizerSummary(model) {
+  const el = document.getElementById('optimizer-summary');
+  if (!el) return;
+  const cards = [
+    { label: t('optimizer_summary_assets'), value: String(model.assets.length), meta: model.assets.join(', ') },
+    { label: t('optimizer_summary_max_sharpe'), value: formatPct(model.maxSharpe.ret * 100), meta: `Vol ${formatPct(model.maxSharpe.vol * 100)} | Sharpe ${model.maxSharpe.sharpe.toFixed(2)}` },
+    { label: t('optimizer_summary_min_vol'), value: formatPct(model.minVol.ret * 100), meta: `Vol ${formatPct(model.minVol.vol * 100)} | Sharpe ${model.minVol.sharpe.toFixed(2)}` },
+    { label: t('optimizer_summary_rf'), value: formatPct(model.rf * 100), meta: model.targetReturn != null ? t('optimizer_target', { value: formatPct(model.targetReturn * 100, 1) }) : t('optimizer_summary_no_target') },
+  ];
+  el.innerHTML = cards.map((card) => `<div class="optimizer-summary-card"><div class="label">${card.label}</div><div class="value">${card.value}</div><div class="meta">${card.meta}</div></div>`).join('');
+}
+
+function renderOptimizerWeights(model) {
+  const el = document.getElementById('optimizer-weights');
+  if (!el) return;
+  const headers = [t('optimizer_weights_asset'), ...model.optimizedPortfolios.map((portfolio) => portfolio.label)];
+  const rows = model.assets.map((asset, index) => `<tr><td>${asset}</td>${model.optimizedPortfolios.map((portfolio) => `<td>${formatPct(portfolio.data.weights[index] * 100, 2)}</td>`).join('')}</tr>`).join('');
+  el.innerHTML = `<div class="optimizer-table-wrap"><table class="optimizer-table"><thead><tr>${headers.map((header) => `<th>${header}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderOptimizerFrontier(model) {
+  const section = document.getElementById('optimizer-frontier-section');
+  const canvas = prepareOptimizerCanvas('optimizer-frontier-chart', 420);
+  if (!canvas) return;
+  if (section) {
+    section.hidden = false;
+    section.style.setProperty('display', 'block', 'important');
+  }
+  const width = 900;
+  const height = 620;
+  const randomData = model.randomPortfolios.map((portfolio) => ({ x: portfolio.vol * 100, y: portfolio.ret * 100, sharpe: portfolio.sharpe }));
+  const points = [
+    ...randomData,
+    ...model.frontier,
+    { x: model.maxSharpe.vol * 100, y: model.maxSharpe.ret * 100 },
+    { x: model.minVol.vol * 100, y: model.minVol.ret * 100 },
+    ...(model.targetPortfolio ? [{ x: model.targetPortfolio.vol * 100, y: model.targetPortfolio.ret * 100 }] : []),
+  ];
+  const scatterX = randomData.map((p) => p.x).sort((a, b) => a - b);
+  const scatterY = randomData.map((p) => p.y).sort((a, b) => a - b);
+  const xMin = Math.max(0, percentile(scatterX, 0.01) * 0.85);
+  const xMax = Math.max(...points.map((p) => p.x), percentile(scatterX, 0.995)) * 1.02;
+  const yMin = Math.min(percentile(scatterY, 0.005), model.rf * 100, ...model.frontier.map((p) => p.y)) * 0.92;
+  const yMax = Math.max(percentile(scatterY, 0.995), ...model.frontier.map((p) => p.y), model.maxSharpe.ret * 100) * 1.05;
+  const sharpeValues = randomData.map((p) => p.sharpe);
+  const minSharpe = Math.min(...sharpeValues);
+  const maxSharpe = Math.max(...sharpeValues);
+  const sharpeLegendId = `optimizer-sharpe-gradient-${Date.now()}`;
+  const margin = { top: 48, right: 96, bottom: 62, left: 74 };
+  const scaleX = (value) => margin.left + ((value - xMin) / ((xMax - xMin) || 1)) * (width - margin.left - margin.right);
+  const scaleY = (value) => height - margin.bottom - ((value - yMin) / ((yMax - yMin) || 1)) * (height - margin.top - margin.bottom);
+  const frontierPath = buildSmoothSvgPath(model.frontier.map((point) => ({ x: scaleX(point.x), y: scaleY(point.y) })));
+  const cmlStart = { x: 0, y: model.rf * 100 };
+  const cmlMaxX = (((yMax / 100) - model.rf) / Math.max(model.maxSharpe.sharpe, 0.0001)) * 100;
+  const cmlTargetX = Math.min(xMax, cmlMaxX);
+  const cmlEnd = { x: cmlTargetX, y: (model.rf + model.maxSharpe.sharpe * (cmlTargetX / 100)) * 100 };
+  const cmlPath = `M ${scaleX(cmlStart.x).toFixed(2)} ${scaleY(cmlStart.y).toFixed(2)} L ${scaleX(cmlEnd.x).toFixed(2)} ${scaleY(cmlEnd.y).toFixed(2)}`;
+  const scatterDots = randomData.slice(0, 9000).map((point) => `<circle cx="${scaleX(point.x).toFixed(2)}" cy="${scaleY(point.y).toFixed(2)}" r="1.65" fill="${optimizerSharpeColor(point.sharpe, minSharpe, maxSharpe)}" />`).join('');
+  const xTicks = buildLinearTicks(xMin, xMax, 6);
+  const yTicks = buildLinearTicks(yMin, yMax, 6);
+
+  canvas.innerHTML = `
+    <div class="optimizer-svg-shell">
+      <div class="optimizer-svg-frame">
+        <svg class="optimizer-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-label="Espacio de portfolios">
+          <defs>
+            <linearGradient id="${sharpeLegendId}" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="${optimizerSharpeColor(minSharpe, minSharpe, maxSharpe)}" />
+              <stop offset="50%" stop-color="${optimizerSharpeColor((minSharpe + maxSharpe) / 2, minSharpe, maxSharpe)}" />
+              <stop offset="100%" stop-color="${optimizerSharpeColor(maxSharpe, minSharpe, maxSharpe)}" />
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="${width}" height="${height}" fill="transparent" />
+          ${xTicks.map((tick) => `<g><line x1="${scaleX(tick)}" y1="${margin.top}" x2="${scaleX(tick)}" y2="${height - margin.bottom}" stroke="rgba(15,23,42,0.08)" /><text x="${scaleX(tick)}" y="${height - 18}" font-size="11" text-anchor="middle" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
+          ${yTicks.map((tick) => `<g><line x1="${margin.left}" y1="${scaleY(tick)}" x2="${width - margin.right}" y2="${scaleY(tick)}" stroke="rgba(15,23,42,0.08)" /><text x="${margin.left - 10}" y="${scaleY(tick) + 4}" font-size="11" text-anchor="end" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
+          ${scatterDots}
+          <path d="${frontierPath}" fill="none" stroke="#1f5eff" stroke-width="3" />
+          <path d="${cmlPath}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" />
+          ${renderOptimizerStar(scaleX(model.maxSharpe.vol * 100), scaleY(model.maxSharpe.ret * 100), '#e0b100', 11)}
+          ${renderOptimizerMarker(scaleX(model.minVol.vol * 100), scaleY(model.minVol.ret * 100), '#ef4444', 6.5)}
+          ${model.targetPortfolio ? renderOptimizerDiamond(scaleX(model.targetPortfolio.vol * 100), scaleY(model.targetPortfolio.ret * 100), '#157347', 7) : ''}
+          <g transform="translate(24, 22)">
+            <rect x="0" y="0" width="154" height="96" rx="12" fill="rgba(255,255,255,0.86)" stroke="rgba(15,23,42,0.08)" />
+            <g transform="translate(14,18)">
+              <line x1="0" y1="0" x2="24" y2="0" stroke="#1f5eff" stroke-width="3" />
+              <text x="34" y="4" font-size="12" fill="#334155">${t('optimizer_frontier_line')}</text>
+              <path d="M 0 22 L 24 22" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" />
+              <text x="34" y="26" font-size="12" fill="#334155">${t('optimizer_frontier_cml')}</text>
+              ${renderOptimizerStar(12, 46, '#e0b100', 10)}
+              <text x="34" y="50" font-size="12" fill="#334155">${t('optimizer_summary_max_sharpe')}</text>
+              <circle cx="12" cy="70" r="6.5" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+              <text x="34" y="74" font-size="12" fill="#334155">${t('optimizer_frontier_min_vol')}</text>
+            </g>
+          </g>
+          <g transform="translate(${width - 34}, ${margin.top + 8})">
+            <rect x="0" y="0" width="12" height="${height - margin.top - margin.bottom - 16}" rx="6" fill="url(#${sharpeLegendId})" />
+            <text x="6" y="-8" font-size="11" text-anchor="middle" fill="#475569">${t('optimizer_sharpe_ratio')}</text>
+            <text x="18" y="${height - margin.top - margin.bottom - 12}" font-size="10" fill="#64748b">${minSharpe.toFixed(2)}</text>
+            <text x="18" y="10" font-size="10" fill="#64748b">${maxSharpe.toFixed(2)}</text>
+          </g>
+          <text x="${width / 2}" y="${height - 10}" font-size="13" text-anchor="middle" fill="#475569">${t('optimizer_frontier_vol_axis')}</text>
+          <text x="20" y="${height / 2}" font-size="13" text-anchor="middle" fill="#475569" transform="rotate(-90 20 ${height / 2})">${t('optimizer_frontier_ret_axis')}</text>
+        </svg>
+      </div>
+    </div>
+  `;
+}
+
+function optimizerSharpeColor(value, min, max) {
+  const normalized = (value - min) / ((max - min) || 1);
+  const hue = 210 - normalized * 150;
+  return `hsla(${hue}, 72%, 48%, 0.58)`;
+}
+
+function renderOptimizerPerformance(model) {
+  const section = document.getElementById('optimizer-performance-section');
+  const assetCanvas = prepareOptimizerCanvas('optimizer-assets-chart', 420);
+  const portfolioCanvas = prepareOptimizerCanvas('optimizer-portfolios-chart', 420);
+  if (!assetCanvas || !portfolioCanvas) return;
+  if (section) {
+    section.hidden = false;
+    section.style.setProperty('display', 'block', 'important');
+  }
+  const enrichedAssets = model.assetSeries.map((series, index) => ({
+    ...series,
+    color: optimizerPalette(index),
+    endValue: series.values[series.values.length - 1] || 0,
+  }));
+  const highlightedAssets = enrichedAssets
+    .slice()
+    .sort((a, b) => Math.abs(b.endValue) - Math.abs(a.endValue))
+    .slice(0, Math.min(5, enrichedAssets.length))
+    .map((series) => series.label);
+
+  renderOptimizerLineSvg(
+    assetCanvas,
+    enrichedAssets.map((series) => ({
+      ...series,
+      highlighted: highlightedAssets.includes(series.label),
+      muted: !highlightedAssets.includes(series.label),
+    })),
+    t('optimizer_assets_title'),
+    {
+      subtitle: t('optimizer_assets_subtitle'),
+      legendMode: 'compact',
+    }
+  );
+
+  renderOptimizerLineSvg(
+    portfolioCanvas,
+    model.portfolioSeries.map((series) => ({
+      ...series,
+      color: series.color,
+      highlighted: true,
+      muted: false,
+    })),
+    t('optimizer_portfolios_title'),
+    {
+      subtitle: t('optimizer_portfolios_subtitle'),
+      legendMode: 'labels',
+    }
+  );
+}
+
+function optimizerLineChartOptions(yTitle) {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#555555' } } },
+    scales: {
+      x: { ticks: { color: '#555555', maxTicksLimit: 8 }, grid: { color: '#1a1a1a' } },
+      y: { title: { display: true, text: yTitle, color: '#555555' }, ticks: { color: '#555555' }, grid: { color: '#1a1a1a' } },
+    }
+  };
+}
+
+function renderOptimizerLineSvg(container, seriesList, title, options = {}) {
+  const width = 760;
+  const height = 500;
+  const margin = {
+    top: 56,
+    right: options.legendMode === 'labels' ? 96 : 26,
+    bottom: 52,
+    left: 64,
+  };
+  const allValues = seriesList.flatMap((series) => series.values);
+  const yMin = Math.min(...allValues, 0);
+  const yMax = Math.max(...allValues, 0);
+  const xMax = Math.max(1, ...seriesList.map((series) => series.values.length - 1));
+  const scaleX = (index) => margin.left + (index / xMax) * (width - margin.left - margin.right);
+  const scaleY = (value) => height - margin.bottom - ((value - yMin) / ((yMax - yMin) || 1)) * (height - margin.top - margin.bottom);
+  const yTicks = buildLinearTicks(yMin, yMax, 4);
+  const xTicks = buildLinearTicks(0, xMax, 5).map((tick) => Math.round(tick));
+  const paths = seriesList.map((series) => ({
+    label: series.label,
+    color: series.color,
+    highlighted: !!series.highlighted,
+    muted: !!series.muted,
+    endValue: series.values[series.values.length - 1] || 0,
+    endX: scaleX(Math.max(series.values.length - 1, 0)),
+    endY: scaleY(series.values[series.values.length - 1] || 0),
+    d: series.values.map((value, index) => `${index === 0 ? 'M' : 'L'} ${scaleX(index).toFixed(2)} ${scaleY(value).toFixed(2)}`).join(' ')
+  }));
+
+  const labelCandidates = options.legendMode === 'labels'
+    ? paths.slice().sort((a, b) => a.endY - b.endY)
+    : [];
+  const placedLabels = [];
+  labelCandidates.forEach((path) => {
+    let y = path.endY;
+    for (const used of placedLabels) {
+      if (Math.abs(y - used) < 16) y = used + 16;
+    }
+    placedLabels.push(y);
+    path.labelY = Math.max(margin.top + 10, Math.min(height - margin.bottom - 6, y));
+  });
+
+  container.innerHTML = `
+    <div class="optimizer-svg-shell">
+      <div class="optimizer-svg-frame">
+        <svg class="optimizer-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-label="${title}">
+          <text x="${margin.left}" y="24" font-size="16" font-weight="700" text-anchor="start" fill="#0f172a">${title}</text>
+          ${options.subtitle ? `<text x="${margin.left}" y="42" font-size="11" text-anchor="start" fill="#64748b">${options.subtitle}</text>` : ''}
+          ${xTicks.map((tick) => `<g><line x1="${scaleX(tick)}" y1="${margin.top}" x2="${scaleX(tick)}" y2="${height - margin.bottom}" stroke="rgba(15,23,42,0.08)" /><text x="${scaleX(tick)}" y="${height - 16}" font-size="11" text-anchor="middle" fill="#64748b">${tick}</text></g>`).join('')}
+          ${yTicks.map((tick) => `<g><line x1="${margin.left}" y1="${scaleY(tick)}" x2="${width - margin.right}" y2="${scaleY(tick)}" stroke="rgba(15,23,42,0.08)" /><text x="${margin.left - 10}" y="${scaleY(tick) + 4}" font-size="11" text-anchor="end" fill="#64748b">${tick.toFixed(0)}%</text></g>`).join('')}
+          ${paths.map((path) => `<path d="${path.d}" fill="none" stroke="${path.color}" stroke-width="${path.highlighted ? 2.4 : 1.4}" opacity="${path.muted ? 0.28 : 0.95}" />`).join('')}
+          ${options.legendMode === 'labels' ? paths.map((path) => `
+            <g>
+              <line x1="${path.endX + 4}" y1="${path.endY}" x2="${width - margin.right + 10}" y2="${path.labelY}" stroke="${path.color}" stroke-width="1.2" opacity="0.8" />
+              <text x="${width - margin.right + 14}" y="${path.labelY + 4}" font-size="11" font-weight="600" text-anchor="start" fill="${path.color}">${path.label}</text>
+            </g>
+          `).join('') : ''}
+          <text x="18" y="${height / 2}" font-size="13" text-anchor="middle" fill="#475569" transform="rotate(-90 18 ${height / 2})">Crecimiento acumulado (%)</text>
+        </svg>
+      </div>
+      ${options.legendMode === 'compact' ? `
+        <div class="optimizer-legend">
+          ${paths.filter((path) => path.highlighted).map((path) => `<span class="optimizer-legend-item"><span class="optimizer-legend-swatch" style="background:${path.color}"></span>${path.label}</span>`).join('')}
+          ${paths.some((path) => path.muted) ? `<span class="optimizer-legend-item"><span class="optimizer-legend-swatch" style="background:#cbd5e1"></span>${t('optimizer_assets_rest')}</span>` : ''}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function buildLinearTicks(min, max, count) {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [0];
+  if (min === max) return [min];
+  const ticks = [];
+  for (let i = 0; i < count; i++) {
+    ticks.push(min + ((max - min) * i / (count - 1)));
+  }
+  return ticks;
+}
+
+function percentile(sortedValues, ratio) {
+  if (!sortedValues.length) return 0;
+  const index = Math.min(sortedValues.length - 1, Math.max(0, ratio * (sortedValues.length - 1)));
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return sortedValues[lower];
+  const weight = index - lower;
+  return sortedValues[lower] * (1 - weight) + sortedValues[upper] * weight;
+}
+
+function buildSmoothSvgPath(points) {
+  if (!points.length) return '';
+  if (points.length < 3) return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(' ');
+  let path = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const current = points[i];
+    const next = points[i + 1];
+    const midX = (current.x + next.x) / 2;
+    const midY = (current.y + next.y) / 2;
+    path += ` Q ${current.x.toFixed(2)} ${current.y.toFixed(2)} ${midX.toFixed(2)} ${midY.toFixed(2)}`;
+  }
+  const last = points[points.length - 1];
+  path += ` T ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
+  return path;
+}
+
+function renderOptimizerMarker(x, y, color, radius) {
+  return `<circle cx="${x}" cy="${y}" r="${radius}" fill="${color}" stroke="#ffffff" stroke-width="2" />`;
+}
+
+function renderOptimizerStar(x, y, color, outerRadius) {
+  const innerRadius = outerRadius * 0.45;
+  const points = [];
+  for (let i = 0; i < 10; i++) {
+    const angle = (-Math.PI / 2) + (i * Math.PI / 5);
+    const radius = i % 2 === 0 ? outerRadius : innerRadius;
+    points.push(`${(x + Math.cos(angle) * radius).toFixed(2)},${(y + Math.sin(angle) * radius).toFixed(2)}`);
+  }
+  return `<polygon points="${points.join(' ')}" fill="${color}" stroke="#ffffff" stroke-width="2" />`;
+}
+
+function renderOptimizerDiamond(x, y, color, size) {
+  return `<path d="M ${x} ${y - size} L ${x + size} ${y} L ${x} ${y + size} L ${x - size} ${y} Z" fill="${color}" stroke="#ffffff" stroke-width="2" />`;
+}
+
+function optimizerPalette(index) {
+  const colors = ['#157347', '#1f5eff', '#d97706', '#dc2626', '#7c3aed', '#0f766e', '#b45309', '#334155'];
+  return colors[index % colors.length];
+}
+
+function renderOptimizerCagr(model) {
+  const el = document.getElementById('optimizer-cagr');
+  if (!el) return;
+  const rows = model.cagrRows.map((row) => `<tr><td>${row.label}</td><td>${row.type === 'Activo' ? t('optimizer_type_asset') : t('optimizer_type_portfolio')}</td><td>${formatPct(row.cagr * 100, 2)}</td></tr>`).join('');
+  el.innerHTML = `<div class="optimizer-table-wrap"><table class="optimizer-table"><thead><tr><th>${t('optimizer_cagr_asset_portfolio')}</th><th>${t('optimizer_cagr_type')}</th><th>${t('optimizer_cagr_annual')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderOptimizerCorrelation(model) {
+  const el = document.getElementById('optimizer-correlation');
+  if (!el) return;
+  const assets = model.assets;
+  const matrix = model.correlation;
+  const count = assets.length;
+  const cell = count <= 8 ? 54 : count <= 12 ? 44 : 36;
+  const left = 72;
+  const top = 54;
+  const width = left + cell * count + 84;
+  const height = top + cell * count + 64;
+  const gradientId = `optimizer-corr-gradient-${Date.now()}`;
+
+  const cells = assets.map((asset, rowIndex) =>
+    matrix[rowIndex].map((value, colIndex) => {
+      const x = left + colIndex * cell;
+      const y = top + rowIndex * cell;
+      const fill = optimizerCorrelationColor(value);
+      const textColor = value > 0.55 ? '#ffffff' : '#fffaf8';
+      return `
+        <rect x="${x}" y="${y}" width="${cell}" height="${cell}" fill="${fill}" stroke="rgba(255,255,255,0.32)" stroke-width="1" />
+        <text x="${x + cell / 2}" y="${y + cell / 2 + 4}" font-size="${cell > 42 ? 12 : 10}" font-weight="600" text-anchor="middle" fill="${textColor}">${value.toFixed(2)}</text>
+      `;
+    }).join('')
+  ).join('');
+
+  const xLabels = assets.map((asset, index) => {
+    const x = left + index * cell + cell / 2;
+    const y = top + cell * count + 18;
+    return `<text x="${x}" y="${y}" font-size="11" text-anchor="end" fill="#475569" transform="rotate(-45 ${x} ${y})">${asset}</text>`;
+  }).join('');
+
+  const yLabels = assets.map((asset, index) => {
+    const x = left - 12;
+    const y = top + index * cell + cell / 2 + 4;
+    return `<text x="${x}" y="${y}" font-size="11" text-anchor="end" fill="#475569">${asset}</text>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="optimizer-corr-wrap">
+      <div class="optimizer-corr-card">
+        <svg class="optimizer-svg optimizer-corr-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-label="Matriz de correlación">
+          <defs>
+            <linearGradient id="${gradientId}" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="${optimizerCorrelationColor(0)}" />
+              <stop offset="100%" stop-color="${optimizerCorrelationColor(1)}" />
+            </linearGradient>
+          </defs>
+          <text x="${width / 2 - 18}" y="24" font-size="16" font-weight="700" text-anchor="middle" fill="#0f172a">${t('optimizer_corr_title')}</text>
+          ${cells}
+          ${xLabels}
+          ${yLabels}
+          <text x="${left + cell * count / 2}" y="${height - 8}" font-size="12" text-anchor="middle" fill="#475569">${t('optimizer_ticker')}</text>
+          <text x="18" y="${top + cell * count / 2}" font-size="12" text-anchor="middle" fill="#475569" transform="rotate(-90 18 ${top + cell * count / 2})">${t('optimizer_ticker')}</text>
+          <rect x="${width - 42}" y="${top}" width="16" height="${cell * count}" fill="url(#${gradientId})" rx="8" />
+          ${buildLinearTicks(0, 1, 6).map((tick) => {
+            const y = top + (1 - tick) * (cell * count);
+            return `<text x="${width - 18}" y="${y + 4}" font-size="10" fill="#475569">${tick.toFixed(1)}</text>`;
+          }).join('')}
+          <text x="${width - 10}" y="${top + cell * count / 2}" font-size="12" text-anchor="middle" fill="#475569" transform="rotate(-90 ${width - 10} ${top + cell * count / 2})">${t('optimizer_correlation')}</text>
+        </svg>
+      </div>
+    </div>
+  `;
+}
+
+function optimizerCorrelationColor(value) {
+  const clamped = Math.max(0, Math.min(1, value));
+  const red = 255;
+  const green = Math.round(220 - clamped * 160);
+  const blue = Math.round(220 - clamped * 180);
+  return `rgb(${red}, ${green}, ${blue})`;
 }

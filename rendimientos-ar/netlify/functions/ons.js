@@ -19,8 +19,7 @@ function fetch912() {
 exports.handler = async () => {
   try {
     const allBonds = await fetch912();
-    // Filter USD bonds (ending in D) with valid prices
-    const usdBonds = allBonds.filter(b => b.symbol.endsWith('D') && b.c > 0);
+    const validBonds = allBonds.filter(b => b.symbol && parseFloat(b.c) > 0);
     return {
       statusCode: 200,
       headers: {
@@ -28,7 +27,7 @@ exports.handler = async () => {
         'Access-Control-Allow-Origin': '*',
         'Cache-Control': 'public, max-age=300'
       },
-      body: JSON.stringify({ data: usdBonds, timestamp: new Date().toISOString() })
+      body: JSON.stringify({ data: validBonds, timestamp: new Date().toISOString() })
     };
   } catch (error) {
     return {

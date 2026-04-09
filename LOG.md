@@ -1055,3 +1055,877 @@
   - si siguiera muy chico, considerar una version simplificada del isotipo solo para favicon.
 - Siguiente paso sugerido:
   - cerrar y reabrir la pestaña o limpiar cache del icono, y luego continuar con GitHub + Netlify.
+## 2026-04-01 13:56:58 -03:00
+- Accion: integracion inicial del monitor BDI de obligaciones negociables dentro de la seccion `Corporativos`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/index.html`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario agrego una app Python con logica propia para ONs y pidio readecuarla al stack actual de `rendimientos-ar`.
+- Resultado:
+  - se agrego una capa de datos propia en `public/bdi-ons-data.js` con el universo BDI de ONs aportado por el usuario;
+  - la seccion `Corporativos` ahora consume precios live desde `/api/ons`, referencia MEP desde `/api/cotizaciones` y calcula precio USD, precio ARS, TC implicito, paridad, TIR USD, TIR ARS, duration, convexity y proximo pago;
+  - la tabla principal fue reorientada a un monitor institucional BDI con resumen superior y fila clickeable;
+  - el modal/calculadora de ONs ahora muestra ficha tecnica, ley, calificacion, lamina, descripcion del emisor y metricas nuevas;
+  - `node --check` valido sin errores de sintaxis `rendimientos-ar/public/app.js` y `rendimientos-ar/public/bdi-ons-data.js`.
+- Problemas encontrados:
+  - el codigo Python original estaba hecho para `Streamlit`, por lo que no podia incrustarse directo en la web actual sin separar datos, calculos y presentacion;
+  - no todos los tickers del universo heredado de `config.json` coinciden uno a uno con el subconjunto institucional aportado en `app.py`.
+- Decisiones tomadas:
+  - integrar la logica como capa BDI propia dentro del frontend existente en lugar de intentar embeder `Streamlit`;
+  - usar el conjunto curado de ONs del usuario como monitor principal de `Corporativos`;
+  - mantener como fuentes live `data912` y `cotizaciones` para no duplicar backends.
+- Pendientes:
+  - validar visualmente en navegador que `data912` entregue ambas puntas (`ARS` y `USD`) para todos los tickers curados;
+  - revisar si conviene sumar filtros, orden por ley/calificacion o una segunda tabla con universo ampliado;
+  - definir si esta misma capa debe migrarse luego a backend/serverless para reducir logica financiera en `public/app.js`.
+- Siguiente paso sugerido:
+  - levantar la app en local, abrir `Corporativos` y validar juntos que las metricas coincidan con la app Python original para los emisores clave.
+
+## 2026-04-01 14:38:14 -03:00
+- Accion: correccion de la seccion `Corporativos` tras validacion visual local del usuario.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/ons.js`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario reporto que no aparecia el precio en pesos, que `Proximo pago` y `Vencimiento` se solapaban y que el grafico mostraba menos puntos de los esperados.
+- Resultado:
+  - `/api/ons` en local y en Netlify ahora devuelve tambien bonos con punta ARS, no solo tickers terminados en `D`;
+  - la tabla de `Corporativos` paso a usar una envoltura propia y `table-layout: auto` para dejar espacio real a las nuevas columnas;
+  - la columna de `Proximo pago` ahora puede wrappear sin pisar `Vencimiento`;
+  - se mantuvo la curva tomando todos los items que entren por el monitor, por lo que al llegar mas puntas live deberian verse mas emisores en el grafico;
+  - `node --check` valido sin errores `public/app.js` y `server.js`.
+- Decisiones tomadas:
+  - corregir primero la fuente de datos (`/api/ons`) antes de tocar mas la logica de calculo;
+  - aislar los estilos de la tabla BDI de ONs para no romper otras tablas del proyecto.
+- Pendientes:
+  - reiniciar el servidor local para que tome el cambio de `server.js`;
+  - volver a validar en navegador si ya aparecen precios ARS y mas puntos en la curva;
+  - si aun faltaran emisores, revisar disponibilidad real de cotizaciones en `data912` para esos tickers.
+- Siguiente paso sugerido:
+  - reiniciar `npm.cmd start`, abrir `Corporativos` y confirmar si ya se destrabaron precio ARS, columnas y cantidad de puntos visibles.
+
+## 2026-04-01 14:51:50 -03:00
+- Accion: correccion del grafico de `Corporativos` para que use el mismo universo visible en la tabla.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario confirmo que la tabla estaba bien, pero el grafico seguia mostrando menos puntos que los emisores visibles.
+- Resultado:
+  - se elimino la seleccion curada fija de ONs que estaba dejando afuera emisores;
+  - la curva ahora toma todos los items con `duration` y `TIR` validos que entran a la tabla de `Corporativos`;
+  - tambien se removio el `yDomain` fijo para evitar que algunos puntos quedaran fuera del area visible;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-charts.js`.
+- Decisiones tomadas:
+  - alinear explicitamente el grafico con la tabla como fuente de verdad;
+  - mantener una guia de curva generica sobre el conjunto completo, en vez de una lista manual de emisores preferidos.
+- Pendientes:
+  - refrescar el navegador y confirmar que la cantidad de puntos visibles coincida con la cantidad de ONs listadas;
+  - si hiciera falta, ajustar despues el etiquetado para mejorar legibilidad cuando haya muchos puntos.
+- Siguiente paso sugerido:
+  - recargar `http://localhost:3000`, ir a `Corporativos` y verificar si ahora ves todos los puntos esperados.
+
+## 2026-04-01 14:55:44 -03:00
+- Accion: ajuste fino de la curva de tendencia en `Corporativos`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: con los puntos ya completos, la guia de tendencia seguia mostrando una forma poco fiel al conjunto real de ONs.
+- Resultado:
+  - se reemplazo la guia tipo `hump` para ONs por una tendencia suavizada construida sobre anclas de mediana del set real;
+  - la curva ahora sigue mejor la distribucion visible de la tabla sin forzar una loma artificial;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-charts.js`.
+- Decisiones tomadas:
+  - priorizar una curva descriptiva y estable antes que una forma teorica prefijada;
+  - mantener intactos los puntos reales y tocar solo la guia.
+- Pendientes:
+  - refrescar el navegador y validar visualmente si la curva ya acompana correctamente a los datos.
+- Siguiente paso sugerido:
+  - recargar `Corporativos` y cerrar el ajuste si la nueva tendencia ya te convence visualmente.
+
+## 2026-04-01 14:58:24 -03:00
+- Accion: correccion del punto de arranque y cierre de la curva de `Corporativos`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario observo que la curva comenzaba en el segundo dato en vez de arrancar en el primero.
+- Resultado:
+  - la guia ahora se ancla explicitamente al primer punto real y al ultimo punto real del grafico;
+  - se mantuvo el suavizado intermedio sobre anclas de mediana para evitar una forma quebrada;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-charts.js`.
+- Pendientes:
+  - refrescar el navegador y verificar si con este ajuste la curva ya resulta aceptable;
+  - si no convence visualmente, la alternativa recomendada es quitar la curva y dejar solo los puntos reales.
+- Siguiente paso sugerido:
+  - recargar `Corporativos` y decidir si esta version ya sirve o si conviene eliminar la guia por completo.
+
+## 2026-04-01 14:59:47 -03:00
+- Accion: eliminacion de la curva guia en el grafico de `Corporativos`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario indico explicitamente que la curva no estaba quedando bien y pidio quitarla.
+- Resultado:
+  - el grafico de `Corporativos` ahora deja solo los puntos reales de los emisores, sin linea de tendencia;
+  - se ajusto el caption para reflejar que el grafico muestra solo los datos visibles de la tabla;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-charts.js`.
+- Decisiones tomadas:
+  - priorizar una visualizacion honesta y limpia por encima de una curva decorativa poco confiable.
+- Pendientes:
+  - refrescar el navegador y confirmar que el grafico ya se ve como esperaba el usuario.
+- Siguiente paso sugerido:
+  - recargar `Corporativos` y validar el resultado final sin curva.
+
+## 2026-04-06 10:59:12 -03:00
+- Accion: ampliacion de `Liquidez` con `Duration mod.` y agregado de selector de idioma `ES / EN`.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio sumar `Duration Modificada` en la parte de liquidez y una solapa para poner la pagina en ingles.
+- Resultado:
+  - se agrego un toggle `ES / EN` en el header que guarda preferencia en `localStorage` y recarga la interfaz en el idioma elegido;
+  - se agregaron traducciones estaticas principales de navegacion, hero, secciones clave y footer mediante `bdi-overrides.js`;
+  - `Liquidez` ahora intenta leer `Modified Duration` desde la ficha CAFCI de cada FCI y mostrarla en las tarjetas cuando ese dato esta disponible;
+  - las tarjetas dinamicas de liquidez/especiales ahora adaptan etiquetas base (`TNA/APR`, `Limite/Limit`, `Patrimonio/AUM`, etc.) segun idioma;
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js` y `rendimientos-ar/public/bdi-overrides.js`.
+- Problemas encontrados:
+  - la estructura exacta del dato de `Modified Duration` en CAFCI no estaba documentada localmente, por lo que la extraccion se implemento con una busqueda robusta por claves y etiquetas relacionadas;
+  - no toda la app completa queda traducida al 100% en este bloque, pero si la capa principal visible y la parte dinamica de liquidez solicitada.
+- Decisiones tomadas:
+  - resolver el cambio de idioma con recarga completa para simplificar consistencia entre textos estaticos y tarjetas dinamicas;
+  - mostrar `Duration mod.` en FCIs solo cuando la ficha fuente realmente la exponga.
+- Pendientes:
+  - validar en navegador que algunos FCIs efectivamente muestren `Duration mod.` si CAFCI devuelve el dato;
+  - revisar si queres extender la traduccion a mas modales, tablas o mensajes secundarios de la app.
+- Siguiente paso sugerido:
+  - refrescar la app, probar `ES / EN` en el header y revisar `Liquidez` para confirmar si la nueva metrica aparece en los fondos.
+
+## 2026-04-06 11:09:02 -03:00
+- Accion: agregado de columnas `Duration` y `Duration Mod.` en `Renta fija ARS` y `Bonos CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario aclaro que la `Duration Modificada` que queria sumar correspondia a las tablas de `Renta fija ARS` y `Bonos CER`, no a la parte de FCIs.
+- Resultado:
+  - `Renta fija ARS` ahora muestra `Duration` y `Duration Mod.` como columnas nuevas en la tabla;
+  - `Bonos CER` ahora muestra `Duration Mod.` al lado de la columna `Duration` existente;
+  - la formula aplicada fue `Duration Mod. = Duration / (1 + tasa)`, usando la `TIR` de cada instrumento como tasa de referencia;
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Decisiones tomadas:
+  - para `Renta fija ARS`, la `Duration` se aproxima con tiempo al vencimiento en anios dado que la tabla actual trabaja con flujo final y TIR de instrumentos capitalizables;
+  - en `CER`, se reutiliza la `Duration` Macaulay ya calculada y se deriva la `Duration Mod.` sobre esa base.
+- Pendientes:
+  - refrescar la app y validar visualmente que las nuevas columnas entren bien en desktop y mobile.
+- Siguiente paso sugerido:
+  - revisar `Renta fija ARS` y `Bonos CER` en navegador para confirmar que las nuevas columnas se lean bien y que el usuario este conforme con la convencion usada.
+
+## 2026-04-06 11:20:00 -03:00
+- Accion: ampliacion de la capa de idioma ingles para textos residuales y noticias.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/news.js`
+  - `LOG.md`
+- Motivo: el usuario detecto varios textos que seguian apareciendo en espanol al activar `EN`, incluyendo descripciones, fuentes, secciones soberanas/corporativas y noticias.
+- Resultado:
+  - se agregaron traducciones adicionales en frontend para categorias de mercado (`Crypto`, descripcion de activos digitales, fuente Yahoo, textos de soberanos y caption corporativo);
+  - la seccion de noticias ahora pide `/api/news?lang=en` cuando la interfaz esta en ingles;
+  - el servidor local y la funcion de Netlify de noticias ahora seleccionan un feed de Google News en ingles cuando reciben `lang=en`;
+  - se tradujeron textos visibles de soberanos USD y de la seccion/chart relacionados que aun quedaban hardcodeados en espanol.
+- Problemas encontrados:
+  - la terminal se volvio inusualmente lenta y no permitio cerrar la verificacion final de sintaxis en esta pasada.
+- Decisiones tomadas:
+  - priorizar la correccion funcional de la capa de idioma y del feed de noticias aunque la verificacion automatica final quedara pendiente por el entorno.
+- Pendientes:
+  - refrescar la app en `EN` y revisar especificamente los ejemplos reportados por el usuario;
+  - si todavia quedan textos residuales, hacer una ultima pasada de limpieza sobre labels menores o mensajes de error secundarios.
+- Siguiente paso sugerido:
+  - abrir la app en ingles y recorrer `Mercado`, `Soberanos USD`, `Corporativos` y `Noticias` para confirmar que esta tanda ya corrige los casos reportados.
+
+## 2026-04-06 11:55:00 -03:00
+- Accion: segunda pasada de traduccion EN sobre textos estaticos y dinamicos residuales.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `LOG.md`
+- Motivo: el usuario reporto que seguian visibles en espanol multiples titulos, descripciones, bullets, labels de cotizaciones, tablas de ARS/CER/Corporativos y textos del bloque `Mi cartera` al activar la interfaz en ingles.
+- Resultado:
+  - se ampliaron claves bilingues en `app.js` para heroes, cotizaciones, mensajes de carga/error, tabla de `Renta fija ARS`, `Bonos CER` y `Corporativos`;
+  - se tradujeron labels del strip de cotizaciones (`Official dollar`, `MEP`, `country risk`) y varios mensajes de UI que seguian hardcodeados;
+  - se cubrieron en `bdi-overrides.js` los textos estaticos de briefing, shortcuts, `Hot Movers`, `Market news`, `Renta fija ARS`, `CER`, `Soberanos`, `Corporativos` y `Mi cartera`;
+  - se tradujeron tambien labels visibles del modulo de portfolio para tipos de activo.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-overrides.js`.
+- Decisiones tomadas:
+  - mantener la traduccion de noticias via `/api/news?lang=en`; si el server local estaba levantado antes del cambio backend previo, va a requerir reinicio para que el feed en ingles impacte en navegador.
+- Pendientes:
+  - refrescar la app en `EN` y revisar si queda algun texto residual en espanol dentro de modales/calculadoras secundarias;
+  - si las noticias siguen saliendo en espanol, reiniciar el server local para tomar la version nueva de `/api/news`.
+- Siguiente paso sugerido:
+  - hacer hard refresh en ingles y validar especialmente `Mercado`, `Renta fija ARS`, `Bonos CER`, `Soberanos USD`, `Corporativos` y `Mi cartera`.
+
+## 2026-04-06 12:35:00 -03:00
+- Accion: incorporacion de nueva solapa de optimizador de carteras.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario compartio un optimizador de carteras en Python y pidio integrarlo a la web existente como una nueva solapa.
+- Resultado:
+  - se agrego una nueva pestana principal `Optimizador` en la navegacion;
+  - se incorporo una interfaz nueva con inputs para tickers, anios, tasa libre de riesgo, retorno objetivo y peso minimo;
+  - se implemento un motor Markowitz adaptado a `JavaScript` que reutiliza `/api/mundo` para traer historicos diarios desde Yahoo Finance;
+  - el modulo ahora renderiza:
+    - espacio riesgo-retorno con portfolios aleatorios;
+    - frontera eficiente aproximada;
+    - portfolio de maximo Sharpe;
+    - portfolio de minima volatilidad;
+    - portfolio cercano a retorno objetivo si se informa;
+    - tabla de pesos optimos;
+    - series de rendimientos acumulados;
+    - tabla de CAGR;
+    - matriz de correlacion.
+- Decisiones tomadas:
+  - no se embebio el codigo Python directamente porque la arquitectura actual del sitio es `HTML/CSS/JS + Node/Netlify`;
+  - la optimizacion se adapto a frontend con muestreo aleatorio sobre el simplex en lugar de depender de `scipy` en runtime.
+- Pendientes:
+  - validar visualmente la nueva solapa en navegador;
+  - revisar performance con universos de tickers grandes y ajustar cantidad de portfolios aleatorios si hiciera falta;
+  - eventualmente extender la traduccion EN completa de esta nueva solapa.
+- Siguiente paso sugerido:
+  - levantar la app, abrir `Optimizador`, correr una cartera chica de prueba y verificar que graficos, pesos y tablas carguen correctamente.
+
+## 2026-04-06 12:50:00 -03:00
+- Accion: ajuste de visibilidad y render del optimizador de carteras.
+- Archivos afectados:
+  - endimientos-ar/public/index.html`r
+  - endimientos-ar/public/styles.css`r
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario reporto que los graficos del optimizador no se veian y que los contenedores quedaban visibles en blanco antes de ejecutar una corrida.
+- Resultado:
+  - las secciones de resultados del optimizador ahora nacen ocultas y solo se muestran despues de una corrida valida;
+  - se agregaron alturas explicitas de canvas para los charts del optimizador;
+  - el render de Chart.js se difiere al siguiente frame para asegurar que los contenedores ya esten visibles antes de dibujar.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina, correr el optimizador otra vez y validar que aparezcan el scatter de frontera y los dos graficos de rendimientos acumulados.
+
+## 2026-04-06 13:05:00 -03:00
+- Accion: segundo ajuste de render del optimizador de carteras.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - endimientos-ar/public/styles.css`r
+  - LOG.md`r
+- Motivo: el usuario seguia sin ver las secciones Espacio de portfolios y Rendimientos acumulados luego de correr el optimizador.
+- Resultado:
+  - se fijo altura explicita para los charts del optimizador;
+  - se agrego una espera corta antes de renderizar Chart.js para asegurar que los contenedores ya esten visibles;
+  - se fuerza visibilidad de las secciones de frontera y performance al momento de dibujar;
+  - se fija altura directa sobre los canvas antes de instanciar los charts.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y volver a correr una optimizacion corta para validar que ya aparezcan tanto el scatter riesgo-retorno como los dos charts acumulados.
+
+## 2026-04-06 13:15:00 -03:00
+- Accion: tercer ajuste de visibilidad/render del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario seguia sin ver las secciones Espacio de portfolios y Rendimientos acumulados luego del ajuste anterior.
+- Resultado:
+  - se agrego una capa explicita para forzar display:block sobre las secciones del optimizador cuando hay resultados;
+  - se agrego preparacion explicita de canvas con ancho/alto antes de instanciar los charts;
+  - se fuerza tambien altura sobre el contenedor padre de cada canvas para evitar renders en cero.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - hacer hard refresh del navegador y volver a correr el optimizador; si aun no aparecen, el siguiente paso debe ser inspeccionar en vivo la consola del browser o dejar un fallback textual visible dentro de esas secciones para diagnosticar el punto exacto de falla.
+
+## 2026-04-06 13:25:00 -03:00
+- Accion: cambio de estrategia visual para las secciones de charts del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/index.html`r
+  - endimientos-ar/public/styles.css`r
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario seguia sin ver Espacio de portfolios y Rendimientos acumulados, por lo que convenia evitar ocultar por completo esas secciones.
+- Resultado:
+  - las secciones de charts del optimizador quedan siempre visibles con titulo y descripcion;
+  - antes de correr una optimizacion muestran un placeholder textual en lugar de un bloque blanco;
+  - al ejecutar una corrida valida, el placeholder se oculta y aparece el contenedor real de charts.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar primero que aparezcan ambas secciones con placeholder, y luego correr el optimizador para confirmar si el placeholder se reemplaza por los charts.
+
+## 2026-04-06 13:40:00 -03:00
+- Accion: reemplazo de charts del optimizador por render SVG directo.
+- Archivos afectados:
+  - endimientos-ar/public/index.html`r
+  - endimientos-ar/public/styles.css`r
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario seguia viendo las secciones del optimizador pero sin graficos luego de correr una optimizacion.
+- Resultado:
+  - Espacio de portfolios ahora se renderiza como SVG scatter/line directo en DOM;
+  - Rendimientos acumulados ahora se renderiza como dos line charts SVG directos en DOM;
+  - se elimino la dependencia practica de canvas/Chart.js para estos bloques especificos del optimizador, reduciendo riesgo de fallas silenciosas de render.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y volver a correr el optimizador para confirmar que ahora los tres graficos SVG aparezcan correctamente.
+
+## 2026-04-06 13:55:00 -03:00
+- Accion: mejora visual del optimizador de carteras.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - endimientos-ar/public/styles.css`r
+  - LOG.md`r
+- Motivo: el usuario pidio sumar referencias explicitas (Frontera eficiente, Max Sharpe, Min Volatilidad, CML) y corregir el solapamiento entre la leyenda de empresas y la matriz de correlacion.
+- Resultado:
+  - el grafico principal del optimizador ahora dibuja y etiqueta tambien la CML;
+  - se agrego una leyenda clara para portfolios aleatorios, frontera eficiente, CML, max Sharpe, min volatilidad y retorno objetivo;
+  - los graficos de rendimientos acumulados ahora renderizan dentro de un shell con area de grafico y leyenda separadas, evitando que la leyenda desborde y se pise con la matriz.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y correr el optimizador para validar lectura del grafico principal y verificar que ya no haya solapamientos en la seccion inferior.
+
+## 2026-04-06 14:10:00 -03:00
+- Accion: ajuste de proporciones y escalado del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - endimientos-ar/public/styles.css`r
+  - LOG.md`r
+- Motivo: el usuario reporto que los graficos del optimizador se veian raros, deformados y con un ajuste visual poco consistente dentro de la pagina.
+- Resultado:
+  - se removio el estiramiento forzado de contenedores del optimizador;
+  - los SVG ahora usan preserveAspectRatio para conservar proporciones reales;
+  - se fijaron viewBox y margenes mas estables para el scatter principal y los line charts;
+  - se ajusto el layout para que las leyendas y el area del grafico respiren mejor y no deformen la lectura.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y volver a correr el optimizador para evaluar si el grafico principal y los acumulados ahora se ven proporcionados y mas limpios.
+
+## 2026-04-06 14:20:00 -03:00
+- Accion: agregado de referencia visual de Sharpe Ratio en el grafico principal del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario indico que el Sharpe Ratio no aparecia en el primer grafico del optimizador.
+- Resultado:
+  - se agrego una escala visual de Sharpe Ratio dentro del SVG principal;
+  - la referencia muestra gradiente de color y extremos minimo/maximo para interpretar el color de los portfolios aleatorios.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y correr el optimizador para validar que la escala de Sharpe quede visible y no interfiera con el resto de la lectura del grafico.
+
+## 2026-04-06 14:40:00 -03:00
+- Accion: correccion del nucleo de optimizacion para frontera eficiente y CML.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario detecto que la frontera eficiente no se estaba graficando correctamente y que la CML se veia inconsistente respecto del script original en Python.
+- Resultado:
+  - Max Sharpe, Min Vol, Retorno objetivo y Frontera eficiente dejaron de salir de una aproximacion sobre portfolios aleatorios;
+  - se implemento una optimizacion numerica con proyeccion al simplex para pesos long-only y objetivo de retorno;
+  - la frontera ahora se construye a partir de soluciones de minima varianza para una grilla de retornos objetivo;
+  - la CML ahora se dibuja usando el portfolio de maximo Sharpe derivado de esa frontera y arranca en volatilidad cero.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y comparar nuevamente el primer grafico con la referencia Python para validar forma de frontera y pendiente de la CML.
+
+## 2026-04-06 14:55:00 -03:00
+- Accion: redisenio visual de la seccion Rendimientos acumulados del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - endimientos-ar/public/styles.css`r
+  - LOG.md`r
+- Motivo: el usuario pidio mejorar esteticamente la lectura de Rendimientos acumulados, que se veia muy cargada y con poca jerarquia visual.
+- Resultado:
+  - Activos ahora resalta solo las series mas relevantes y deja el resto del universo en segundo plano;
+  - Portfolios ahora prioriza la lectura con etiquetas al final de cada linea en lugar de una leyenda pesada debajo;
+  - se agregaron subtitulos, chips de leyenda mas limpios y una caja grafica con mejor atmosfera visual;
+  - se mejoro la jerarquia visual entre el chart y sus referencias para hacer la seccion mas institucional y menos ruidosa.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar la nueva lectura de Activos y Portfolios, en especial si la simplificacion del chart izquierdo resulta mas util para el usuario.
+
+## 2026-04-06 15:10:00 -03:00
+- Accion: redisenio visual de la matriz de correlacion del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - endimientos-ar/public/styles.css`r
+  - LOG.md`r
+- Motivo: el usuario pidio que la matriz se vea mas cercana a una referencia estilo heatmap clasico, ya que la version anterior se percibia visualmente pobre.
+- Resultado:
+  - la matriz dejo de renderizarse como grilla de divs y ahora se dibuja como un heatmap SVG;
+  - se agregaron labels de ejes mas limpios, valores centrados por celda y barra lateral de color;
+  - la paleta se acerco a una escala roja clasica de correlacion positiva, similar a la referencia compartida por el usuario.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar si la nueva matriz ya se percibe alineada con la referencia visual deseada.
+
+## 2026-04-06 15:35:00 -03:00
+- Accion: ajuste fuerte del primer grafico del optimizador para acercarlo a la referencia Python.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - LOG.md`r
+- Motivo: el usuario comparo el scatter de la web con la salida de Python y detecto diferencias marcadas en encuadre, densidad, CML y lectura general del grafico.
+- Resultado:
+  - se aumento significativamente la densidad de portfolios aleatorios;
+  - se ajusto el encuadre usando percentiles del universo simulado para reducir espacio muerto y acercar la lectura a Python;
+  - la frontera eficiente ahora se dibuja con una curva mas suave;
+  - la CML se renderiza en rojo, recortada al rango util del grafico;
+  - se incorporo colorbar vertical de Sharpe y leyenda interna estilo mas cercano al grafico de referencia.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina y comparar nuevamente el primer grafico con la referencia Python para evaluar si la diferencia ya se redujo de forma util.
+
+## 2026-04-06 16:05:00 -03:00
+- Accion: ajuste de CML y ampliacion de traducciones EN del optimizador.
+- Archivos afectados:
+  - endimientos-ar/public/app.js`r
+  - endimientos-ar/public/bdi-overrides.js`r
+  - LOG.md`r
+- Motivo: el usuario indico que la recta CML se iba del grafico y que la nueva seccion del optimizador seguia mostrando muchos textos en espanol al activar ingles.
+- Resultado:
+  - la CML ahora se recorta al rango util del grafico en lugar de extenderse visualmente fuera de escala;
+  - se agregaron claves bilingues para mensajes, metricas, ejes, labels y textos del optimizador;
+  - se ampliaron los overrides estaticos para titulos y descripciones de la seccion del optimizador en EN.
+- Verificacion:
+  - 
+ode --check valido sin errores endimientos-ar/public/app.js;
+  - 
+ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
+- Siguiente paso sugerido:
+  - refrescar la pagina, volver a correr el optimizador y validar tanto el recorte de CML como la interfaz en ingles dentro de toda la seccion.
+
+## 2026-04-07 10:35:00 -03:00
+- Accion: incorporacion de una nueva solapa de calculadora de interes compuesto.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio sumar una herramienta nueva para proyectar inversion inicial, aportes mensuales, plazo, tasa, rango de varianza y frecuencia de capitalizacion, con grafico comparativo entre trayectoria sin invertir e invertida.
+- Resultado:
+  - se agrego una nueva solapa principal de `Interes compuesto` en la navegacion superior;
+  - se incorporo una interfaz por pasos para capital inicial, contribucion, plazo, tasa, varianza y frecuencia de capitalizacion;
+  - se implemento una simulacion mensual con escenarios de tasa baja, base y alta;
+  - se agrego un grafico SVG propio para comparar `sin invertir` versus `invertido`, incluyendo banda de sensibilidad por tasa;
+  - se sumo una tabla de desglose final y una capa bilingue ES/EN para la nueva seccion.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-overrides.js`.
+- Siguiente paso sugerido:
+  - refrescar la app, probar la nueva solapa con distintos supuestos y validar visualmente tanto el grafico como la traduccion al ingles.
+
+## 2026-04-07 10:55:00 -03:00
+- Accion: correccion del render del grafico de interes compuesto.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario reporto que la calculadora mostraba el resumen numerico pero no el grafico ni el desglose final.
+- Resultado:
+  - se corrigio el formato de puntos enviado al generador de paths SVG;
+  - el grafico comparativo ahora puede renderizar correctamente las trayectorias `sin invertir`, `tasa baja`, `tasa base` y `tasa alta`;
+  - al evitar la excepcion de render, tambien vuelve a aparecer el bloque de desglose final.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - hacer refresh completo del navegador y validar que aparezcan tanto el grafico como la tabla final de escenarios.
+
+## 2026-04-07 11:10:00 -03:00
+- Accion: mejora estetica del grafico de interes compuesto.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario pidio potenciar visualmente el chart, especialmente para evitar solapes en el eje Y y mejorar la lectura general.
+- Resultado:
+  - se amplio el margen izquierdo del SVG para dar mas aire al eje Y;
+  - los labels monetarios del eje Y pasaron a formato compacto en `K/M`, reduciendo ruido y solapes;
+  - se agregaron marcadores y etiquetas finales sobre las lineas principales para mejorar la jerarquia visual;
+  - el chart queda mas limpio y con lectura mas institucional.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar si el nuevo balance del eje Y y las etiquetas finales ya resultan comodos en desktop y mobile.
+
+## 2026-04-07 11:22:00 -03:00
+- Accion: ajuste de encuadre y leyenda del grafico de interes compuesto.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio centrar los labels debajo del grafico y reducir el espacio blanco del fondo sin modificar el grafico en si.
+- Resultado:
+  - se redujo el margen interno del SVG para que el area util gane presencia;
+  - se ajusto el marco visual del chart para que no quede tan ancho ni vacio;
+  - la leyenda inferior quedo centrada justo debajo del grafico;
+  - se mantuvo intacta la logica y la estructura principal de la visualizacion.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-overrides.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar si el nuevo encuadre ya se percibe mas compacto y equilibrado.
+
+## 2026-04-07 11:34:00 -03:00
+- Accion: ajuste de proporcion del marco del grafico y jerarquia visual de `Desglose final`.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio reducir el ancho visual del marco del chart y hacer que el bloque `Desglose final` no pase desapercibido debajo del grafico.
+- Resultado:
+  - se acoto el ancho util del bloque del grafico y se hizo menos panoramico para que el encuadre resulte mas proporcionado;
+  - el chart ahora queda centrado dentro de un contenedor visualmente mas compacto;
+  - `Desglose final` paso a tener un tratamiento de seccion destacada, con fondo propio, borde suave y un encabezado mas visible.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar si el nuevo balance entre grafico y desglose ya se siente natural dentro de la seccion.
+
+## 2026-04-07 12:05:00 -03:00
+- Accion: incorporacion inicial de una nueva solapa `Heatmap USA` estilo Finviz.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio sumar una visualizacion tipo Finviz usando datos de Yahoo Finance, avanzando de a poco con una primera version funcional.
+- Resultado:
+  - se agrego una nueva solapa principal `Heatmap USA`;
+  - se incorporo un endpoint `/api/heatmap` para traer precio, variacion diaria y market cap desde Yahoo sobre un universo curado de large caps;
+  - se agrego version serverless equivalente en Netlify;
+  - se implemento un treemap SVG agrupado por sector, con tamaño por market cap y color por variacion diaria;
+  - se sumaron traducciones base ES/EN y controles de refresh.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-overrides.js`;
+  - `node --check` valido sin errores `rendimientos-ar/server.js`;
+  - `node --check` valido sin errores `rendimientos-ar/netlify/functions/heatmap.js`.
+- Siguiente paso sugerido:
+  - levantar la app, abrir `Heatmap USA` y validar esta primera version para luego mejorar densidad, industria y jerarquia visual.
+
+## 2026-04-07 12:40:00 -03:00
+- Accion: correccion operativa del endpoint `/api/heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `LOG.md`
+- Motivo: el usuario reporto primero un `404` y luego se detecto que Yahoo devolvia `401` sobre el endpoint batch usado para quotes masivas.
+- Resultado:
+  - se confirmo que el `404` venia de un proceso `node` viejo que seguia escuchando en el puerto 3000;
+  - se reemplazo ese proceso por una instancia fresca del server local;
+  - se rehizo el backend del heatmap para dejar de depender del endpoint batch bloqueado por Yahoo;
+  - ahora el heatmap usa cotizacion por ticker via endpoint `chart`, que responde correctamente, y combina eso con pesos curados de market cap para el treemap;
+  - validacion final local: `curl http://localhost:3000/api/heatmap` devolvio `200 OK` con payload de datos.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/server.js`;
+  - `node --check` valido sin errores `rendimientos-ar/netlify/functions/heatmap.js`;
+  - prueba HTTP local exitosa sobre `/api/heatmap`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar el treemap en la nueva solapa, para luego seguir con mejoras visuales hacia una lectura mas cercana a Finviz.
+
+## 2026-04-07 12:58:00 -03:00
+- Accion: mejora estetica fuerte del treemap `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario mostro que la primera composicion del heatmap se veia visualmente muy pobre, con columnas finitas, labels solapados y poca legibilidad general.
+- Resultado:
+  - se reemplazo la distribucion lineal simple por una composicion mas equilibrada en dos franjas de sectores;
+  - dentro de cada sector ahora hay agrupacion por industria antes de dibujar tickers;
+  - se agregaron umbrales de visibilidad para ticker, variacion e industria, evitando texto forzado en cajas diminutas;
+  - la lectura general del mapa ahora prioriza proporcion y jerarquia visual antes que mostrar todos los labels sin filtro.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y revisar esta segunda version del heatmap, para luego ajustar paleta, densidad y tamanos de fuente hacia un look todavia mas cercano a Finviz.
+
+## 2026-04-07 13:18:00 -03:00
+- Accion: segunda pasada estetica del `Heatmap USA` y aclaracion de fuente de datos.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio seguir mejorando la estetica y consulto si los datos de Yahoo podian estar mal.
+- Resultado:
+  - se paso a una paleta mas sobria y cercana a terminal/Finviz, evitando verdes y rojos excesivamente chillones;
+  - los sectores ahora se distribuyen en tres filas para reducir compresion lateral;
+  - se mejoro el criterio de visibilidad de labels para ticker, variacion, industria y encabezados de sector;
+  - se reforzo el marco visual oscuro del mapa y la leyenda para que todo el bloque se lea como una pieza unificada;
+  - se aclaro en la fuente que precio y variacion diaria vienen de Yahoo, mientras que el tamaño relativo por market cap sigue siendo curado en esta primera version.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/server.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar esta nueva estetica para luego decidir si conviene avanzar hacia una tercera pasada aun mas cercana a Finviz, o empezar a afinar los pesos relativos del universo.
+
+## 2026-04-08 00:24:00 -03:00
+- Accion: preparacion de migracion del heatmap hacia proveedor de datos mas robusto.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio preparar la migracion para que los datos del heatmap sean lo mas realistas posible antes de seguir refinando la estetica.
+- Resultado:
+  - se implemento arquitectura dual para el heatmap: `Polygon` si existe `POLYGON_API_KEY`, o fallback a Yahoo si no esta configurado;
+  - se agrego cache en memoria para referencia corporativa del heatmap cuando se usa Polygon;
+  - el frontend ahora muestra una fuente distinta segun el proveedor realmente usado;
+  - se documento en README que hoy el fallback usa Yahoo + escala curada y que el salto a Polygon ya esta preparado.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/server.js`;
+  - `node --check` valido sin errores `rendimientos-ar/netlify/functions/heatmap.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - validar sintaxis y reiniciar el server local para que el heatmap quede listo para detectar `POLYGON_API_KEY` cuando se configure.
+
+## 2026-04-08 00:56:00 -03:00
+- Accion: activacion real de la migracion del heatmap con proveedor hibrido.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario compartio una nueva `POLYGON_API_KEY` y pidio que el heatmap use datos lo mas realistas posible.
+- Resultado:
+  - se verifico que la nueva key es valida para endpoints de referencia de Polygon, pero no tiene entitlement para snapshots de mercado en tiempo real;
+  - se adapto el heatmap para usar un esquema hibrido: `Polygon` aporta market cap y metadata corporativa, mientras `Yahoo Finance` mantiene precio y variacion diaria;
+  - el frontend ahora distingue correctamente la fuente `polygon-reference+yahoo` y la muestra de forma explicita en la seccion;
+  - se corrigio la carga local de `.env` para que la key del proyecto sobreescriba variables de entorno viejas del sistema y no dispare falsos `401`;
+  - con esta combinacion el peso relativo de los bloques queda mas realista sin romper el funcionamiento local ni el fallback existente.
+- Verificacion:
+  - queda pendiente reiniciar el server local y validar `/api/heatmap` en ejecucion con la configuracion actual.
+- Siguiente paso sugerido:
+  - reiniciar la app local, verificar que el endpoint devuelva `provider: polygon-reference+yahoo` y luego retomar el refinamiento estetico del mapa.
+
+## 2026-04-08 01:18:00 -03:00
+- Accion: tercera pasada estetica del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio seguir mejorando la estetica del heatmap mientras se pospone la validacion final de la migracion de datos.
+- Resultado:
+  - se ajusto la paleta para acercarla a un look mas sobrio tipo terminal/Finviz y reducir tonos demasiado brillantes;
+  - se reforzaron headers de sector e industria con mas jerarquia, barras superiores mas limpias y share visual por sector;
+  - los tiles ahora tienen mejor contraste, un highlight sutil y textos con mejor legibilidad sobre fondos intensos;
+  - el contenedor general paso a una presentacion mas oscura y premium, con mejor profundidad visual y una leyenda mas integrada.
+- Verificacion:
+  - queda pendiente refresh visual en navegador para validar el resultado en pantalla.
+- Siguiente paso sugerido:
+  - revisar el heatmap en la pagina y decidir un ultimo ajuste fino sobre spacing, tipografia y densidad de labels.
+
+## 2026-04-08 01:31:00 -03:00
+- Accion: cuarta pasada estetica del `Heatmap USA` enfocada en densidad y composicion.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio seguir mejorando el mapa al ver que todavia se sentia pesado y poco refinado.
+- Resultado:
+  - se redistribuyeron los sectores en cuatro filas para balancear mejor el mapa y evitar una franja superior excesivamente dominante;
+  - se aumentaron los espacios entre sectores, industrias y tiles para que el heatmap respire mejor;
+  - se endurecieron los umbrales de labels para esconder texto en bloques chicos y reducir ruido visual;
+  - se suavizaron headers, shares de sector y leyenda para un look mas limpio y menos cargado.
+- Verificacion:
+  - queda pendiente validacion visual final en navegador luego de refrescar la pagina.
+- Siguiente paso sugerido:
+  - probar el heatmap y, si hace falta, ajustar solo microdetalles de paleta o proporciones.
+
+## 2026-04-08 01:45:00 -03:00
+- Accion: agregado de tooltip hover al `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio poder pasar el mouse sobre el grafico para ver informacion detallada por activo.
+- Resultado:
+  - se agrego un tooltip flotante sobre los bloques del heatmap;
+  - al hacer hover ahora se muestran ticker, nombre, precio, variacion diaria, sector, industria y market cap;
+  - el tooltip sigue al mouse dentro del contenedor y no ensucia el mapa con labels permanentes extra.
+- Verificacion:
+  - queda pendiente refresh visual para confirmar el comportamiento en navegador.
+- Siguiente paso sugerido:
+  - probar el hover y, si hace falta, ajustar el contenido o la posicion del tooltip.
+
+## 2026-04-08 01:57:00 -03:00
+- Accion: refinamiento estetico fino del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario compartio la vista actual y pidio seguir puliendo la presentacion visual del mapa.
+- Resultado:
+  - se suavizo la paleta para un look mas maduro y cercano a terminal institucional;
+  - se aligeraron los headers de sector e industria para que no compitan tanto con los activos;
+  - se mejoro el frame general y la leyenda para que el bloque se sienta mas premium;
+  - se agrego un hover mas elegante sobre tiles para reforzar interactividad sin ensuciar el layout.
+- Verificacion:
+  - `node --check` queda como validacion pendiente inmediata sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap y decidir si conviene un ultimo ajuste de tipografia o si ya pasamos a enriquecer datos del tooltip.
+
+## 2026-04-08 02:09:00 -03:00
+- Accion: cambio de layout interno del `Heatmap USA` para bloques mas cuadrados.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario pidio que dentro de cada sector los bloques mantengan proporciones mas cercanas a cuadrados y no se deformen tanto en rectangulos largos.
+- Resultado:
+  - se agrego una implementacion `squarified treemap` para el acomodo interno del mapa;
+  - industrias y activos ahora se distribuyen con una logica que privilegia proporciones mas balanceadas;
+  - esto reduce tiras largas y mejora la lectura visual dentro de cada sector.
+- Verificacion:
+  - queda pendiente `node --check` sobre `rendimientos-ar/public/app.js` y validacion visual en navegador.
+- Siguiente paso sugerido:
+  - refrescar el heatmap y evaluar si alcanza con este layout o si conviene ajustar tambien la distribucion de sectores.
+
+## 2026-04-08 02:18:00 -03:00
+- Accion: correccion del layout interno del `Heatmap USA` tras resultado visual deficiente.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el cambio anterior hacia `squarified treemap` genero franjas excesivamente largas y empeoro la lectura del mapa.
+- Resultado:
+  - se retiro la estrategia anterior;
+  - se implemento un layout binario balanceado para industrias y activos, buscando recuperar proporciones mas razonables sin volver al comportamiento inicial;
+  - el objetivo de este ajuste es mantener mejor la relacion visual entre tamanos y evitar tiras horizontales extremas.
+- Verificacion:
+  - queda pendiente `node --check` y refresh visual en navegador.
+- Siguiente paso sugerido:
+  - refrescar el heatmap y verificar si esta variante recupera una composicion mas natural.
+
+## 2026-04-08 02:31:00 -03:00
+- Accion: mejora de realismo del fallback Yahoo para `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio avanzar con la recomendacion de corto plazo para traer datos mas reales desde Yahoo Finance.
+- Resultado:
+  - se reemplazo el enfoque ticker por ticker basado solo en `chart` por un `batch quote` de Yahoo;
+  - el heatmap ahora puede tomar desde Yahoo, en bloque, `market cap`, `price`, `change %` y `name`;
+  - el fallback local y la funcion de Netlify quedaron alineados con esta mejora;
+  - se reduce la dependencia de market caps curados y mejora la fidelidad general del mapa aun sin un plan premium de Polygon.
+- Verificacion:
+  - queda pendiente validar sintaxis y reiniciar el server local para confirmar la respuesta actualizada de `/api/heatmap`.
+- Siguiente paso sugerido:
+  - verificar el endpoint en vivo y luego decidir si conviene sumar tambien volumen u otros campos al tooltip.
+
+## 2026-04-08 02:42:00 -03:00
+- Accion: ampliacion del universo de acciones del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio que el mapa incluya muchas mas acciones y no quede limitado al universo original.
+- Resultado:
+  - se amplio de forma relevante el universo del heatmap;
+  - se sumaron mas large caps de tecnologia, consumo ciclico, comunicacion, consumo defensivo, healthcare, finanzas, industriales, energia, real estate y utilities;
+  - esto aumenta densidad, cobertura sectorial y parecido con mapas de mercado mas completos.
+- Verificacion:
+  - queda pendiente reiniciar el server local para reflejar el nuevo universo en la pagina.
+- Siguiente paso sugerido:
+  - levantar la app de nuevo, revisar la nueva densidad del mapa y ajustar layout si hace falta por el mayor numero de tickers.
+
+## 2026-04-08 12:49:00 -03:00
+- Accion: correccion del `HTTP 502` del heatmap tras ampliar el universo.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `LOG.md`
+- Motivo: al probar la ampliacion del universo, Yahoo rechazo el endpoint `v7/finance/quote` con `401 Unauthorized` y el heatmap quedo devolviendo `502`.
+- Resultado:
+  - se dejo el intento de `batch quote` como mejora oportunista cuando Yahoo lo permita;
+  - si ese endpoint falla, el sistema ahora degrada automaticamente al flujo que usa `chart` por ticker, que ya venia funcionando;
+  - con esto el heatmap deja de romperse y mantiene compatibilidad con el universo ampliado.
+- Verificacion:
+  - queda pendiente reiniciar el server local y probar de nuevo `/api/heatmap`.
+- Siguiente paso sugerido:
+  - volver a levantar la app, confirmar que el heatmap responda otra vez y luego revisar el mapa con el nuevo universo.
+
+## 2026-04-08 13:04:00 -03:00
+- Accion: eliminacion de la seccion `Liquidez en pesos` del modulo ARS.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `LOG.md`
+- Motivo: el usuario pidio sacar la seccion de liquidez en pesos dentro de la parte de liquidez.
+- Resultado:
+  - se elimino la subpestana y el panel de `Liquidez en pesos`;
+  - la entrada `ARS` ahora abre de forma natural en `Plazo fijo`;
+  - se limpiaron accesos y textos visibles para que la home no siga apuntando a una seccion removida.
+- Verificacion:
+  - queda pendiente refresh visual en navegador para confirmar la navegacion final.
+- Siguiente paso sugerido:
+  - refrescar la app y revisar la nueva entrada `ARS` para validar que quede clara y ordenada.
+
+## 2026-04-08 13:21:00 -03:00
+- Accion: agregado de temporalidad personalizada al `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio poder usar el heatmap con diferentes temporalidades, eligiendo fecha inicial y fecha final o comparando contra el momento actual.
+- Resultado:
+  - se agregaron controles de fecha en el frontend;
+  - el backend ahora acepta `start` y `end` para calcular variacion del periodo;
+  - si `end` queda vacio, el color se calcula desde la fecha inicial hasta ahora;
+  - se mantuvo el comportamiento diario como fallback cuando no se informa una fecha de inicio.
+- Verificacion:
+  - queda pendiente reiniciar el server local para probar el flujo completo de frontend + backend.
+- Siguiente paso sugerido:
+  - levantar la app, probar un rango corto y otro abierto hasta hoy, y ajustar si hace falta la velocidad o el texto del estado.

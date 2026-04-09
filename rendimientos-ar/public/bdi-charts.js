@@ -169,6 +169,45 @@
     ];
   }
 
+  function buildMedianTrendGuide(points) {
+    const filtered = filterOutliers(points);
+    if (filtered.length < 3) return sortByX(filtered);
+
+    const sorted = sortByX(filtered);
+    const anchors = buildUpperAnchors(sorted, [0.18, 0.4, 0.62, 0.84], 'median');
+    if (anchors.length < 2) return sorted;
+
+    const smoothedCore = anchors.map((anchor, index) => {
+      const prev = anchors[Math.max(0, index - 1)];
+      const next = anchors[Math.min(anchors.length - 1, index + 1)];
+      return {
+        x: anchor.x,
+        y: median([prev.y, anchor.y, next.y]),
+      };
+    });
+
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    const firstCore = smoothedCore[0];
+    const lastCore = smoothedCore[smoothedCore.length - 1];
+
+    const guide = [
+      { x: first.x, y: first.y },
+      {
+        x: firstCore.x,
+        y: median([first.y, firstCore.y, smoothedCore[Math.min(1, smoothedCore.length - 1)].y]),
+      },
+      ...smoothedCore.slice(1, -1),
+      {
+        x: lastCore.x,
+        y: median([smoothedCore[Math.max(0, smoothedCore.length - 2)].y, lastCore.y, last.y]),
+      },
+      { x: last.x, y: last.y },
+    ];
+
+    return sortByX(guide).filter((point, index, arr) => index === 0 || point.x > arr[index - 1].x);
+  }
+
   function buildGuideFromLabels(points, labelGroups, fallbackBuilder) {
     const curated = labelGroups
       .map((group) => findPointByLabel(points, Array.isArray(group) ? group : [group]))
@@ -368,6 +407,7 @@
 
   function renderSoberanosCurveBDI(items) {
     const host = ensureHost('#soberanos-chart-section .scatter-plot');
+    const lang = localStorage.getItem('bdi-language') || 'es';
     const localPoints = items
       .filter((item) => item.ley !== 'NY')
       .map((item) => ({ x: item.duration, y: item.ytm, label: item.symbol, color: PALETTE.local }));
@@ -406,7 +446,9 @@
       yDomain: [4.3, 11.2],
       xTickFormat: (value) => formatNumber(value, 1),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
-      caption: 'Curva soberanos ultima cotizacion',
+      caption: lang === 'en'
+        ? 'Visual comparison between local-law and NY-law bonds to track curve shape and relative yield.'
+        : 'Curva soberanos ultima cotizacion',
     });
   }
 
@@ -438,15 +480,15 @@
 
   function renderONsCurveBDI(items) {
     const host = ensureHost('#ons-chart-section .scatter-plot');
-    const preferred = ['YM34', 'VSCT', 'TSC4', 'TTCD', 'BACH', 'IRCO', 'PN35', 'BACG', 'TTC8', 'YMCX', 'MGCO'];
-    const curatedItems = items
-      .filter((item) => preferred.some((code) => String(item.d912Ticker || '').toUpperCase().startsWith(code)))
+    const lang = localStorage.getItem('bdi-language') || 'es';
+    const allItems = [...items]
+      .filter((item) => Number.isFinite(item?.duration) && Number.isFinite(item?.ytm))
       .sort((a, b) => a.duration - b.duration);
 
-    const onPoints = curatedItems.map((item) => ({
+    const onPoints = allItems.map((item) => ({
       x: item.duration,
       y: item.ytm,
-      label: preferred.find((code) => String(item.d912Ticker || '').toUpperCase().startsWith(code)) || item.d912Ticker,
+      label: item.symbol || item.d912Ticker,
       color: PALETTE.accent,
     }));
 
@@ -456,19 +498,16 @@
         {
           color: PALETTE.accent,
           points: onPoints,
-          guideBuilder: (points) => buildGuideFromLabels(
-            points,
-            ['IRCO', 'PN35', 'BACH', 'YM34', 'TSC4'],
-            (series) => buildHumpGuide(series, { minPeakT: 0.54, maxPeakT: 0.84, maxDrop: 0.36 })
-          ),
+          guideBuilder: () => [],
         },
       ],
       xLabel: 'Duration (anos)',
       yLabel: 'TIR (%)',
-      yDomain: [3.9, 7.6],
       xTickFormat: (value) => formatNumber(value, 1),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
-      caption: 'curva ONs preferidas ultima cotizacion',
+      caption: lang === 'en'
+        ? 'corporate issuers based on the same data visible in the table'
+        : 'emisores corporativos sobre los mismos datos visibles en la tabla',
     });
   }
 

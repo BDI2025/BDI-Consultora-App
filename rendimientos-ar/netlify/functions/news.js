@@ -2,9 +2,10 @@
 const https = require('https');
 const { URL } = require('url');
 
-const FEEDS = [
-  'https://news.google.com/rss/search?q=when:3h+mercados+OR+dolar+OR+bolsa+OR+wall+street+OR+bitcoin+OR+acciones+OR+bonos&hl=es-419&gl=AR&ceid=AR:es-419',
-];
+const FEEDS = {
+  es: 'https://news.google.com/rss/search?q=when:3h+mercados+OR+dolar+OR+bolsa+OR+wall+street+OR+bitcoin+OR+acciones+OR+bonos&hl=es-419&gl=AR&ceid=AR:es-419',
+  en: 'https://news.google.com/rss/search?q=when:3h+markets+OR+dollar+OR+bonds+OR+stocks+OR+wall+street+OR+bitcoin+OR+treasury&hl=en-US&gl=US&ceid=US:en',
+};
 
 function fetchFeed(feedUrl) {
   return new Promise((resolve) => {
@@ -59,7 +60,8 @@ function parseRSS(xml) {
 
 exports.handler = async function(event) {
   try {
-    const xml = await fetchFeed(FEEDS[0]);
+    const lang = String(event.queryStringParameters?.lang || 'es').toLowerCase() === 'en' ? 'en' : 'es';
+    const xml = await fetchFeed(FEEDS[lang]);
     if (!xml) throw new Error('Empty response');
 
     const items = parseRSS(xml).slice(0, 20);
