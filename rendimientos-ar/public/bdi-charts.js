@@ -217,6 +217,150 @@
     return fallbackBuilder(points);
   }
 
+  function solveLinearSystem3x3(matrix, vector) {
+    const a = matrix.map((row, index) => [...row, vector[index]]);
+    const size = 3;
+
+    for (let pivot = 0; pivot < size; pivot += 1) {
+      let maxRow = pivot;
+      for (let row = pivot + 1; row < size; row += 1) {
+        if (Math.abs(a[row][pivot]) > Math.abs(a[maxRow][pivot])) maxRow = row;
+      }
+      if (Math.abs(a[maxRow][pivot]) < 1e-10) return null;
+      if (maxRow !== pivot) {
+        const temp = a[pivot];
+        a[pivot] = a[maxRow];
+        a[maxRow] = temp;
+      }
+
+      const pivotValue = a[pivot][pivot];
+      for (let col = pivot; col <= size; col += 1) a[pivot][col] /= pivotValue;
+
+      for (let row = 0; row < size; row += 1) {
+        if (row === pivot) continue;
+        const factor = a[row][pivot];
+        for (let col = pivot; col <= size; col += 1) {
+          a[row][col] -= factor * a[pivot][col];
+        }
+      }
+    }
+
+    return a.map((row) => row[size]);
+  }
+
+  function nelsonSiegelLoadings(x, tau) {
+    const safeX = Math.max(x, 1e-6);
+    const safeTau = Math.max(tau, 1e-6);
+    const ratio = safeX / safeTau;
+    const expTerm = Math.exp(-ratio);
+    const l1 = (1 - expTerm) / ratio;
+    const l2 = l1 - expTerm;
+    return [1, l1, l2];
+  }
+
+  function fitNelsonSiegel(points) {
+    const filtered = sortByX(points).filter((point) => Number.isFinite(point.x) && point.x > 0 && Number.isFinite(point.y));
+    if (filtered.length < 4) return null;
+
+    const minX = Math.min(...filtered.map((point) => point.x));
+    const maxX = Math.max(...filtered.map((point) => point.x));
+    const tauMin = Math.max(0.04, minX * 0.35);
+    const tauMax = Math.max(tauMin + 0.08, maxX * 1.45);
+    let best = null;
+
+    for (let step = 0; step <= 180; step += 1) {
+      const tau = tauMin + ((tauMax - tauMin) * step) / 180;
+      const gram = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+      ];
+      const rhs = [0, 0, 0];
+
+      filtered.forEach((point) => {
+        const loading = nelsonSiegelLoadings(point.x, tau);
+        for (let row = 0; row < 3; row += 1) {
+          rhs[row] += loading[row] * point.y;
+          for (let col = 0; col < 3; col += 1) {
+            gram[row][col] += loading[row] * loading[col];
+          }
+        }
+      });
+
+      const betas = solveLinearSystem3x3(gram, rhs);
+      if (!betas) continue;
+
+      const sse = filtered.reduce((acc, point) => {
+        const loading = nelsonSiegelLoadings(point.x, tau);
+        const fitted = betas[0] * loading[0] + betas[1] * loading[1] + betas[2] * loading[2];
+        return acc + (point.y - fitted) ** 2;
+      }, 0);
+
+      if (!best || sse < best.sse) {
+        best = {
+          tau,
+          beta0: betas[0],
+          beta1: betas[1],
+          beta2: betas[2],
+          sse,
+        };
+      }
+    }
+
+    if (!best) return null;
+
+    const pointCount = 90;
+    const curvePoints = Array.from({ length: pointCount }, (_, index) => {
+      const x = minX + ((maxX - minX) * index) / (pointCount - 1);
+      const loading = nelsonSiegelLoadings(x, best.tau);
+      const y = best.beta0 * loading[0] + best.beta1 * loading[1] + best.beta2 * loading[2];
+      return { x, y };
+    });
+
+    return {
+      ...best,
+      points: curvePoints,
+    };
+  }
+
+  function fitPolynomialCurve(points, degree = 2, samples = 90) {
+    const filtered = sortByX(points).filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    if (filtered.length < degree + 1 || degree !== 2) return null;
+
+    const xs = filtered.map((point) => point.x);
+    const ys = filtered.map((point) => point.y);
+    const matrix = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+    const vector = [0, 0, 0];
+
+    for (let row = 0; row <= degree; row += 1) {
+      for (let col = 0; col <= degree; col += 1) {
+        matrix[row][col] = xs.reduce((sum, x) => sum + (x ** (row + col)), 0);
+      }
+      vector[row] = xs.reduce((sum, x, index) => sum + (ys[index] * (x ** row)), 0);
+    }
+
+    const coefficients = solveLinearSystem3x3(matrix, vector);
+    if (!coefficients) return null;
+
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const curvePoints = Array.from({ length: samples }, (_, index) => {
+      const x = minX + ((maxX - minX) * index) / (samples - 1);
+      const y = coefficients.reduce((sum, coefficient, power) => sum + coefficient * (x ** power), 0);
+      return { x, y };
+    });
+
+    return {
+      degree,
+      coefficients,
+      points: curvePoints,
+    };
+  }
+
   function buildMonotonePath(points, scaleX, scaleY) {
     const sorted = sortByX(points);
     if (!sorted.length) return '';
@@ -258,6 +402,139 @@
     return { dx: -22, dy: -8 };
   }
 
+  function estimateLabelBox(point, x, y, anchor = 'middle', options = {}) {
+    const valueText = `${formatNumber(point.y, 2)}%`;
+    const inlineText = options.inline ? `${point.label}; ${valueText}` : null;
+    const labelWidth = Math.max(36, String(point.label || '').length * 7.1);
+    const valueWidth = Math.max(34, valueText.length * 6.2);
+    const inlineWidth = inlineText ? Math.max(46, inlineText.length * 6.6) : 0;
+    const boxWidth = Math.max(labelWidth, valueWidth, inlineWidth) + 10;
+    const boxHeight = options.inline ? 16 : 30;
+    const left = anchor === 'start'
+      ? x - 2
+      : anchor === 'end'
+        ? x - boxWidth + 2
+        : x - boxWidth / 2;
+    return {
+      left,
+      right: left + boxWidth,
+      top: y - 12,
+      bottom: y + boxHeight,
+    };
+  }
+
+  function overlaps(boxA, boxB) {
+    return !(
+      boxA.right < boxB.left ||
+      boxA.left > boxB.right ||
+      boxA.bottom < boxB.top ||
+      boxA.top > boxB.bottom
+    );
+  }
+
+  function countNearbyPoints(points, index, scaleX, scaleY, radiusX = 70, radiusY = 44) {
+    const current = points[index];
+    const cx = scaleX(current.x);
+    const cy = scaleY(current.y);
+    let count = 0;
+
+    points.forEach((point, pointIndex) => {
+      if (pointIndex === index) return;
+      const dx = Math.abs(scaleX(point.x) - cx);
+      const dy = Math.abs(scaleY(point.y) - cy);
+      if (dx <= radiusX && dy <= radiusY) count += 1;
+    });
+
+    return count;
+  }
+
+  function buildAutoLabelPlacements(points, scaleX, scaleY, width, height, margin, options = {}) {
+    const occupied = [];
+    const placements = [];
+    const plotLeft = margin.left + 8;
+    const plotRight = width - margin.right - 8;
+    const plotTop = margin.top + 8;
+    const plotBottom = height - margin.bottom - 24;
+    const repelRadius = Number.isFinite(options.pointRepelRadius) ? options.pointRepelRadius : 11;
+    const sorted = points
+      .map((point, index) => ({ point, index }))
+      .sort((a, b) => a.point.x - b.point.x || a.point.y - b.point.y);
+
+    sorted.forEach(({ point, index }, sortedIndex) => {
+      const cx = scaleX(point.x);
+      const cy = scaleY(point.y);
+      const preferred = [
+        { dx: 0, dy: -18, anchor: 'middle' },
+        { dx: 0, dy: 24, anchor: 'middle' },
+        { dx: 14, dy: -8, anchor: 'start' },
+        { dx: -14, dy: -8, anchor: 'end' },
+        { dx: 16, dy: 16, anchor: 'start' },
+        { dx: -16, dy: 16, anchor: 'end' },
+        { dx: 26, dy: -4, anchor: 'start' },
+        { dx: -26, dy: -4, anchor: 'end' },
+        { dx: 22, dy: 24, anchor: 'start' },
+        { dx: -22, dy: 24, anchor: 'end' },
+      ];
+
+      if (sortedIndex === 0) {
+        preferred.unshift({ dx: 10, dy: -8, anchor: 'start' });
+      } else if (sortedIndex === sorted.length - 1) {
+        preferred.unshift({ dx: -10, dy: -8, anchor: 'end' });
+      }
+
+      let best = null;
+      preferred.forEach((candidate, candidateIndex) => {
+        const x = cx + candidate.dx;
+        const y = cy + candidate.dy;
+        const box = estimateLabelBox(point, x, y, candidate.anchor, { inline: options.inlineLabels });
+        let penalty = candidateIndex * 4;
+
+        if (box.left < plotLeft) penalty += (plotLeft - box.left) * 5;
+        if (box.right > plotRight) penalty += (box.right - plotRight) * 5;
+        if (box.top < plotTop) penalty += (plotTop - box.top) * 5;
+        if (box.bottom > plotBottom) penalty += (box.bottom - plotBottom) * 5;
+
+        occupied.forEach((otherBox) => {
+          if (overlaps(box, otherBox)) penalty += 120;
+        });
+
+        points.forEach((otherPoint, otherIndex) => {
+          const otherCx = scaleX(otherPoint.x);
+          const otherCy = scaleY(otherPoint.y);
+          const circleBox = {
+            left: otherCx - repelRadius,
+            right: otherCx + repelRadius,
+            top: otherCy - repelRadius,
+            bottom: otherCy + repelRadius,
+          };
+          if (overlaps(box, circleBox)) {
+            penalty += otherIndex === index ? 40 : 85;
+          }
+        });
+
+        if (!best || penalty < best.penalty) {
+          best = { ...candidate, penalty, box };
+        }
+      });
+
+      const resolved = best || { dx: 0, dy: -18, anchor: 'middle', box: estimateLabelBox(point, cx, cy - 18, 'middle', { inline: options.inlineLabels }) };
+      occupied.push(resolved.box);
+      placements[index] = resolved;
+    });
+
+    return placements;
+  }
+
+  function getDynamicXDomain(points, fallbackMin, fallbackMax, options = {}) {
+    const values = points.map((point) => point.x).filter((value) => Number.isFinite(value));
+    const minValue = values.length ? Math.min(...values) : fallbackMin;
+    const maxValue = values.length ? Math.max(...values) : fallbackMax;
+    const ratio = Number.isFinite(options.padRatio) ? options.padRatio : 0.05;
+    const minPad = Number.isFinite(options.minPad) ? options.minPad : 0.05;
+    const pad = Math.max((maxValue - minValue) * ratio, minPad);
+    return [Math.max(0, minValue - pad), maxValue + pad];
+  }
+
   function renderScatter(host, config) {
     if (!host) return;
 
@@ -276,12 +553,12 @@
 
     const xs = allPoints.map((point) => point.x);
     const ys = allPoints.map((point) => point.y);
-    let minX = Math.min(...xs);
-    let maxX = Math.max(...xs);
+    let minX = config.xDomain ? config.xDomain[0] : Math.min(...xs);
+    let maxX = config.xDomain ? config.xDomain[1] : Math.max(...xs);
     let minY = config.yDomain ? config.yDomain[0] : Math.min(...ys);
     let maxY = config.yDomain ? config.yDomain[1] : Math.max(...ys);
 
-    const xPad = (maxX - minX) * 0.06 || 1;
+    const xPad = config.xDomain ? 0 : ((maxX - minX) * 0.06 || 1);
     const yPad = config.yDomain ? 0 : ((maxY - minY) * 0.12 || 1);
     minX -= xPad;
     maxX += xPad;
@@ -291,8 +568,8 @@
     const scaleX = (value) => margin.left + ((value - minX) / (maxX - minX || 1)) * plotWidth;
     const scaleY = (value) => margin.top + plotHeight - ((value - minY) / (maxY - minY || 1)) * plotHeight;
 
-    const xTicks = createTicks(minX, maxX, 5);
-    const yTicks = createTicks(minY, maxY, 5);
+    const xTicks = createTicks(minX, maxX, config.xTickCount || 5);
+    const yTicks = createTicks(minY, maxY, config.yTickCount || 5);
 
     const gridLines = [
       ...xTicks.map((tick) => {
@@ -315,26 +592,69 @@
       return `<text x="${margin.left - 18}" y="${y}" text-anchor="end" class="bdi-chart-tick">${escapeHtml(config.yTickFormat(tick))}</text>`;
     }).join('');
 
-    const curveMarkup = series.map((serie) => {
-      const guidePoints = serie.guideBuilder(serie.points);
-      const path = buildMonotonePath(guidePoints, scaleX, scaleY);
-      return path ? `<path d="${path}" class="bdi-chart-curve" style="stroke:${serie.color}" />` : '';
+    const curveMarkup = config.showCurve
+      ? series.map((serie) => {
+          const guidePoints = typeof serie.guideBuilder === 'function' ? serie.guideBuilder(serie.points) : [];
+          const path = buildMonotonePath(guidePoints, scaleX, scaleY);
+          if (!path) return '';
+          return `<path d="${path}" class="bdi-chart-curve ${config.curveClass || ''}" style="stroke:${config.curveColor || serie.color}" />`;
+        }).join('')
+      : '';
+    const extraCurveMarkup = (config.extraCurves || []).map((curve) => {
+      const path = buildMonotonePath(curve.points || [], scaleX, scaleY);
+      if (!path) return '';
+      return `<path d="${path}" class="bdi-chart-curve ${curve.className || ''}" style="stroke:${curve.color || PALETTE.local}" />`;
     }).join('');
+
+    const autoPlacements = buildAutoLabelPlacements(
+      allPoints,
+      scaleX,
+      scaleY,
+      width,
+      height,
+      margin,
+      { pointRepelRadius: config.pointRepelRadius, inlineLabels: config.inlineLabels }
+    );
+    const compactThreshold = Number.isFinite(config.compactThreshold) ? config.compactThreshold : 2;
+    const ultraCompactThreshold = Number.isFinite(config.ultraCompactThreshold) ? config.ultraCompactThreshold : 4;
+    const pointRadius = Number.isFinite(config.pointRadius) ? config.pointRadius : 7;
 
     const pointMarkup = allPoints.map((point, index) => {
       const cx = scaleX(point.x);
       const cy = scaleY(point.y);
-      const offset = labelOffset(index, point);
-      const labelX = Math.max(30, Math.min(width - 30, cx + offset.dx));
+      const offset = autoPlacements[index] || (typeof config.labelOffset === 'function'
+        ? config.labelOffset(point, index, allPoints)
+        : labelOffset(index, point));
+      const textAnchor = offset.anchor || 'middle';
+      const labelX = Math.max(36, Math.min(width - 36, cx + offset.dx));
       const labelY = Math.max(24, Math.min(height - 90, cy + offset.dy));
       const valueText = `${formatNumber(point.y, 2)}%`;
+      const nearbyCount = countNearbyPoints(allPoints, index, scaleX, scaleY);
+      const compact = nearbyCount >= compactThreshold;
+      const ultraCompact = nearbyCount >= ultraCompactThreshold;
+      const showValue = typeof config.showValue === 'function'
+        ? config.showValue(point, nearbyCount, allPoints)
+        : !ultraCompact;
+      const labelClass = [
+        'bdi-chart-label',
+        compact ? 'compact' : '',
+        ultraCompact ? 'ultra-compact' : '',
+        config.inlineLabels ? 'inline' : '',
+        config.labelClass || '',
+      ].filter(Boolean).join(' ');
+      const callout = config.showCallout && (Math.abs(offset.dx) > 8 || Math.abs(offset.dy) > 12)
+        ? `<line x1="${cx}" y1="${cy}" x2="${labelX}" y2="${labelY - 6}" class="bdi-chart-callout" />`
+        : '';
+      const inlineText = `${point.label}; ${valueText}`;
 
       return `
         <g class="bdi-chart-point">
-          <circle cx="${cx}" cy="${cy}" r="7" fill="${point.color}" class="bdi-chart-dot" />
-          <text x="${labelX}" y="${labelY}" text-anchor="middle" class="bdi-chart-label">
-            <tspan x="${labelX}" dy="0">${escapeHtml(point.label)}</tspan>
-            <tspan x="${labelX}" dy="1.1em" class="bdi-chart-label-value">${escapeHtml(valueText)}</tspan>
+          ${callout}
+          <circle cx="${cx}" cy="${cy}" r="${pointRadius}" fill="${point.color}" class="bdi-chart-dot" />
+          <text x="${labelX}" y="${labelY}" text-anchor="${textAnchor}" class="${labelClass}">
+            ${config.inlineLabels
+              ? `<tspan x="${labelX}" dy="0">${escapeHtml(showValue ? inlineText : point.label)}</tspan>`
+              : `<tspan x="${labelX}" dy="0">${escapeHtml(point.label)}</tspan>${showValue ? `<tspan x="${labelX}" dy="${compact ? '1.0em' : '1.1em'}" class="bdi-chart-label-value">${escapeHtml(valueText)}</tspan>` : ''}`}
           </text>
           <title>${escapeHtml(point.label)} - ${escapeHtml(valueText)}</title>
         </g>
@@ -350,6 +670,7 @@
           <line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${margin.left + plotWidth}" y2="${margin.top + plotHeight}" class="bdi-chart-axis" />
           <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" class="bdi-chart-axis" />
           ${curveMarkup}
+          ${extraCurveMarkup}
           ${pointMarkup}
           ${xLabels}
           ${yLabels}
@@ -357,8 +678,25 @@
           <text x="26" y="${margin.top + plotHeight / 2}" text-anchor="middle" class="bdi-chart-axis-label" transform="rotate(-90 26 ${margin.top + plotHeight / 2})">${escapeHtml(config.yLabel)}</text>
         </svg>
         ${config.caption ? `<p class="bdi-chart-caption">${escapeHtml(config.caption)}</p>` : ''}
+        ${config.metaHtml ? `<div class="bdi-chart-meta">${config.metaHtml}</div>` : ''}
       </div>
     `;
+  }
+
+  function getDynamicYDomain(points, fallbackMin, fallbackMax, options = {}) {
+    const values = points.map((point) => point.y).filter((value) => Number.isFinite(value));
+    const minValue = values.length ? Math.min(...values) : fallbackMin;
+    const maxValue = values.length ? Math.max(...values) : fallbackMax;
+    const ratio = Number.isFinite(options.padRatio) ? options.padRatio : 0.14;
+    const minPad = Number.isFinite(options.minPad) ? options.minPad : 0.35;
+    const floor = Number.isFinite(options.floor) ? options.floor : null;
+    const ceil = Number.isFinite(options.ceil) ? options.ceil : null;
+    const pad = Math.max((maxValue - minValue) * ratio, minPad);
+    let domainMin = minValue - pad;
+    let domainMax = maxValue + pad;
+    if (floor != null) domainMin = Math.max(floor, domainMin);
+    if (ceil != null) domainMax = Math.min(ceil, domainMax);
+    return [domainMin, domainMax];
   }
 
   function renderLecapScatterBDI(items) {
@@ -369,6 +707,9 @@
     const boncapPoints = items
       .filter((item) => item.ticker.startsWith('T'))
       .map((item) => ({ x: item.dias / 365, y: item.tir, label: item.ticker, color: PALETTE.accent }));
+    const polynomialFit = fitPolynomialCurve([...lecapPoints, ...boncapPoints], 2, 120);
+    const lecapYDomain = getDynamicYDomain([...lecapPoints, ...boncapPoints], 26.4, 31.9, { minPad: 0.3, padRatio: 0.12 });
+    const lecapXDomain = getDynamicXDomain([...lecapPoints, ...boncapPoints], 0, 1.2, { padRatio: 0.06, minPad: 0.025 });
 
     renderScatter(host, {
       title: 'Curva de renta fija ARS',
@@ -376,32 +717,69 @@
         {
           color: PALETTE.local,
           points: lecapPoints,
-          guideBuilder: (points) => buildGuideFromLabels(
-            points,
-            ['S15Y6', 'S29Y6', 'S31L6', 'S30S6', 'S3006', 'S30N6'],
-            buildConcaveIncreaseGuide
-          ),
         },
         {
           color: PALETTE.accent,
           points: boncapPoints,
-          guideBuilder: (points) => buildGuideFromLabels(
-            points,
-            ['T30J6', 'T15E7', 'T30A7', 'T31Y7', 'T30J7'],
-            (series) => buildHumpGuide(series, { minPeakT: 0.5, maxPeakT: 0.78, maxDrop: 0.18 })
-          ),
         },
       ],
+      extraCurves: polynomialFit ? [
+        {
+          points: polynomialFit.points,
+          color: '#ff9500',
+          className: 'polynomial-curve',
+        },
+      ] : [],
       legend: [
         { label: 'LECAP', color: PALETTE.local },
         { label: 'BONCAP', color: PALETTE.accent },
+        ...(polynomialFit ? [{ label: 'Regresión polinómica', color: '#ff9500' }] : []),
       ],
-      xLabel: 'Duration aproximada (anos)',
+      xLabel: 'Duration aproximada (a\u00f1os)',
       yLabel: 'TIR (%)',
-      yDomain: [26.4, 31.9],
+      xDomain: lecapXDomain,
+      yDomain: lecapYDomain,
+      xTickCount: 4,
+      yTickCount: 4,
       xTickFormat: (value) => formatNumber(value, 2),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
       caption: 'Ticker y TIR actual de cada instrumento ultima cotizacion',
+      metaHtml: polynomialFit ? `
+        <div class="bdi-chart-parameter-panel">
+          <div class="bdi-chart-parameter-head">
+            <span class="bdi-chart-parameter-title">Ajuste polinómico</span>
+            <span class="bdi-chart-parameter-model">Grado 2</span>
+          </div>
+          <div class="bdi-chart-parameter-grid">
+            <div>
+              <span>Nivel base estimado</span>
+              <strong>${escapeHtml(formatNumber(polynomialFit.coefficients[0], 3))}</strong>
+            </div>
+            <div>
+              <span>Pendiente inicial</span>
+              <strong>${escapeHtml(formatNumber(polynomialFit.coefficients[1], 3))}</strong>
+            </div>
+            <div>
+              <span>Curvatura</span>
+              <strong>${escapeHtml(formatNumber(polynomialFit.coefficients[2], 3))}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="bdi-chart-parameter-notes">
+          <div class="bdi-chart-parameter-note">
+            <strong>Lo que se observa en la curva</strong>
+            <span>El nivel base estimado para durations cortas es ${escapeHtml(formatNumber(polynomialFit.coefficients[0], 2))}, lo que da una referencia inicial del tramo más cercano.</span>
+          </div>
+          <div class="bdi-chart-parameter-note">
+            <strong>Cómo arranca la pendiente</strong>
+            <span>La pendiente inicial estimada es ${escapeHtml(formatNumber(polynomialFit.coefficients[1], 2))}, útil para ver si la curva comienza empinándose o más estable.</span>
+          </div>
+          <div class="bdi-chart-parameter-note">
+            <strong>Qué tan curva se vuelve</strong>
+            <span>La curvatura estimada es ${escapeHtml(formatNumber(polynomialFit.coefficients[2], 2))}, y ayuda a leer si el trazado se acelera, se aplana o cambia de forma al alargar duration.</span>
+          </div>
+        </div>
+      ` : '',
     });
   }
 
@@ -414,6 +792,10 @@
     const nyPoints = items
       .filter((item) => item.ley === 'NY')
       .map((item) => ({ x: item.duration, y: item.ytm, label: item.symbol, color: PALETTE.ny }));
+    const localPolynomialFit = fitPolynomialCurve(localPoints, 2, 120);
+    const nyPolynomialFit = fitPolynomialCurve(nyPoints, 2, 120);
+    const soberanosYDomain = getDynamicYDomain([...localPoints, ...nyPoints], 4.3, 11.2, { minPad: 0.45, padRatio: 0.16, floor: 0 });
+    const soberanosXDomain = getDynamicXDomain([...localPoints, ...nyPoints], 0, 7, { padRatio: 0.06, minPad: 0.08 });
 
     renderScatter(host, {
       title: 'Curva soberana en USD',
@@ -421,29 +803,34 @@
         {
           color: PALETTE.local,
           points: localPoints,
-          guideBuilder: (points) => buildGuideFromLabels(
-            points,
-            ['AL29', 'AL30', 'AN29', 'AE38', 'AL35', 'AL41'],
-            (series) => buildHumpGuide(series, { minPeakT: 0.48, maxPeakT: 0.78, maxDrop: 0.75 })
-          ),
         },
         {
           color: PALETTE.ny,
           points: nyPoints,
-          guideBuilder: (points) => buildGuideFromLabels(
-            points,
-            ['GD29', 'GD30', 'GD38', 'GD35', 'GD41'],
-            (series) => buildHumpGuide(series, { minPeakT: 0.48, maxPeakT: 0.8, maxDrop: 0.48 })
-          ),
         },
+      ],
+      extraCurves: [
+        ...(localPolynomialFit ? [{
+          points: localPolynomialFit.points,
+          color: PALETTE.local,
+          className: 'polynomial-curve',
+        }] : []),
+        ...(nyPolynomialFit ? [{
+          points: nyPolynomialFit.points,
+          color: PALETTE.ny,
+          className: 'polynomial-curve',
+        }] : []),
       ],
       legend: [
         { label: 'Ley local', color: PALETTE.local },
         { label: 'Ley NY', color: PALETTE.ny },
+        ...(localPolynomialFit ? [{ label: 'Ajuste ley local', color: PALETTE.local }] : []),
+        ...(nyPolynomialFit ? [{ label: 'Ajuste ley NY', color: PALETTE.ny }] : []),
       ],
-      xLabel: 'Duration (anos)',
+      xLabel: 'Duration (a\u00f1os)',
       yLabel: 'TIR (%)',
-      yDomain: [4.3, 11.2],
+      xDomain: soberanosXDomain,
+      yDomain: soberanosYDomain,
       xTickFormat: (value) => formatNumber(value, 1),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
       caption: lang === 'en'
@@ -455,6 +842,9 @@
   function renderCERCurveBDI(items) {
     const host = ensureHost('#cer-chart-section .scatter-plot');
     const cerPoints = items.map((item) => ({ x: item.duration, y: item.ytm, label: item.symbol, color: PALETTE.cer }));
+    const cerPolynomialFit = fitPolynomialCurve(cerPoints, 2, 120);
+    const cerYDomain = getDynamicYDomain(cerPoints, -11.5, 25.5, { minPad: 0.6, padRatio: 0.14 });
+    const cerXDomain = getDynamicXDomain(cerPoints, 0, 7, { padRatio: 0.06, minPad: 0.08 });
 
     renderScatter(host, {
       title: 'Curva CER',
@@ -462,18 +852,35 @@
         {
           color: PALETTE.cer,
           points: cerPoints,
-          guideBuilder: (points) => buildGuideFromLabels(
-            points,
-            ['TZX26', 'X30N6', 'TZX27', 'TZXD7', 'TZX28', 'DICP', 'PARP'],
-            buildConcaveIncreaseGuide
-          ),
         },
       ],
-      xLabel: 'Duration (anos)',
+      extraCurves: cerPolynomialFit ? [
+        {
+          points: cerPolynomialFit.points,
+          color: '#ff9500',
+          className: 'polynomial-curve cer-curve',
+        },
+      ] : [],
+      legend: [
+        { label: 'CER', color: PALETTE.cer },
+        ...(cerPolynomialFit ? [{ label: 'Ajuste polinómico', color: '#ff9500' }] : []),
+      ],
+      xLabel: 'Duration (a\u00f1os)',
       yLabel: 'TIR real (%)',
-      yDomain: [-11.5, 25.5],
+      xDomain: cerXDomain,
+      yDomain: cerYDomain,
+      xTickCount: 4,
+      yTickCount: 6,
       xTickFormat: (value) => formatNumber(value, 1),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
+      compactThreshold: 1,
+      ultraCompactThreshold: 2,
+      pointRadius: 6.5,
+      pointRepelRadius: 14,
+      showCallout: true,
+      inlineLabels: true,
+      labelClass: 'cer-label',
+      showValue: (point, nearbyCount) => nearbyCount === 0,
       caption: 'Curva Familia CER ultima cotizacion',
     });
   }
@@ -491,6 +898,8 @@
       label: item.symbol || item.d912Ticker,
       color: PALETTE.accent,
     }));
+    const onsYDomain = getDynamicYDomain(onPoints, 0, 20, { minPad: 0.4, padRatio: 0.12, floor: 0 });
+    const onsXDomain = getDynamicXDomain(onPoints, 0, 10, { padRatio: 0.06, minPad: 0.08 });
 
     renderScatter(host, {
       title: 'Curva de corporativos en USD',
@@ -498,11 +907,23 @@
         {
           color: PALETTE.accent,
           points: onPoints,
-          guideBuilder: () => [],
         },
       ],
-      xLabel: 'Duration (anos)',
+      extraCurves: onPoints.length >= 3 ? [
+        {
+          points: fitPolynomialCurve(onPoints, 2, 120)?.points || [],
+          color: '#ff9500',
+          className: 'polynomial-curve',
+        },
+      ].filter((curve) => curve.points.length) : [],
+      legend: [
+        { label: lang === 'en' ? 'Corporate bonds' : 'Corporativos', color: PALETTE.accent },
+        ...(onPoints.length >= 3 ? [{ label: lang === 'en' ? 'Polynomial fit' : 'Ajuste polinómico', color: '#ff9500' }] : []),
+      ],
+      xLabel: 'Duration (a\u00f1os)',
       yLabel: 'TIR (%)',
+      xDomain: onsXDomain,
+      yDomain: onsYDomain,
       xTickFormat: (value) => formatNumber(value, 1),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
       caption: lang === 'en'

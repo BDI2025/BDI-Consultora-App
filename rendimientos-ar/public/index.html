@@ -299,20 +299,22 @@
         </div>
       </section>
 
-      <section class="section" id="optimizer-frontier-section">
-        <h2>Espacio de portfolios</h2>
-        <p class="section-desc">Mapa riesgo-retorno con portfolios aleatorios, frontera eficiente y cartera de mercado implícita.</p>
-        <div class="optimizer-empty-state" id="optimizer-frontier-empty">Corré una optimización para ver el mapa riesgo-retorno.</div>
-        <div class="scatter-plot optimizer-chart" id="optimizer-frontier-chart-wrap" style="display:none">
-          <div id="optimizer-frontier-chart"></div>
-        </div>
-      </section>
+      <div class="optimizer-results-layout">
+        <section class="section" id="optimizer-frontier-section">
+          <h2>Espacio de portfolios</h2>
+          <p class="section-desc">Mapa riesgo-retorno con portfolios aleatorios, frontera eficiente y cartera de mercado implícita.</p>
+          <div class="optimizer-empty-state" id="optimizer-frontier-empty">Corré una optimización para ver el mapa riesgo-retorno.</div>
+          <div class="scatter-plot optimizer-chart" id="optimizer-frontier-chart-wrap" style="display:none">
+            <div id="optimizer-frontier-chart"></div>
+          </div>
+        </section>
 
-      <section class="section" id="optimizer-weights-section" style="display:none">
-        <h2>Pesos óptimos</h2>
-        <p class="section-desc">Comparación de asignaciones para maximo Sharpe, minima volatilidad y retorno objetivo.</p>
-        <div id="optimizer-weights"></div>
-      </section>
+        <section class="section" id="optimizer-weights-section" style="display:none">
+          <h2>Pesos óptimos</h2>
+          <p class="section-desc">Comparación de asignaciones para maximo Sharpe, minima volatilidad y retorno objetivo.</p>
+          <div id="optimizer-weights"></div>
+        </section>
+      </div>
 
       <section class="section" id="optimizer-performance-section">
         <h2>Rendimientos acumulados</h2>
@@ -344,21 +346,34 @@
 
     <div id="tab-heatmap" style="display:none">
       <section class="section" id="heatmap-section">
-        <h2>Heatmap USA</h2>
-        <p class="section-desc">Mapa de mercado estilo Finviz con large caps de Estados Unidos, color por variación del período seleccionado y tamaño por market cap.</p>
+        <h2 id="heatmap-section-title">Heatmap</h2>
+        <p class="section-desc" id="heatmap-section-desc">Mapa de mercado estilo Finviz con large caps de Estados Unidos, color por variación del período seleccionado y tamaño por market cap.</p>
         <div class="heatmap-toolbar">
-          <p class="section-source" id="heatmap-status">Cargando heatmap...</p>
           <div class="heatmap-controls">
+            <label class="heatmap-control" for="heatmap-market-select">
+              <span id="heatmap-market-label">Universo</span>
+              <select id="heatmap-market-select" class="heatmap-native-select">
+                <option value="usa">USA</option>
+                <option value="argentina-ars">Argentina ARS</option>
+                <option value="argentina-usd">Argentina USD</option>
+              </select>
+              <button type="button" class="heatmap-select-trigger" id="heatmap-market-trigger" aria-haspopup="listbox" aria-expanded="false">
+                <span id="heatmap-market-trigger-text">USA</span>
+              </button>
+            </label>
             <label class="heatmap-control" for="heatmap-start-date">
               <span id="heatmap-start-label">Inicio</span>
-              <input type="date" id="heatmap-start-date">
+              <input type="text" id="heatmap-start-date" class="heatmap-date-input" placeholder="Seleccionar fecha" readonly>
             </label>
             <label class="heatmap-control" for="heatmap-end-date">
               <span id="heatmap-end-label">Fin</span>
-              <input type="date" id="heatmap-end-date">
+              <input type="text" id="heatmap-end-date" class="heatmap-date-input" placeholder="Seleccionar fecha" readonly>
             </label>
-            <button class="portfolio-add-btn portfolio-add-btn-secondary" id="heatmap-now-btn" type="button">Hasta hoy</button>
-            <button class="portfolio-add-btn" id="heatmap-refresh-btn" type="button">Aplicar</button>
+            <div class="heatmap-actions">
+              <button class="portfolio-add-btn portfolio-add-btn-secondary heatmap-action-secondary" id="heatmap-now-btn" type="button">Hasta hoy</button>
+              <button class="portfolio-add-btn heatmap-action-primary" id="heatmap-refresh-btn" type="button">Aplicar</button>
+            </div>
+        <p class="section-source heatmap-period-hint heatmap-period-hint-legacy" id="heatmap-period-hint-legacy">DejÃ¡ la fecha final vacÃ­a para comparar desde el inicio hasta ahora.</p>
           </div>
         </div>
         <p class="section-source heatmap-period-hint" id="heatmap-period-hint">Dejá la fecha final vacía para comparar desde el inicio hasta ahora.</p>
@@ -367,8 +382,11 @@
             <div class="optimizer-empty-state" id="heatmap-empty">Cargando universo de acciones...</div>
             <div id="heatmap-chart"></div>
           </div>
+          <div class="heatmap-meta">
+            <p class="section-source" id="heatmap-status">Cargando heatmap...</p>
+            <p class="section-source" id="heatmap-source"></p>
+          </div>
         </div>
-        <p class="section-source" id="heatmap-source"></p>
       </section>
     </div>
 
@@ -458,9 +476,9 @@
                 <span class="compound-step-kicker">Paso 4</span>
                 <h3>Capitalización</h3>
                 <p class="compound-step-copy">Cantidad de veces por año que se capitalizará el interés.</p>
-                <label class="optimizer-field">
+                <label class="optimizer-field compound-frequency-field" for="compound-frequency">
                   <span>Frecuencia de capitalización</span>
-                  <select id="compound-frequency">
+                  <select id="compound-frequency" class="heatmap-native-select">
                     <option value="1">Anual</option>
                     <option value="2">Semestral</option>
                     <option value="4">Trimestral</option>
@@ -469,6 +487,9 @@
                     <option value="52">Semanal</option>
                     <option value="365">Diaria</option>
                   </select>
+                  <button type="button" class="heatmap-select-trigger compound-select-trigger" id="compound-frequency-trigger" aria-haspopup="listbox" aria-expanded="false">
+                    <span id="compound-frequency-trigger-text">Mensual</span>
+                  </button>
                 </label>
               </article>
             </div>
@@ -498,8 +519,8 @@
         </div>
       </section>
 
-      <section class="section" id="compound-breakdown-section" style="display:none">
-        <h2>Desglose final</h2>
+        <section class="section" id="compound-breakdown-section" style="display:none">
+          <h2>Desglose final</h2>
         <p class="section-desc">Comparación de aporte total, capital final, interés ganado y sensibilidad por tasa.</p>
         <div id="compound-breakdown"></div>
       </section>
@@ -507,13 +528,15 @@
   </main>
 
   <footer class="footer">
-    <p>BDI Consultora, elaborado por Tomás Rodríguez.</p>
+    <p>BDI Consultora, elaborado por Tomás Rodríguez y Juan Di Maria.</p>
     <p>Fuentes consultadas: CAFCI, ArgentinaDatos, BCRA, data912, Yahoo Finance y Google News.</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="/bdi-ons-data.js"></script>
+  <script src="/heatmap-config.js"></script>
+  <script src="/heatmap-tile-contract.js"></script>
   <script src="/app.js"></script>
   <script src="/bdi-charts.js"></script>
   <script src="/bdi-overrides.js"></script>

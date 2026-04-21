@@ -1929,3 +1929,1529 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - queda pendiente reiniciar el server local para probar el flujo completo de frontend + backend.
 - Siguiente paso sugerido:
   - levantar la app, probar un rango corto y otro abierto hasta hoy, y ajustar si hace falta la velocidad o el texto del estado.
+
+## 2026-04-09 00:00:00 -03:00
+- Accion: limpieza puntual de textos residuales del modulo ARS.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `LOG.md`
+- Motivo: quedaban copys heredados de `Liquidez en pesos` aunque la seccion ya no existe como submodulo visible.
+- Resultado:
+  - se ajustaron titulos y descripciones del hero ARS para que hablen de `Liquidez` y alternativas de corto plazo, sin sugerir una seccion removida;
+  - se limpiaron copys residuales del shortcut ARS en espanol e ingles;
+  - no se modificaron navegacion, tabs ni comportamiento funcional.
+- Verificacion:
+  - el usuario ya habia confirmado que la UI no mostraba la seccion removida y que el heatmap funcionaba correctamente en local.
+- Siguiente paso sugerido:
+  - refrescar la pagina y confirmar que el modulo ARS conserve el mismo comportamiento visual, ahora con copys mas consistentes.
+
+## 2026-04-09 00:10:00 -03:00
+- Accion: actualizacion de credito autoral en el footer.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `LOG.md`
+- Motivo: el usuario pidio sumar a Juan Di Maria junto a Tomas Rodriguez en la linea de autoria del footer.
+- Resultado:
+  - el footer base ahora muestra `BDI Consultora, elaborado por Tomás Rodríguez y Juan Di Maria.`;
+  - se alinearon las variantes de override en espanol e ingles para conservar consistencia visual y de idioma.
+- Verificacion:
+  - cambio de copy solamente, sin impacto en navegacion ni logica.
+- Siguiente paso sugerido:
+  - refrescar la pagina para validar el nuevo credito en el pie.
+
+## 2026-04-09 00:35:00 -03:00
+- Accion: adaptacion del optimizador de carteras para seguir mucho mas de cerca el flujo Python provisto por el usuario.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio que el optimizador web respete al pie de la letra la logica del script original en Python, evitando aproximaciones propias innecesarias.
+- Resultado:
+  - el motor ahora trabaja con un flujo mas fiel al script original:
+    - retornos diarios y media/covarianza anualizadas;
+    - optimizacion de Sharpe optimo;
+    - optimizacion de minima volatilidad;
+    - portfolio de retorno objetivo solo cuando la solucion pasa la tolerancia;
+    - frontera eficiente sobre `100` objetivos de retorno;
+    - generacion de `100000` portfolios aleatorios con filtro por peso minimo;
+    - tabla de CAGR y grafico comparativo;
+    - matriz de correlacion con gradiente celeste a rojo.
+  - se ajustaron labels y descripciones visibles del modulo para reflejar mejor este comportamiento.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Problemas encontrados:
+  - el archivo `app.js` tiene zonas con encoding mezclado, por lo que parte de la adaptacion tuvo que aplicarse en parches pequenos para no arriesgar el resto del archivo.
+- Siguiente paso sugerido:
+  - refrescar la pagina, correr 2 o 3 pruebas con tickers reales y comparar visualmente los resultados contra el script Python de referencia.
+
+## 2026-04-09 00:50:00 -03:00
+- Accion: refinamiento visual del grafico `Espacio de portfolios` del optimizador.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario reporto problemas visuales concretos respecto del grafico:
+  - la CML se iba del area util;
+  - el label del eje X se solapaba con los ticks;
+  - los ticks del eje resultaban poco naturales;
+  - la leyenda y el encuadre general necesitaban mas aire.
+- Resultado:
+  - la CML ahora se dibuja recortada al dominio visible del grafico;
+  - los ejes usan `nice ticks` en lugar de marcas lineales poco racionales;
+  - se ampliaron margenes del SVG para separar mejor ticks, labels y eje;
+  - la leyenda se agrando y gano mejor encuadre dentro del area superior izquierda.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y revisar de nuevo el frontier para decidir un ultimo ajuste fino de paleta, grosor de linea o posicion de la leyenda si todavia hiciera falta.
+
+## 2026-04-09 01:05:00 -03:00
+- Accion: reorganizacion del layout del optimizador para desktop.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio aprovechar mejor el ancho disponible en desktop y ubicar el grafico del frontier a la izquierda con `Pesos optimos` a la derecha, en proporcion `70/30`.
+- Resultado:
+  - `Espacio de portfolios` y `Pesos optimos` ahora comparten una grilla de resultados del optimizador;
+  - en desktop ancho se renderizan en `70/30`;
+  - en mobile y pantallas angostas vuelven a una sola columna para no comprometer legibilidad.
+- Verificacion:
+  - cambio estructural de layout solamente; la logica del optimizador no fue alterada en este paso.
+- Siguiente paso sugerido:
+  - refrescar la pagina y validar si el nuevo reparto de ancho ya le da al grafico la presencia que el modulo necesita.
+
+## 2026-04-09 11:25:00 -03:00
+- Accion: encapsulacion inicial del motor Python del optimizador y alineacion del fallback.
+- Archivos afectados:
+  - `rendimientos-ar/python/optimizer_runner.py`
+  - `rendimientos-ar/python/requirements.txt`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio llevar a la pagina el calculo del script Python original, priorizando fidelidad frente a la aproximacion JS, pero sin romper la app si Python no esta disponible.
+- Resultado:
+  - se consolido el endpoint local `POST /api/optimizer` para que `server.js` ejecute el runner Python dentro de `rendimientos-ar/python/`;
+  - el runner ahora valida mejor fallos de optimizacion en `Sharpe optimo` y `minima volatilidad`, en lugar de seguir silenciosamente con soluciones no confiables;
+  - se agrego `rendimientos-ar/python/requirements.txt` con `numpy`, `pandas`, `scipy` y `yfinance` para dejar instalacion y runtime mas trazables;
+  - `server.js` suma `py` como candidato de runtime, mejorando compatibilidad en Windows;
+  - el fallback JS del optimizador se alinea a `25000` portfolios aleatorios para no quedar desfasado respecto del objetivo de liviandad definido por el usuario;
+  - `README.md` deja documentado que el frontend intenta primero el motor Python y recurre a JS solo como degradacion controlada.
+- Verificacion:
+  - queda pendiente correr `node --check` sobre `server.js` y `public/app.js`, y luego validar el endpoint con dependencias Python instaladas en la maquina del usuario.
+- Siguiente paso sugerido:
+  - instalar dependencias Python localmente, reiniciar el server y probar `POST /api/optimizer` desde la pagina para confirmar que ya responde el motor `Python/SciPy`.
+
+## 2026-04-09 11:42:00 -03:00
+- Accion: restitucion de `100000` portfolios aleatorios en el optimizador.
+- Archivos afectados:
+  - `rendimientos-ar/python/optimizer_runner.py`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio volver a `100000` portfolios para acercar el comportamiento del modulo web al script Python que ejecuta en Google Colab.
+- Resultado:
+  - el runner Python vuelve a aceptar y generar hasta `100000` portfolios aleatorios;
+  - el frontend vuelve a solicitar `100000` al endpoint Python;
+  - el fallback JS tambien vuelve a usar `100000`, para no producir una nube distinta cuando el motor Python no este disponible;
+  - `README.md` queda alineado con ese volumen real.
+- Verificacion:
+  - cambio acotado a parametros de generacion de portfolios; queda pendiente prueba en navegador con el motor Python ya instalado.
+- Siguiente paso sugerido:
+  - reinstalar o verificar dependencias Python, reiniciar el server y comparar una corrida de la pagina contra la misma corrida en Colab usando exactamente los mismos tickers y periodo.
+
+## 2026-04-09 11:58:00 -03:00
+- Accion: correccion de la CML en el render web y robustecimiento del launcher Python en Windows.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/server.js`
+  - `LOG.md`
+- Motivo: el usuario detecto una discrepancia fuerte entre la CML mostrada en la pagina y la obtenida en Python/Colab, y ademas reporto que el backend devolvia `Python was not found`.
+- Resultado:
+  - la CML del frontier ahora vuelve a dibujarse desde volatilidad `0`, como en el script Python original, en lugar de arrancar desde el minimo visible del eje X;
+  - el dominio del eje X del frontier vuelve a incluir `0`, para que la recta no quede visualmente corrida respecto del grafico de referencia;
+  - `server.js` ahora intenta lanzar Python en Windows no solo con `python` y `python3`, sino tambien con `py -3`, que es una variante mucho mas comun cuando el alias `python` de Microsoft Store esta roto o no instalado;
+  - con esto se reduce el riesgo de comparar el frontier Python de Colab contra el fallback JS de la pagina por un problema de launcher local.
+- Verificacion:
+  - queda pendiente reiniciar el server local y validar una corrida real del optimizador para confirmar que el estado ya no caiga en `Fallback JS`.
+- Siguiente paso sugerido:
+  - reiniciar el server, ejecutar una prueba del optimizador y verificar en pantalla que la fuente diga `Python engine` antes de comparar de nuevo contra Colab.
+
+## 2026-04-09 12:12:00 -03:00
+- Accion: fijacion explicita del binario Python local para el optimizador.
+- Archivos afectados:
+  - `rendimientos-ar/.env`
+  - `LOG.md`
+- Motivo: aunque Python 3.13 estaba instalado y `pip` funcionaba en PowerShell, el server seguia resolviendo el alias roto de Microsoft Store al invocar `python` para `/api/optimizer`.
+- Resultado:
+  - se creo `rendimientos-ar/.env` con `OPTIMIZER_PYTHON_BIN=C:\Users\juand\AppData\Local\Programs\Python\Python313\python.exe`;
+  - a partir de este punto, `server.js` puede invocar el runner Python con ruta fija y deja de depender del PATH o de los aliases de Windows.
+- Verificacion:
+  - queda pendiente reiniciar el server local y repetir `POST /api/optimizer` para confirmar que la respuesta ya salga con el motor Python real.
+- Siguiente paso sugerido:
+  - reiniciar `npm start`, volver a llamar `/api/optimizer` y verificar que la pagina deje de caer en `Fallback JS`.
+
+## 2026-04-09 13:05:00 -03:00
+- Accion: ampliacion del modulo `Heatmap` para soportar acciones argentinas dentro del mismo mapa.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio mantener un unico modulo `HEATMAP` y empezar a cargar tambien universos de acciones argentinas usando `data912`.
+- Resultado:
+  - se agrego un selector de universo dentro del bloque `Heatmap` para alternar entre `USA`, `Argentina ARS` y `Argentina USD`;
+  - `server.js` y la funcion de Netlify ahora aceptan `market` en `/api/heatmap`;
+  - se confirmo e integro `https://data912.com/live/arg_stocks` como fuente para acciones argentinas;
+  - se preparo un primer universo curado de tickers argentinos en pesos y sus variantes dolarizadas;
+  - el mapa argentino usa `pct_change` de `data912` para color y `precio * volumen` como proxy visual de tamano en este primer boceto;
+  - los heatmaps argentinos dejan ocultos los controles de rango historico, porque por ahora se apoyan en variacion diaria y no en series por fecha como el mapa USA;
+  - tooltip, layout y fuente visible quedaron adaptados para convivir dentro del mismo modulo.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/server.js`;
+  - `node --check` valido sin errores `rendimientos-ar/netlify/functions/heatmap.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - reiniciar el server local, probar los tres universos del selector y luego refinar manualmente la asignacion de sectores/industrias y el criterio de tamano relativo para Argentina.
+
+## 2026-04-09 13:42:00 -03:00
+- Accion: refinamiento estetico inicial del bloque `Heatmap` con foco en los universos argentinos.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el primer boceto funcional del heatmap argentino ya cargaba datos, pero la presentacion se veia cruda: toolbar desbalanceado, textos con encoding roto, estado poco prolijo y treemap demasiado achatado para el universo local.
+- Resultado:
+  - se mejoro la composicion visual del toolbar con una caja mas clara para controles y una tarjeta de estado mas legible;
+  - se reforzo la jerarquia visual del bloque con hint y fuente mejor integrados;
+  - se amplio el contenedor del heatmap y se le dio mas presencia al frame SVG;
+  - el treemap argentino ahora usa una proporcion un poco mas favorable (`3` filas en vez de `4`) para ganar legibilidad;
+  - se agrego una sanitizacion defensiva de copy para evitar que aparezcan textos rotos como `variaciÃ³n diaria` o `TamaÃ±o`.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/server.js`.
+- Siguiente paso sugerido:
+  - reiniciar el server local, revisar visualmente `Argentina ARS` y `Argentina USD`, y luego hacer una segunda pasada fina sobre sectores, paleta y universo filtrado.
+
+## 2026-04-13 18:05:00 -03:00
+- Accion: ajuste fino del `Heatmap USA` para ganar ancho util y mejorar la lectura de sectores chicos e industrias.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario indico que la jerarquia general del heatmap USA ya le gustaba, pero seguian flojos los labels de sectores pequenos como `Utilities` y `Real Estate`, y algunas etiquetas de industria quedaban con cajas demasiado grandes o texto mal aprovechado.
+- Resultado:
+  - se amplio el ancho util del mapa USA y del contenedor general para aprovechar mejor el box disponible;
+  - se recalibro el `viewBox` del heatmap USA para darle un poco mas de aire lateral;
+  - los headers de sector ahora escalan mejor segun el ancho disponible, para favorecer la lectura en sectores chicos;
+  - las etiquetas de industria ahora ajustan mas el ancho al texto real en lugar de dejar una pastilla demasiado larga;
+  - se flexibilizo el umbral de render de headers de industria para no perder tanta informacion en cajas medianas.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap USA y revisar visualmente `Utilities`, `Real Estate` y sectores angostos; si todavia quedan apretados, evaluar abreviaturas selectivas solo para headers secundarios.
+
+## 2026-04-13 18:18:00 -03:00
+- Accion: segunda pasada fina sobre labels del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: tras el ajuste anterior, el usuario remarco que `Utilities` y `Real Estate` seguian viendose flojos, y que algunas pastillas de industria todavia no quedaban lo bastante ajustadas al texto.
+- Resultado:
+  - se amplio nuevamente el ancho util del mapa USA;
+  - se agregaron abreviaturas selectivas para sectores angostos como `UTIL.` y `REAL EST.`;
+  - las etiquetas de industria ahora usan un ancho minimo mucho mas contenido y calculado con una aproximacion mas cercana al ancho real del texto;
+  - el porcentaje de composicion sectorial deja de mostrarse en cajas angostas para no competir con el label principal.
+- Verificacion:
+  - queda sugerido refresco visual del heatmap USA para comprobar lectura final de headers y pills.
+- Siguiente paso sugerido:
+  - si aun quedaran casos limite, hacer una ultima pasada de excepciones muy puntuales sobre 2 o 3 labels concretos del universo USA.
+
+## 2026-04-13 18:28:00 -03:00
+- Accion: rebalanceo visual suave del layout sectorial del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario propuso reducir un poco el peso visual de `Financial` y `Consumer Defensive` para liberar espacio hacia `Utilities` y `Real Estate`, que seguian quedando cortos de ancho para leer bien sus labels.
+- Resultado:
+  - se agrego una ponderacion visual de layout solo para USA;
+  - `Financial` y `Consumer Defensive` ocupan un poco menos en el treemap;
+  - `Utilities` y `Real Estate` reciben algo mas de superficie para mejorar la legibilidad;
+  - la composicion porcentual visible sigue calculandose con el peso real del sector, no con la ponderacion estetica.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap USA y revisar si el nuevo balance ya resuelve los headers; si no alcanzara, aplicar una ultima capa de excepciones por sector.
+
+## 2026-04-13 18:34:00 -03:00
+- Accion: aumento leve del espaciado entre sectores del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: con el rebalanceo visual ya resuelto, el usuario pidio un acabado mas prolijo para que las uniones entre cajas sectoriales no quedaran tan pegadas ni generaran una sensacion antiestetica.
+- Resultado:
+  - se incremento de forma leve el `outerGap` del heatmap USA;
+  - el mapa gana separacion visual entre sectores sin alterar la jerarquia general ni la logica de tamanos.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap USA y verificar si el nuevo aire entre sectores ya es suficiente o si conviene sumar un inset minimo interno por bloque.
+
+## 2026-04-13 18:39:00 -03:00
+- Accion: agregado de inset interno por bloque sectorial en el `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: aun con mayor `outerGap`, el usuario senalo que los boxes sectoriales seguian viendose pegados entre si, especialmente en sectores chicos del lateral derecho.
+- Resultado:
+  - cada sector ahora se dibuja con un inset interno pequeno respecto de su rectangulo base;
+  - esto genera una separacion visual real entre bloques, sin depender solo del gap de particion;
+  - el ajuste se aplico mas fuerte en USA y mas suave en Argentina para no castigar demasiado el mapa local.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap USA y comprobar si el nuevo inset ya resuelve el efecto de cajas soldadas; si hiciera falta, reducir 1 o 2 px mas el ancho interno solo en sectores pequenos.
+
+## 2026-04-13 18:46:00 -03:00
+- Accion: redisenio del encabezado visual de cada sector en el `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario marco que el box del sector seguia viendose raro a nivel estetico, especialmente en capturas parciales donde la franja superior completa se sentia pesada y poco elegante.
+- Resultado:
+  - se elimino la franja sectorial corrida de lado a lado;
+  - cada sector ahora usa una cabecera tipo chip, mas compacta y suave;
+  - el nombre del sector queda mejor integrado al bloque;
+  - el porcentaje sectorial se mantiene, pero mas liviano y menos invasivo.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap USA y validar si esta nueva cabecera ya resuelve el ruido visual del box; si hiciera falta, bajar un punto mas el contraste del chip.
+
+## 2026-04-13 18:52:00 -03:00
+- Accion: agregado de linea divisoria bajo el encabezado sectorial del `Heatmap USA`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario propuso sumar una separacion explicita entre el titulo del sector y el contenido inferior para ordenar mejor el bloque sin volver a la barra pesada anterior.
+- Resultado:
+  - se agrego una linea sutil bajo el encabezado del sector;
+  - el bloque ahora separa mejor la identidad del sector respecto de los tiles internos;
+  - se mantiene la cabecera tipo chip, pero con una transicion visual mas clara hacia el contenido.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar el heatmap USA y decidir si la linea debe quedarse apenas visible o si conviene bajarle un poco mas la opacidad.
+
+## 2026-04-13 19:02:00 -03:00
+- Accion: ensanche del frame y del `viewBox` para los heatmaps de Argentina.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario senalo que el mapa argentino seguia sintiendose angosto y que varios sectores pequenos podian beneficiarse de un layout mas panoramico que aprovechara mejor todo el box disponible.
+- Resultado:
+  - el `viewBox` de Argentina paso a ser mas ancho y levemente menos alto;
+  - el frame SVG del heatmap argentino ahora usa una relacion de aspecto mas panoramica;
+  - el contenedor maximo de Argentina tambien se ensancho para usar mejor el ancho disponible;
+  - se redujo un poco el gap externo argentino para recuperar superficie util dentro del mapa.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Argentina ARS` y `Argentina USD` para evaluar si el nuevo formato ya ordena mejor sectores chicos como `Utilities`, `Real Est.` y `Materials`.
+
+## 2026-04-13 19:09:00 -03:00
+- Accion: rebalanceo visual sectorial para los heatmaps de Argentina.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario detecto que `Consumer Staples/Defensive` seguia quedando chico frente al peso visual de `Energy` y `Financials`, aun despues de ensanchar el mapa.
+- Resultado:
+  - se redujo un poco el peso visual de `Energy` y `Financials` en el layout argentino;
+  - se reforzo el espacio asignado a `Consumer Staples/Defensive`;
+  - tambien se dio un pequeno impulso a `Real Estate`, `Materials` y `Utilities` para que no queden tan comprimidos.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Argentina ARS` y revisar si `Consumer Staples/Defensive` ya entra mejor; si todavia no alcanza, ajustar tambien el alto relativo de las filas argentinas.
+
+## 2026-04-13 19:16:00 -03:00
+- Accion: compresion visual suave de activos dominantes en el heatmap argentino.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: aun con rebalanceo sectorial, `YPFD` seguia dominando demasiado el layout argentino y desplazando visualmente al resto de sectores.
+- Resultado:
+  - se introdujo un `layoutValue` separado del valor economico real para el treemap argentino;
+  - el layout ahora aplica una compresion suave a los montos grandes;
+  - `YPFD` recibe una compresion adicional y algunos dominantes financieros una mas leve;
+  - los datos visibles, tooltips y composiciones siguen basandose en el valor real, mientras que la compresion afecta solo la estetica del reparto espacial.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Argentina ARS` y evaluar si el mapa ya respira mejor; si aun quedara desbalanceado, tocar el reparto vertical de filas argentinas.
+
+## 2026-04-13 19:24:00 -03:00
+- Accion: compresion fuerte del layout argentino y aumento del numero de filas del treemap.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario confirmo que el mapa argentino seguia sin entrar bien y que ya no era prioritario respetar con tanta fidelidad el peso relativo tipo market cap, sino lograr que el conjunto se vea mejor y mas equilibrado.
+- Resultado:
+  - se reforzo la compresion de activos dominantes argentinos, especialmente `YPFD/YPFDD` y grandes financieros;
+  - la ponderacion sectorial argentina ahora usa una compresion adicional y un piso visual para que los sectores chicos no desaparezcan;
+  - el treemap argentino pasa a repartirse en 4 filas para mejorar la entrada de mas sectores dentro del mismo frame.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Argentina ARS` y `Argentina USD`; si todavia quedaran cajas desbalanceadas, revisar ya no el peso sino el universo filtrado de tickers por sector.
+
+## 2026-04-13 19:32:00 -03:00
+- Accion: correccion de textos visibles con `años` en graficos y ejes.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario reporto que en algunos graficos seguia apareciendo `anos` en vez de `años`.
+- Resultado:
+  - se corrigieron labels de ejes `Duration (años)` y `Duration aproximada (años)` en la capa SVG de curvas;
+  - se corrigieron tambien textos de la calculadora/axis usando escapes Unicode para evitar nuevas roturas de encoding.
+- Verificacion:
+  - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
+  - `node --check` valido sin errores `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar la app y revisar especialmente curvas de `Soberanos`, `CER`, `Corporativos` y la calculadora compuesta para confirmar que ya no queda ningun `anos` visible.
+
+## 2026-04-13 19:38:00 -03:00
+- Accion: actualizacion de calificaciones en el monitor local de ONs/corporativos.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `LOG.md`
+- Motivo: el usuario indico las nuevas calificaciones a mostrar para emisores corporativos puntuales.
+- Resultado:
+  - `Banco Macro` -> `AAA`
+  - `Transportadora Gas` -> `AA-`
+  - `Pampa Energia` -> `AAA`
+  - `Vista Energy` -> `AAA`
+  - `CGC` -> `AA-`
+  - `IRSA` -> `AAA`
+  - `Tecpetrol` -> `AAA`
+- Verificacion:
+  - se confirmo que `app.js` ya consume y muestra `rating` desde `bdi-ons-data.js`, por lo que no hizo falta cambiar la capa de render.
+- Siguiente paso sugerido:
+  - refrescar la seccion de `Corporativos en USD` y validar visualmente que la columna/ficha de `Calif.` ya refleje estas notas.
+
+## 2026-04-14 10:08:00 -03:00
+- Accion: alta de un nuevo bono corporativo `VSCX` para `Vista Energy` en el monitor local de ONs.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `LOG.md`
+- Motivo: el usuario envio el flujo de fondos de `VSCX` y pidio incorporarlo al universo de corporativos.
+- Resultado:
+  - se agrego `VSCX` con:
+    - compania `Vista Energy`
+    - `rating: AAA`
+    - `lotSize: 1000`
+    - `couponAnnual: 7.88`
+    - cashflows tecnicos desde `2026-04-08` hasta `2038-04-08`
+  - se asumio mapeo local `arsTicker: VSCXO` y `usdTicker: VSCXD`, siguiendo la convencion ya usada en el archivo para otros emisores.
+- Verificacion:
+  - el render de corporativos ya consume automaticamente nuevas entradas de `window.BDI_ON_MONITOR`, por lo que no hizo falta tocar `app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Corporativos en USD` y confirmar si el ticker aparece con el mapeo esperado; si la plaza local usa otra nomenclatura, ajustar solo `arsTicker` / `usdTicker`.
+
+## 2026-04-14 10:16:00 -03:00
+- Accion: correccion de emisores y laminas minimas en corporativos locales.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `LOG.md`
+- Motivo: el usuario informo que algunas fichas del monitor local estaban asignadas al emisor equivocado o con lamina minima incorrecta.
+- Resultado:
+  - `TSC4` paso a `Transportadora de Gas del Sur S.A.` con `lotSize: 10000`
+  - `MGCO` paso a `Pampa Energia S.A.` con `lotSize: 10000` y `law: NY`
+  - `PLC5` paso a `Pluspetrol S.A.` con `lotSize: 1000`
+  - `TTCD` paso a `Tecpetrol S.A.` con `lotSize: 1000`
+  - se ajustaron tambien las descripciones para que queden alineadas con cada emisor.
+- Verificacion:
+  - el monitor de corporativos consume directamente estos metadatos, por lo que el cambio impacta en tabla y ficha sin tocar la capa de render.
+- Siguiente paso sugerido:
+  - refrescar `Corporativos en USD` y revisar que emisor, lamina y rating coincidan con tu referencia para cada ticker.
+
+## 2026-04-14 10:22:00 -03:00
+- Accion: alta de `PN43` para `Pan American Energy S.L.` en el monitor local de ONs.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `LOG.md`
+- Motivo: el usuario envio un nuevo flujo de fondos para sumar otra ON corporativa al universo visible.
+- Resultado:
+  - se agrego `PN43` con:
+    - compania `Pan American Energy`
+    - `lotSize: 1000`
+    - `law: NY`
+    - `couponAnnual: 7.76`
+    - flujo tecnico desde `2026-01-15` hasta `2037-01-15`
+    - descripcion indicando pagos en cable
+  - como el usuario no informo una calificacion, se dejo `rating: '-'` de forma provisoria.
+- Verificacion:
+  - el monitor consume nuevas entradas de `window.BDI_ON_MONITOR` sin cambios adicionales en `app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Corporativos en USD` y validar si `PN43` aparece con el ticker/mapeo esperado; si tenes la calificacion, la sumamos en la siguiente pasada.
+
+## 2026-04-14 10:34:00 -03:00
+- Accion: alta de cinco nuevas ONs corporativas en el monitor local.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `LOG.md`
+- Motivo: el usuario envio nuevos flujos de fondos para seguir ampliando el universo de corporativos en USD.
+- Resultado:
+  - se agregaron:
+    - `TLCT` -> `Telecom Argentina S.A.` | `lotSize: 100` | `law: NY`
+    - `RC1C` -> `ARCOR S.A.I.C.` | `lotSize: 1000` | `law: NY`
+    - `YM34` -> `YPF Sociedad Anonima` | `lotSize: 1000` | `law: NY`
+    - `DNC7` -> `Empresa Distribuidora y Comercializadora Norte S.A.` | `lotSize: 1` | `law: NY`
+    - `RUCD` -> `MSU Energy S.A.` | `lotSize: 1` | `law: NY`
+  - cada ticker quedo cargado con su flujo tecnico completo;
+  - como el usuario no envio calificaciones para estas ONs, se dejaron provisoriamente en `rating: '-'`.
+- Verificacion:
+  - el monitor local de ONs consume automaticamente nuevas entradas de `window.BDI_ON_MONITOR`.
+- Siguiente paso sugerido:
+  - refrescar `Corporativos en USD` y validar aparicion, ticker y laminas; si tenes las calificaciones de estas nuevas ONs, las sumamos en la proxima pasada.
+
+## 2026-04-14 10:41:00 -03:00
+- Accion: carga de calificaciones para nuevas ONs incorporadas al monitor local.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `LOG.md`
+- Motivo: el usuario envio las calificaciones faltantes para las nuevas ONs agregadas en la pasada anterior.
+- Resultado:
+  - `RUCD / MSU Energy` -> `AA-`
+  - `DNC7 / Edenor` -> `A+`
+  - `TLCT / Telecom Argentina` -> `AA+`
+  - `PN43 / Pan American Energy` -> `AAA`
+  - `YM34 / YPF` -> `AAA`
+  - `RC1C / ARCOR` -> `AAA`
+- Verificacion:
+  - `app.js` ya toma `rating` desde `bdi-ons-data.js`, por lo que la actualizacion impacta directo en la UI.
+- Siguiente paso sugerido:
+  - refrescar `Corporativos en USD` y validar que columna/ficha `Calif.` ya muestre correctamente estas nuevas notas.
+
+## 2026-04-14 11:46:39 -03:00
+- Accion: ajuste de tablas y graficos de monitoreo en renta fija local.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio sumar `TEM` en `Renta fija ARS` y `Bonos CER`, quitar las lineas que unian puntos en todos los graficos de monitoreo de activos y corregir el eje Y de `Soberanos` para que no queden datos fuera del grafico.
+- Resultado:
+  - se agrego helper `calcTEM()` en frontend;
+  - `LECAPs / BONCAPs` ahora muestran columna `TEM` junto a `TNA`, `TIR`, `Duration` y `Duration Mod.`;
+  - `Bonos CER` ahora muestran columna `TEM` junto a `TIR real`, `Duration` y `Duration Mod.`;
+  - los charts SVG de `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos` dejan de renderizar curvas/lineas guia y quedan solo con puntos y etiquetas;
+  - `Soberanos` pasa de un `yDomain` fijo a uno dinamico con padding, evitando que un bono quede por fuera del grafico.
+- Verificacion:
+  - pendiente correr validacion visual local en la maquina del usuario tras refrescar la pagina;
+  - se ejecutara chequeo de sintaxis sobre `app.js` y `bdi-charts.js`.
+- Siguiente paso sugerido:
+  - revisar visualmente `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos`; si la columna `TEM` queda muy ancha en mobile, compactar headers o esconderla en pantallas chicas.
+
+## 2026-04-14 11:53:39 -03:00
+- Accion: extension del eje Y dinamico al resto de los monitores de renta fija y reacomodo visual de `TEM` en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio replicar la dinamica de escala de `Soberanos` en `Renta fija ARS`, `Bonos CER` y `Corporativos`, y ademas acomodar la tabla ARS para que `TEM` no empuje el scroll horizontal.
+- Resultado:
+  - se agrego helper comun `getDynamicYDomain()` para charts SVG de monitoreo;
+  - `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos` usan ahora eje Y dinamico con padding;
+  - en `Renta fija ARS`, `TEM` se reubico junto a `TNA` y `TIR`;
+  - se recalibraron anchos de columnas en `.lecap-table` para achicar `Ticker` y evitar que la tabla se vaya innecesariamente hacia la derecha.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js` y `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y revisar si `Renta fija ARS` entra mejor en desktop; si aun queda justo, la siguiente mejora seria compactar `Pago final` o abreviar `Duration Mod.` a `Dur. Mod.`.
+
+## 2026-04-14 11:58:22 -03:00
+- Accion: ajuste fino de tabla y grafico en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio achicar un poco mas la columna de nombre/ticker y mejorar la lectura general del grafico de renta fija argentina.
+- Resultado:
+  - la columna `Ticker` de `.lecap-table` se redujo de `16%` a `14%`;
+  - el grafico `Renta fija ARS` ahora usa `xDomain` explicito arrancando en `0`, con menos ticks y offsets mas inteligentes para etiquetas en tramos cortos y largos;
+  - se elimino el arranque negativo del eje X que se veia poco natural para duration.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`;
+  - se intento correr `node --check` sobre `styles.css`, pero Node no valida CSS y devolvio `ERR_UNKNOWN_FILE_EXTENSION`, por lo que la comprobacion visual queda pendiente en navegador.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y validar si la nueva lectura del eje X y las etiquetas ya se siente mas limpia; si aun hiciera falta, el siguiente ajuste seria compactar `Pago final` o acortar labels a una sola linea en algunos puntos.
+
+## 2026-04-14 12:03:28 -03:00
+- Accion: segunda pasada de prolijidad sobre tabla y grafico de `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario reporto que el grafico seguia viendose raro y que la tabla aun quedaba justa en la cabecera de duration modificada.
+- Resultado:
+  - se abrevio el header de `Duration Mod.` a `Dur. Mod.`;
+  - la columna `Ticker` se redujo a `11%`, y se compactaron tambien `Pago final` y `Vencimiento`;
+  - en el grafico ARS se refinaron offsets de etiquetas por ticker para ordenar mejor el tramo corto y la parte larga de la curva;
+  - se habilito `text-anchor` configurable en labels SVG para que algunas anotaciones queden alineadas a izquierda o derecha y no se amontonen.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js` y `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS`; si la tabla ya entra pero el grafico todavia no convence, el siguiente salto de calidad seria pasar a etiquetas compactas en una sola linea (`Ticker · TIR`) o tooltip al hover para despejar la zona izquierda.
+## 2026-04-14 12:14:56 -03:00
+- Accion: reemplazo del etiquetado manual por un sistema automatico comun para todos los graficos de renta fija.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio eliminar cualquier logica manual por ticker para evitar tener que recalibrar curvas a medida que cambian precios y composicion.
+- Resultado:
+  - se eliminaron offsets manuales de `Renta fija ARS`;
+  - se agrego `buildAutoLabelPlacements()` para distribuir etiquetas segun colisiones reales en pixeles;
+  - el algoritmo prueba multiples posiciones alrededor de cada punto y penaliza superposiciones y salidas del area de ploteo;
+  - `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos` pasan a usar este mismo esquema automatico;
+  - tambien se unifico el arranque del eje X en `0` para los graficos de duration positiva mediante `getPositiveXDomain()`.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos`; si la lectura aun se siente cargada, el siguiente paso robusto seria compactar el label visible a una sola linea y dejar el porcentaje completo en hover.
+
+## 2026-04-14 12:19:49 -03:00
+- Accion: compactacion automatica de labels en clusters densos y nuevo ajuste de ancho en tabla ARS.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario mostro que `CER` y `Renta fija ARS` todavia tenian ruido visual en zonas densas.
+- Resultado:
+  - se agrego conteo automatico de vecinos por punto en coordenadas de pantalla;
+  - cuando un cluster esta cargado, el label pasa a modo `compact`;
+  - cuando esta muy cargado, pasa a `ultra-compact` y oculta el porcentaje visible, dejandolo en `title/hover`;
+  - `Ticker` en la tabla ARS se redujo a `9%` para darle mas aire a headers largos.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `CER` y `Renta fija ARS`; si aun hubiera ruido, el paso siguiente seria sumar una linea guia corta entre punto y label solo en casos compactos, sin volver a lineas de curva.
+
+## 2026-04-14 12:24:49 -03:00
+- Accion: tratamiento visual especifico para el cluster denso de `Bonos CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario indico que la curva CER seguia demasiado cargada aun despues del compactado general.
+- Resultado:
+  - `CER` ahora usa umbrales mas agresivos de compactacion (`compactThreshold: 1`, `ultraCompactThreshold: 2`);
+  - en zonas densas se muestra solo el ticker y el porcentaje queda en hover;
+  - los puntos CER usan radio levemente menor;
+  - se agregaron lineas guia cortas (`callout`) para relacionar mejor etiqueta y punto cuando el label queda desplazado;
+  - se sumo clase visual `cer-label` para bajar apenas tamaño y peso del texto en ese grafico.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Bonos CER`; si aun quedara saturado, el siguiente paso seria separar automaticamente el tramo corto en una mini zona inset o usar tooltip persistente al hover y dejar solo tickers visibles.
+
+## 2026-04-14 12:28:07 -03:00
+- Accion: aumento de referencias visuales en eje Y y refuerzo del anti-solapamiento en `Bonos CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario pidio mas ticks en el eje Y y remarco que algunas etiquetas todavia caian encima de otros puntos.
+- Resultado:
+  - `CER` paso a `yTickCount: 6` para dar mejor lectura del rango real;
+  - el algoritmo automatico de placements ahora penaliza que un label pise cualquier punto cercano, no solo su propio circulo;
+  - tambien se ampliaron las posiciones candidatas de label para que tenga mas chances de escapar lateralmente o hacia abajo.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Bonos CER`; si quedaran 1 o 2 casos molestos, el siguiente paso seria un `inset` automatico para el cluster corto de duration, manteniendo el mismo motor de datos.
+
+## 2026-04-14 12:31:17 -03:00
+- Accion: acercamiento visual de `Bonos CER` a la referencia enviada por el usuario.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario compartio una referencia donde la curva CER se lee con una linea guia suave y labels mas compactos en una sola linea.
+- Resultado:
+  - `CER` vuelve a mostrar una curva guia suave, pero solo para ese grafico;
+  - los labels CER pasan a modo inline (`Ticker; 4,53%`) para ocupar menos alto visual;
+  - se ajusto el estilo de la curva y del texto inline para acercarlo al lenguaje visual de la referencia sin copiarla literalmente.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Bonos CER`; si aun quedara demasiado ruido en el tramo corto, el siguiente paso mas potente seria un inset automatico para durations cortas dentro del mismo SVG.
+
+## 2026-04-14 12:35:44 -03:00
+- Accion: retiro de la linea guia en `Bonos CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo: el usuario indico que la linea de referencia no quedaba bien y pidio quitarla.
+- Resultado:
+  - `Bonos CER` vuelve a quedar solo con puntos, labels inline y callouts;
+  - se preservan los demas ajustes automaticos de compactacion y anti-solapamiento.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Bonos CER`; si todavia hiciera falta mas limpieza, el siguiente paso seria un inset automatico para el cluster de durations cortas.
+
+## 2026-04-14 12:37:14 -03:00
+- Accion: retiro de la regla fija que forzaba el inicio del eje X en `0` en los graficos de renta fija.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio que los graficos no arranquen todos en `0` y que el eje X se acomode automaticamente segun los datos.
+- Resultado:
+  - `getPositiveXDomain()` fue reemplazado por `getDynamicXDomain()`;
+  - `Renta fija ARS`, `CER`, `Soberanos` y `Corporativos` ahora ajustan el eje X con min/max reales mas padding;
+  - se preserva un piso no negativo, pero ya no se fuerza artificialmente el arranque en `0` salvo que el rango real lo justifique.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar los cuatro graficos de renta fija y validar si la lectura horizontal quedo mas natural en cada familia.
+
+## 2026-04-15 14:57:09 -03:00
+- Accion: mejora estetica del bloque de controles del `Heatmap` (universo y fechas).
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario pidio mejorar el visualizador del selector de universo (`USA / Argentina ARS / Argentina USD`) y de los controles de fecha porque se veian poco prolijos.
+- Resultado:
+  - se agruparon visualmente las acciones en un bloque `heatmap-actions`;
+  - el selector y los date pickers ahora usan una estetica mas premium con gradiente suave, mejor borde, mejor foco y flecha custom en `select`;
+  - los botones `Hasta hoy` y `Aplicar` ganaron una jerarquia visual mas clara;
+  - se ajusto responsive para que en mobile los botones se apilen/mejoren su ocupacion.
+- Verificacion:
+  - se intento usar `node --check` sobre `index.html`, pero Node no valida `.html` y devolvio `ERR_UNKNOWN_FILE_EXTENSION`;
+  - la validacion real de este cambio queda sujeta a refresco visual en navegador.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap` y validar visual en desktop y mobile; si queres, la siguiente pasada puede ser sobre la barra superior del modulo para integrarla mejor con el status y la fuente de datos.
+
+## 2026-04-15 15:04:02 -03:00
+- Accion: reemplazo del calendario nativo del navegador por un date picker propio en el `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario mostro que el popup nativo de fechas seguia viendose feo y no era suficientemente estilizable.
+- Resultado:
+  - los inputs de fecha del heatmap pasaron de `type=\"date\"` a un control custom readonly;
+  - se agrego un calendario propio con navegacion mensual, seleccion de dia, acciones `Limpiar/Hoy` y posicionamiento flotante;
+  - la logica del heatmap sigue consumiendo fechas ISO internamente mediante `data-iso-value`, sin cambiar el endpoint;
+  - el selector de universo y las fechas ahora quedan visualmente alineados dentro del mismo lenguaje de la app.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap USA` y probar apertura, navegacion y seleccion de ambas fechas; si queres, la siguiente pasada puede agregar presets rapidos (`1M`, `3M`, `YTD`, `1Y`).
+
+## 2026-04-15 15:08:11 -03:00
+- Accion: reemplazo del selector nativo de universo por un control propio y correccion de navegacion mensual en el date picker del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio que el selector de universo tenga la misma estetica que el date picker y reporto que no podia cambiar de mes en el calendario.
+- Resultado:
+  - el `select` nativo de universo quedo oculto y sincronizado con un dropdown propio (`heatmap-market-trigger` + `heatmap-select-popover`);
+  - el popup de fechas ahora previene `mousedown/focus` indeseados y mantiene estable la navegacion mensual;
+  - universo y fechas quedan ahora dentro del mismo lenguaje visual del modulo heatmap.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap` y validar apertura/cierre de ambos popovers; si queres, la siguiente pasada puede sumar iconos o presets rapidos para rango de fechas.
+
+## 2026-04-15 15:22:00 -03:00
+- Accion: mejora de navegacion rapida del date picker del `Heatmap` y ajuste visual para alinearlo con el selector custom de universo.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio que al tocar el titulo del calendario se abra una grilla de meses y que las flechas permitan cambiar el anio de forma rapida, manteniendo la misma estetica del selector de universo.
+- Resultado:
+  - el calendario custom del `Heatmap` ahora abre una vista de meses al hacer click en el titulo (`abril 2026`, etc.);
+  - las flechas laterales ahora desplazan el anio, no el mes, para acelerar la navegacion temporal;
+  - al elegir un mes, el date picker vuelve automaticamente a la vista de dias del mes seleccionado;
+  - el encabezado del calendario y la grilla mensual quedaron reforzados visualmente para que compartan lenguaje con el selector custom de universo.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap USA`, abrir el calendario y validar flujo completo `titulo -> meses -> cambio de anio -> seleccion de fecha`; si queres, despues podemos sumar presets rapidos como `1M`, `3M`, `YTD` y `1Y`.
+
+## 2026-04-15 15:29:00 -03:00
+- Accion: correccion del comportamiento de flechas en el date picker custom del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario aclaro que la navegacion debe ser dual:
+  - en vista de dias, las flechas cambian el mes;
+  - en vista de meses, las flechas cambian el anio.
+- Resultado:
+  - el calendario ahora cambia `mes` cuando esta mostrando dias;
+  - el calendario cambia `anio` solo cuando se abre la grilla de meses desde el titulo;
+  - el rerender del popover quedo migrado a la version nueva (`renderHeatmapDatePickerV3`) para mantener consistente esa logica.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap USA` y probar ambos flujos por separado para validar que la navegacion se sienta natural.
+
+## 2026-04-16 10:42:00 -03:00
+- Accion: mejora de presentacion publica del modulo `Heatmap` y carga por defecto de rueda diaria reciente.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio que `USA` abra mostrando automaticamente la variacion diaria reciente, limpiar copys demasiado tecnicos o con referencias externas visibles y reubicar el resumen de estado para que no quede incrustado en la parte alta del bloque.
+- Resultado:
+  - `Heatmap USA` ahora inicializa por defecto con el rango `ayer -> hoy`;
+  - el copy principal y el texto de fuente del mapa quedaron mas neutrales y mas aptos para publicacion;
+  - el hint de fechas ahora explica que la vista inicial corresponde a la ultima rueda diaria;
+  - el resumen de estado (`cantidad de activos`, `rango`, `actualizacion`) se muestra debajo del grafico con una presentacion mas limpia;
+  - los triggers del modulo quedaron redirigidos a una nueva rutina de carga (`loadHeatmapV2`) para aislar el armado del estado visible.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap USA` y validar que abra con `ayer/hoy`, que el resumen debajo del grafico se vea mas limpio y que el texto de fuente/cabecera ya suene listo para salida publica.
+
+## 2026-04-16 11:04:00 -03:00
+- Accion: ajuste fino de composicion del bloque superior del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio centrar visualmente el selector de universo/fechas dentro de su box y reemplazar el copy especifico de `USA` por una descripcion generica de que es un heatmap, valida para cualquier universo.
+- Resultado:
+  - la banda de controles del `Heatmap` ahora queda centrada dentro del contenedor superior;
+  - el texto explicativo inferior del titulo paso a ser generico y deja de referenciar `USA`;
+  - el hint operativo de fechas queda integrado dentro del mismo bloque de controles;
+  - el hint legacy exterior quedo neutralizado para que no vuelva a mostrarse duplicado;
+  - la caja de meta debajo del grafico mantiene juntos `estado + fuente`.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap` y validar visualmente el centrado del toolbar y el nuevo copy generico del modulo.
+
+## 2026-04-16 11:12:00 -03:00
+- Accion: compactacion del selector de `Universo` y activacion del hint interno del bloque de controles del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario indico que el hint operativo debia vivir dentro del mismo box de controles y que el selector de `Universo` seguia dejando demasiado espacio visual sin uso.
+- Resultado:
+  - el hint visible ahora es el que queda dentro del bloque de controles;
+  - el hint exterior queda oculto para evitar duplicacion visual;
+  - el selector de `Universo` y los campos vecinos quedaron mas compactos y mejor centrados dentro del contenedor.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap` y validar si el ancho de `Universo` ya quedo en un punto comodo o si queres una compresion visual todavia mayor.
+
+## 2026-04-16 11:20:00 -03:00
+- Accion: correccion de textos heredados del `Heatmap` en la capa de overrides.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-overrides.js`
+  - `LOG.md`
+- Motivo: el usuario seguia viendo `Heatmap USA` y el copy viejo con referencia a `Finviz` al entrar por primera vez; la causa real era una sobreescritura posterior desde `bdi-overrides.js`.
+- Resultado:
+  - la capa de overrides ya no fuerza `Heatmap USA` ni el subtitulo viejo;
+  - el titulo queda en `Heatmap`;
+  - la descripcion asociada pasa a ser una explicacion generica de que es un heatmap y para que sirve.
+- Verificacion:
+  - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-overrides.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina con `Ctrl + F5` para asegurar que el navegador descargue la version nueva del override y confirmar que el texto viejo no reaparezca.
+
+## 2026-04-16 11:28:00 -03:00
+- Accion: refinamiento visual del hint inferior dentro del bloque de controles del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario compartio una captura donde la aclaracion inferior quedaba demasiado abierta y desbalanceaba el box de controles.
+- Resultado:
+  - la nota inferior ahora queda centrada;
+  - su ancho maximo se acota para que funcione como aclaracion breve;
+  - el texto gana una presencia mas discreta y deja de competir con la fila principal de controles.
+- Verificacion:
+  - ajuste visual en CSS, sin cambios de logica.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap` y validar si el hint ya acompaña bien al bloque o si conviene atenuarlo aun mas.
+
+## 2026-04-16 11:34:00 -03:00
+- Accion: nuevo ajuste de proporciones del box superior del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario remarco que el box seguia demasiado grande y que la linea inferior no se percibia centrada.
+- Resultado:
+  - el contenedor de controles ahora usa ancho `fit-content` con maximo responsivo para no ocupar mas espacio del necesario;
+  - el hint inferior se centra mediante un wrapper de ancho completo y contenido acotado, mejorando su alineacion visual;
+  - el padding general del box se redujo levemente para que la composicion quede mas compacta.
+- Verificacion:
+  - ajuste visual en CSS, sin cambios de logica.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap` y validar si el tamano del box ya quedo natural o si queres una compresion visual todavia un poco mayor.
+
+## 2026-04-16 11:40:00 -03:00
+- Accion: correccion del ancho excesivo del box superior del `Heatmap` en desktop.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo: el usuario marco que, al abrir `USA`, el contenedor de `Universo + fechas + acciones` seguia usando mas ancho del necesario y se sentia estirado a casi toda la pagina.
+- Resultado:
+  - el bloque superior paso a una grilla auto-ajustada en desktop para que el ancho siga al contenido real;
+  - el campo `Universo` quedo un poco mas compacto;
+  - el hint inferior sigue centrado y ocupando toda la fila, pero sin forzar el ancho total del contenedor;
+  - en mobile se preserva el comportamiento flexible anterior.
+- Verificacion:
+  - ajuste visual en CSS, sin cambios de logica.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap USA` y validar si el box ya acompaña mejor al contenido o si queres compactar tambien un poco `Inicio` y `Fin`.
+
+## 2026-04-16 12:35:00 -03:00
+- Accion: habilitacion de rango historico para `Heatmap` de acciones argentinas, preservando el mismo criterio visual de tamano.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio replicar para Argentina el comportamiento de rango historico que ya existia en `USA`, pero manteniendo en Argentina el mismo proxy de tamano usado en la vista diaria para no desestabilizar el mapa.
+- Resultado:
+  - `Argentina ARS` ahora calcula la variacion por rango usando `data912/historical/stocks/{ticker}`;
+  - `Argentina USD` tambien acepta rango historico y, cuando el ticker dolarizado no tiene serie propia en `data912`, usa el ticker base equivalente solo para el calculo de variacion;
+  - el tamano del bloque argentino sigue viniendo del feed live (`precio x volumen`), por lo que la jerarquia visual no cambia al pasar de diario a historico;
+  - el frontend ya envia `start/end` tambien para Argentina y deja visibles los selectores de fecha en los tres universos;
+  - se actualizaron los copys de fuente para que reflejen mejor que Argentina ya puede trabajar con precios y variaciones por rango.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/server.js`;
+  - `node --check` OK sobre `rendimientos-ar/netlify/functions/heatmap.js`;
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`;
+  - prueba local del handler Netlify con `market=argentina-ars&start=2026-04-01&end=2026-04-15`: `26` activos devueltos;
+  - prueba local del handler Netlify con `market=argentina-usd&start=2026-04-01&end=2026-04-15`: `21` activos devueltos;
+  - prueba local del handler Netlify sin fechas en `argentina-ars`: mantiene la variacion diaria actual.
+- Decisiones:
+  - se agrego cache en memoria del historico argentino para que el selector de fechas no castigue tanto la experiencia;
+  - se priorizo consistencia visual sobre fidelidad estricta del sizing historico, tal como pidio el usuario.
+- Siguiente paso sugerido:
+  - reiniciar el server local y validar visualmente `Argentina ARS` y `Argentina USD` con un rango historico corto y otro mas largo para revisar tiempos de carga, labels y lectura del color.
+## 2026-04-16 12:52:00 -03:00
+- Accion: ajuste de alcance para `Argentina USD` en `Heatmap`, dejandolo solo con variacion diaria.
+- Archivos afectados:
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario prefirio no insinuar un historico en `Argentina USD` si la fuente no lo soporta de forma confiable para los tickers dolarizados.
+- Resultado:
+  - `Argentina USD` vuelve a ignorar `start/end` en backend y serverless;
+  - en frontend se ocultan nuevamente los controles de fecha para ese universo;
+  - el estado visible del modulo vuelve a decir `variacion diaria` para `Argentina USD`;
+  - la fuente visible ahora aclara explicitamente que en ese universo solo se muestra la variacion diaria.
+- Verificacion:
+  - pendiente de validacion visual luego de reiniciar el server local.
+- Siguiente paso sugerido:
+  - refrescar `Heatmap`, probar `Argentina USD` y confirmar que ya no aparezcan fechas ni mensajes ambiguos de rango historico.
+## 2026-04-16 13:08:00 -03:00
+- Accion: mejora visual del grafico y de la tabla final en la calculadora de interes compuesto.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario marco que el eje Y del grafico arrancaba en negativos sin sentido visual, que el label del eje se mezclaba con los ticks y que la tabla final tenia columnas y jerarquia poco prolijas.
+- Resultado:
+  - el grafico ahora arranca el eje Y en `0` cuando todos los escenarios son positivos;
+  - se amplio el margen izquierdo del SVG para separar mejor ticks y label vertical;
+  - se aumento la cantidad de ticks del eje Y para mejorar lectura sin ensuciar el grafico;
+  - la tabla final gano filas con mas jerarquia visual, zebra suave, mejor peso en columnas monetarias y una fila base destacada;
+  - tambien se forzo un ancho minimo de tabla para evitar compresiones feas en desktop.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la calculadora de interes compuesto y validar si el grafico ya respira mejor o si queres una segunda pasada sobre tipografia/escala del eje Y.
+## 2026-04-16 13:20:00 -03:00
+- Accion: mejora visual del selector de capitalizacion en interes compuesto y limpieza del bloque `Desglose final`.
+- Archivos afectados:
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio que el selector de frecuencia de capitalizacion use la misma estetica del selector de universo del heatmap y que el bloque `Desglose final` se vea mas sobrio.
+- Resultado:
+  - la frecuencia de capitalizacion ahora usa un selector custom con trigger y popover del mismo lenguaje visual que el `Universo` del heatmap;
+  - el texto `Frecuencia de capitalizacion: Mensual` quedo corrido un poco a la derecha para alinearse mejor con la tabla;
+  - se saco la barra verde vertical del titulo `Desglose final`, dejando el encabezado mas limpio.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la calculadora y validar si el selector y el bloque final ya quedaron alineados con el resto de la interfaz.
+## 2026-04-16 13:27:00 -03:00
+- Accion: ajuste fino de alineacion en el bloque `Desglose final` de interes compuesto.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio que `Desglose final` arranque a la misma altura visual que la linea `Frecuencia de capitalizacion: Mensual`, y que ambos queden un poco mas a la izquierda.
+- Resultado:
+  - se unifico un pequeno indent para el titulo y la descripcion del bloque final;
+  - la nota inferior de frecuencia ahora arranca con el mismo desplazamiento horizontal y quedo un poco mas a la izquierda que antes.
+- Verificacion:
+  - ajuste visual en CSS, sin cambios de logica.
+- Siguiente paso sugerido:
+  - refrescar la calculadora y validar si el arranque visual ya quedo parejo entre encabezado y nota inferior.
+## 2026-04-17 11:35:00 -03:00
+- Accion: exclusion automatica de instrumentos vencidos o con vencimiento sobre liquidacion T+1 en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que `S17A6` vencio hoy y seguia apareciendo en la curva con una TIR artificial, distorsionando tabla y grafico.
+- Resultado:
+  - `loadLecaps()` ahora descarta letras e instrumentos capitalizables cuyo vencimiento ya paso o cae en la fecha de liquidacion T+1;
+  - se evita forzar `dias = 1`, por lo que ya no se calculan TIR irreales para instrumentos vencidos;
+  - la tabla y el grafico de `Renta fija ARS` solo muestran instrumentos efectivamente comparables.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y validar que `S17A6` ya no aparezca en lista ni grafico y que futuros vencimientos diarios se filtren solos.
+## 2026-04-20 10:05:00 -03:00
+- Accion: implementacion provisoria de ajuste Nelson-Siegel en la curva de `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio probar una curva de referencia mas formal sobre `TIR vs duration` en pesos, primero en `JavaScript`, y ver debajo del grafico los parametros del ajuste para evaluar si el resultado visual tiene sentido.
+- Resultado:
+  - la curva de `Renta fija ARS` ahora calibra un modelo Nelson-Siegel en JS sobre los instrumentos vigentes del grafico;
+  - se dibuja una guia unica de color naranja sobre los puntos `LECAP` y `BONCAP`;
+  - se agrego debajo del SVG un bloque provisional con `beta0`, `beta1`, `beta2` y `tau` para inspeccion rapida;
+  - la leyenda incorpora el ajuste sin tocar el resto de las familias de renta fija.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y evaluar si la forma de la curva Nelson-Siegel es razonable; si queda forzada o poco estable, mover la calibracion a Python o limitarla a una familia puntual.
+## 2026-04-20 10:22:00 -03:00
+- Accion: conexion del flujo de carga de renta fija con los renderers extendidos de `bdi-charts.js`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que la curva nueva no aparecia; se detecto que `app.js` seguia llamando a los renderers locales legacy, por lo que el Nelson-Siegel agregado en `bdi-charts.js` nunca se ejecutaba.
+- Resultado:
+  - `Renta fija ARS`, `Soberanos`, `CER` y `Corporativos` ahora priorizan los renderers expuestos en `window` por `bdi-charts.js`, manteniendo el fallback local si esa capa no esta disponible;
+  - la curva Nelson-Siegel de `Renta fija ARS` y sus parametros ya pueden verse en pantalla.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`.
+- Siguiente paso sugerido:
+  - refrescar la pagina y confirmar visualmente que la curva y el bloque de parametros aparezcan; si la forma no convence, revisar calibracion o mover el ajuste a Python.
+## 2026-04-20 10:34:00 -03:00
+- Accion: cambio de la guia visible de `Renta fija ARS` a regresion polinomica en `JavaScript`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio probar una alternativa estetica a Nelson-Siegel sobre la misma curva de renta fija en pesos, sin eliminar la implementacion previa.
+- Resultado:
+  - la curva visible de `Renta fija ARS` ahora usa una regresion polinomica de grado 2;
+  - debajo del grafico se muestran provisoriamente los coeficientes `a0`, `a1` y `a2`, junto con la indicacion del grado del modelo;
+  - la logica Nelson-Siegel permanece preservada en `bdi-charts.js` para poder retomarla o compararla despues.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y comparar visualmente si la curva polinomica acompana mejor la nube; si sigue quedando artificial, pasar a una calibracion Python o probar por subfamilias.
+## 2026-04-20 10:41:00 -03:00
+- Accion: agregado de explicacion visual para los parametros de la regresion polinomica en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio que, ademas de mostrar `a0`, `a1` y `a2`, la interfaz explique en lenguaje simple que representa cada parametro del ajuste.
+- Resultado:
+  - debajo del bloque de coeficientes ahora aparece una aclaracion breve sobre:
+    - `a0` como nivel base de la curva;
+    - `a1` como pendiente inicial;
+    - `a2` como curvatura;
+  - el bloque quedo estilizado como nota explicativa integrada al chart.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y validar si el texto resulta claro o si conviene volverlo aun mas practico para publico no tecnico.
+## 2026-04-20 10:48:00 -03:00
+- Accion: redisenio visual del bloque de parametros del ajuste polinomico en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario marco que el bloque `a0 / a1 / a2` habia quedado feo y demasiado tecnico en crudo.
+- Resultado:
+  - el bloque ahora usa una cabecera compacta con nombre de modelo y grado;
+  - los coeficientes quedaron en tres cards parejas, sin una cuarta celda vacia o forzada;
+  - la explicacion paso a notas breves, una por parametro, evitando parrafos largos y densos.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y validar si el bloque ya acompana mejor al grafico o si conviene hacerlo todavia mas minimalista.
+## 2026-04-20 10:55:00 -03:00
+- Accion: cambio del lenguaje del bloque interpretativo del ajuste polinomico en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio sacar referencias explicitas a `a0`, `a1` y `a2` y reemplazarlas por una lectura mas natural de lo que se observa en la curva.
+- Resultado:
+  - las cards superiores ahora muestran titulos interpretativos (`Nivel base estimado`, `Pendiente inicial`, `Curvatura`) en vez de nombres de coeficientes;
+  - las notas inferiores se reescribieron como lectura narrativa de la curva, con frases mas cercanas a analisis de mercado que a salida matematica cruda.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y validar si el bloque ya comunica mejor la idea general; si sigue cargado, condensarlo a una unica conclusion breve.
+## 2026-04-20 11:02:00 -03:00
+- Accion: recuperacion de altura visual del grafico en `Renta fija ARS`.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario indico que no queria reducir el tamano del grafico y que, con el bloque interpretativo nuevo, la curva habia perdido protagonismo visual.
+- Resultado:
+  - `#lecaps-chart-section .scatter-plot` ahora usa una altura mayor que el resto de los bloques para devolverle aire al SVG;
+  - tambien se dejo una altura especifica mas generosa para pantallas medianas y mobile, evitando que el chart vuelva a verse comprimido.
+- Verificacion:
+  - ajuste visual en CSS, sin cambios de logica.
+- Siguiente paso sugerido:
+  - refrescar `Renta fija ARS` y confirmar si el balance entre grafico y bloque interpretativo ya quedo mejor.
+## 2026-04-20 11:07:00 -03:00
+- Accion: aplicacion del mismo aumento de altura visual a la curva de `Bonos CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio replicar en `Bonos CER` la recuperacion de altura hecha en `Renta fija ARS`, para que el grafico vuelva a ser protagonista.
+- Resultado:
+  - `#cer-chart-section .scatter-plot` ahora usa la misma altura ampliada que `#lecaps-chart-section` en desktop y una version mas generosa en pantallas mas chicas.
+- Verificacion:
+  - ajuste visual en CSS, sin cambios de logica.
+- Siguiente paso sugerido:
+  - refrescar `Bonos CER` y validar si el grafico ya respira mejor o si conviene afinar tambien margins internos del SVG.
+## 2026-04-20 11:15:00 -03:00
+- Accion: reactivacion de la curva visible en `Bonos CER` dentro del renderer SVG.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que no se veia ninguna curva en `Bonos CER`; se detecto que el renderer tenia `guideBuilder`, pero la opcion `showCurve` no estaba activada en esa vista.
+- Resultado:
+  - la guia de `Bonos CER` vuelve a dibujarse sobre el scatter;
+  - se aplica la clase visual `cer-curve` para conservar el estilo mas fino de esa familia.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar `Bonos CER` y confirmar si la curva ya aparece con la visibilidad esperada.
+## 2026-04-20 11:24:00 -03:00
+- Accion: unificacion de la guia visible a regresion polinomica en todos los graficos de activos a cotizacion actual.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio que el mismo criterio de `polinomio ajustado` aparezca no solo en `Renta fija ARS`, sino tambien en `Bonos CER`, `Soberanos` y `Corporativos`.
+- Resultado:
+  - `Bonos CER` ahora dibuja una curva polinomica ajustada sobre su nube de puntos;
+  - `Soberanos` muestra un ajuste polinomico separado para `Ley local` y `Ley NY`;
+  - `Corporativos` suma tambien su ajuste polinomico sobre los puntos vigentes;
+  - se mantiene el renderer SVG nuevo y la logica Nelson-Siegel sigue preservada en codigo para `Renta fija ARS`.
+- Verificacion:
+  - `node --check` OK sobre `rendimientos-ar/public/bdi-charts.js`.
+- Siguiente paso sugerido:
+  - refrescar las cuatro curvas y comparar si la lectura visual gana consistencia o si alguna familia necesita un tratamiento distinto.
+## 2026-04-21 10:12:00 -03:00
+- Accion: integracion formal del bloque `Engineering / Compound` como estandar tecnico para el desarrollo de BDI.
+- Archivos afectados:
+  - `AGENTS.md`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario indico que no quiere limpiar ese bloque, sino adoptarlo como referencia tecnica para `Optimizador de carteras` y los modulos de `Renta fija`, manteniendo el sistema de trazabilidad propio de BDI.
+- Resultado:
+  - `AGENTS.md` ahora explicita que las instrucciones `Engineering / Compound` pasan a ser parte del estandar tecnico aplicable a `Optimizador`, `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`;
+  - `README.md` incorpora la misma decision para que quede visible tambien a nivel operativo;
+  - se deja explicitado que `LOG.md` sigue siendo el registro cronologico obligatorio del proyecto.
+- Verificacion:
+  - actualizacion documental sin cambios de logica.
+- Siguiente paso sugerido:
+  - aplicar este criterio tecnico en las proximas iteraciones de optimizador y renta fija, especialmente para separacion de responsabilidades y reglas explicitas en los calculos/renderizados.
+## 2026-04-21 10:36:00 -03:00
+- Accion: primera fase de refactorizacion segura del `Heatmap`, extrayendo metadata compartida para backend local y Netlify.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-config.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio empezar una refactorizacion tecnica del modulo `Heatmap` con foco en no romper el proyecto y poder volver atras facilmente si algo no convence.
+- Resultado:
+  - se creo `rendimientos-ar/shared/heatmap-config.js` como fuente comun para:
+    - universo `USA`;
+    - universo `Argentina ARS`;
+    - universo `Argentina USD`;
+    - reglas base por mercado (`rangeEnabled`, `dailyOnly`, `sizeMetric`);
+  - `server.js` y `netlify/functions/heatmap.js` dejaron de mantener copias separadas de esa metadata y ahora consumen el mismo modulo compartido;
+  - no se cambio el payload del endpoint, ni el renderer, ni la UI del heatmap en esta fase.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/server.js`
+    - `rendimientos-ar/netlify/functions/heatmap.js`
+    - `rendimientos-ar/shared/heatmap-config.js`
+- Decisiones:
+  - se avanzo primero por la extraccion de metadata, que es el paso mas reversible y de menor riesgo;
+  - se postergo la conexion del frontend a reglas/config compartidas para una segunda fase, una vez confirmada esta base.
+- Pendientes:
+  - centralizar reglas de mercado tambien del lado frontend;
+  - separar calculo de variacion/tamano de la obtencion de datos;
+  - seguir limpiando la orquestacion del endpoint `/api/heatmap`.
+- Siguiente paso sugerido:
+  - probar visualmente `USA`, `Argentina ARS` y `Argentina USD` sin cambiar nada mas; si todo sigue estable, avanzar con la segunda fase de configuracion compartida y helpers de reglas.
+## 2026-04-21 10:52:00 -03:00
+- Accion: segunda fase segura del `Heatmap`, conectando el frontend a reglas explicitas por mercado.
+- Archivos afectados:
+  - `rendimientos-ar/public/heatmap-config.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - despues de estabilizar la metadata compartida en backend, hacia falta reducir condicionales dispersos en `app.js` para que `USA`, `Argentina ARS` y `Argentina USD` usen una configuracion consistente y facil de mantener.
+- Resultado:
+  - se creo `rendimientos-ar/public/heatmap-config.js` con reglas explicitas por mercado:
+    - `rangeEnabled`;
+    - `dailyOnly`;
+    - `defaultProvider`;
+  - `index.html` ahora carga esa config antes de `app.js`;
+  - `app.js` paso a leer esa config para:
+    - resolver el provider base por universo;
+    - definir si un mercado admite rango historico o solo variacion diaria;
+    - mantener el comportamiento de `Argentina USD` como daily-only sin depender de condicionales repetidos.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/public/app.js`
+    - `rendimientos-ar/public/heatmap-config.js`
+- Decisiones:
+  - se mantuvo una config frontend separada y minima para no mezclar runtime de navegador con modulos Node;
+  - no se cambio la UI ni el renderer en esta fase, solo el cableado interno de reglas.
+- Pendientes:
+  - unificar helpers de calculo y normalizacion del heatmap;
+  - seguir limpiando el endpoint para dejarlo mas cerca de un orquestador;
+  - evaluar si conviene exponer mas config comun sin acoplar frontend y backend de forma fragil.
+- Siguiente paso sugerido:
+  - probar visualmente el cambio entre `USA`, `Argentina ARS` y `Argentina USD`; si todo sigue estable, avanzar con la extraccion de helpers de calculo/normalizacion.
+## 2026-04-21 11:07:00 -03:00
+- Accion: tercera fase segura del `Heatmap`, extrayendo helpers puros compartidos para historicos y rango.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-helpers.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - hacia falta seguir limpiando la logica del modulo sin tocar la salida visible, separando funciones puras de parseo, normalizacion y calculo para dejar backend local y serverless menos monoliticos.
+- Resultado:
+  - se creo `rendimientos-ar/shared/heatmap-helpers.js` con helpers reutilizables para:
+    - `parseHeatmapDate`;
+    - `getArgentinaHeatmapHistorySymbol`;
+    - `normalizeArgentinaHistoricalRow`;
+    - `computeArgentinaRangeChange`;
+    - helpers internos de busqueda temporal sobre series;
+  - `server.js` y `netlify/functions/heatmap.js` dejaron de duplicar esa logica y ahora consumen el mismo modulo compartido;
+  - no se cambio la UI, el renderer ni el contrato visible del endpoint.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/server.js`
+    - `rendimientos-ar/netlify/functions/heatmap.js`
+    - `rendimientos-ar/shared/heatmap-helpers.js`
+- Decisiones:
+  - se extrajeron primero helpers puros y no funciones de fetch, porque es la fase de menor riesgo y mas reversible;
+  - se mantuvo separado el runtime de navegador del runtime Node para no introducir acoplamientos innecesarios.
+- Pendientes:
+  - evaluar extraccion de helpers de fetch/normalizacion por provider;
+  - limpiar mas la orquestacion de `/api/heatmap`;
+  - definir si conviene formalizar un contrato unico de tile tambien del lado frontend.
+- Siguiente paso sugerido:
+  - probar visualmente los tres universos y, si todo sigue estable, avanzar con adaptadores por provider (`Yahoo` / `data912`) para seguir desacoplando fetch, normalizacion y respuesta.
+## 2026-04-21 11:22:00 -03:00
+- Accion: cuarta fase segura del `Heatmap`, incorporando adaptadores compartidos por provider.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-provider-data912.js`
+  - `rendimientos-ar/shared/heatmap-provider-yahoo.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el siguiente paso tecnico natural era dejar de mezclar `fetch` y construccion de tiles en una misma funcion, separando responsabilidades por provider para que el endpoint quede mas mantenible.
+- Resultado:
+  - se creo un adapter compartido para `data912` con construccion de:
+    - tiles live de `Argentina ARS/USD`;
+    - tiles por rango historico para `Argentina ARS`;
+  - se creo un adapter compartido para `Yahoo` con construccion de:
+    - `quoteMap`;
+    - tiles diarios del universo USA;
+    - tiles por rango historico del universo USA;
+  - `server.js` y `netlify/functions/heatmap.js` ahora siguen haciendo `fetch`, pero delegan la normalizacion y construccion final de tiles a esos adaptadores;
+  - no hubo cambios visibles en UI ni en el contrato publico del endpoint.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/server.js`
+    - `rendimientos-ar/netlify/functions/heatmap.js`
+    - `rendimientos-ar/shared/heatmap-provider-data912.js`
+    - `rendimientos-ar/shared/heatmap-provider-yahoo.js`
+- Decisiones:
+  - se mantuvo el `fetch` dentro de cada runtime para no acoplar demasiado las diferencias entre `fetchImpl` y `fetchJSON`;
+  - los adaptadores quedaron enfocados en transformar datos y no en resolver transporte/red.
+- Pendientes:
+  - seguir limpiando la orquestacion de `/api/heatmap` para que quede mas declarativa;
+  - evaluar un contrato unico de tile documentado tambien para frontend;
+  - decidir si la proxima fase conviene enfocarla en endpoint orchestration o en tests/helpers de validacion.
+- Siguiente paso sugerido:
+  - hacer una pasada de consolidacion del endpoint `/api/heatmap`, centralizando seleccion de provider por mercado y bajando todavia mas la complejidad de `server.js` y `netlify/functions/heatmap.js`.
+## 2026-04-21 11:34:00 -03:00
+- Accion: quinta fase segura del `Heatmap`, consolidando la orquestacion del endpoint por mercado/provider.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-orchestration.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - despues de separar metadata, helpers y adaptadores, faltaba bajar la complejidad de los `if` principales del endpoint para que la seleccion de flujo por mercado quede mas explicita y mantenible.
+- Resultado:
+  - se creo `rendimientos-ar/shared/heatmap-orchestration.js` con reglas puras para:
+    - detectar mercados argentinos;
+    - decidir si corresponde rama historica de Argentina;
+    - decidir si vale intentar `Polygon` para USA;
+    - resolver el provider que informa la respuesta;
+  - `server.js` y `netlify/functions/heatmap.js` ahora usan esa orquestacion comun en vez de repetir condicionantes de mercado/provider inline;
+  - no se modifico la UI ni el contrato visible del endpoint.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/server.js`
+    - `rendimientos-ar/netlify/functions/heatmap.js`
+    - `rendimientos-ar/shared/heatmap-orchestration.js`
+- Decisiones:
+  - la orquestacion se dejo como modulo puro y pequeno, para que siga siendo facil de revisar o revertir;
+  - no se forzo todavia una abstraccion mayor del endpoint para evitar una refactorizacion demasiado grande en un solo paso.
+- Pendientes:
+  - definir si la siguiente fase debe formalizar un contrato unico de tile;
+  - evaluar helpers de validacion/sanitizacion para respuestas del heatmap;
+  - eventualmente sumar pruebas automatizadas sobre estas reglas compartidas.
+- Siguiente paso sugerido:
+  - hacer una pasada de estabilizacion y prueba visual de `USA`, `Argentina ARS` y `Argentina USD`; si todo sigue estable, la proxima mejora tecnica razonable es formalizar el contrato unico de tile y documentarlo.
+## 2026-04-21 11:52:00 -03:00
+- Accion: sexta fase segura del `Heatmap`, formalizando un contrato unico de tile entre backend y frontend.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-tile-contract.js`
+  - `rendimientos-ar/shared/heatmap-provider-data912.js`
+  - `rendimientos-ar/shared/heatmap-provider-yahoo.js`
+  - `rendimientos-ar/public/heatmap-tile-contract.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - hacia falta explicitar el shape que consume el renderer del heatmap para no depender de objetos armados de forma diferente segun provider o mercado, y asi reducir fragilidad futura sin cambiar la UI.
+- Resultado:
+  - se creo `rendimientos-ar/shared/heatmap-tile-contract.js` con un constructor/normalizador comun para tiles del backend;
+  - los adaptadores `Yahoo` y `data912` ahora devuelven tiles pasando por ese contrato;
+  - se creo `rendimientos-ar/public/heatmap-tile-contract.js` como espejo liviano del lado navegador;
+  - `index.html` carga ese contrato antes de `app.js`;
+  - `loadHeatmap()` y `loadHeatmapV2()` normalizan `payload.data` antes del render;
+  - no se cambio el renderer ni la UI del `Heatmap`.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/shared/heatmap-tile-contract.js`
+    - `rendimientos-ar/shared/heatmap-provider-data912.js`
+    - `rendimientos-ar/shared/heatmap-provider-yahoo.js`
+    - `rendimientos-ar/public/heatmap-tile-contract.js`
+    - `rendimientos-ar/public/app.js`
+- Decisiones:
+  - se opto por un contrato espejo y minimo en frontend, en lugar de intentar compartir modulos Node en navegador;
+  - el saneo se aplico antes del render para que cualquier provider futuro herede el mismo shape estable.
+- Problemas:
+  - un primer parche sobre `app.js` no encontro el bloque exacto y hubo que reaplicarlo de forma mas puntual para evitar tocar otras secciones.
+- Pendientes:
+  - probar visualmente `USA`, `Argentina ARS` y `Argentina USD`;
+  - evaluar si la proxima fase suma validaciones mas fuertes o si conviene ya frenar la refactorizacion y consolidar.
+- Siguiente paso sugerido:
+  - validar sintaxis y hacer una pasada de estabilizacion visual del `Heatmap`; si sigue todo bien, la siguiente mejora tecnica seria instrumentar validaciones/logs de contrato por provider.
+## 2026-04-21 12:04:00 -03:00
+- Accion: pasada de consolidacion y chequeo operativo del `Heatmap` sobre los tres universos.
+- Archivos afectados:
+  - `LOG.md`
+- Motivo:
+  - despues de formalizar el contrato unico de tile, hacia falta confirmar que el endpoint local siguiera entregando datos consistentes para `USA`, `Argentina ARS` y `Argentina USD` sin romper el renderer.
+- Resultado:
+  - `http://localhost:3000/api/config` respondio `200`;
+  - `USA` con rango `2026-04-14 -> 2026-04-15` respondio `101` activos con provider `yahoo-fallback`;
+  - `Argentina ARS` con rango `2026-04-01 -> 2026-04-15` respondio `26` activos con provider `data912-argentina-ars`;
+  - `Argentina USD` respondio `21` activos con provider `data912-argentina-usd`;
+  - se corrio un chequeo de integridad minimo y los tres universos devolvieron `0` tiles invalidos segun los campos clave (`ticker`, `price`, `change`, `sizeValue/marketCap`).
+- Problemas:
+  - un primer comando de verificacion uso el operador `??`, no soportado por esta version de PowerShell; se rehizo con sintaxis compatible sin afectar el proyecto.
+- Decisiones:
+  - se considero cerrada la fase de consolidacion tecnica inicial del `Heatmap`;
+  - se prioriza ahora no seguir refactorizando a ciegas y pasar a mejoras de validacion/logging o estabilizacion visual segun necesidad.
+- Pendientes:
+  - chequeo visual manual en la UI de `USA`, `Argentina ARS` y `Argentina USD`;
+  - decidir si conviene avanzar con validaciones mas fuertes por provider o pausar la refactorizacion.
+- Siguiente paso sugerido:
+  - si el comportamiento visual sigue estable, avanzar con una capa de validacion/logs de contrato por provider; si no, congelar aca y usar esta base ya mas ordenada como punto de mantenimiento.
+## 2026-04-21 12:18:00 -03:00
+- Accion: septima fase segura del `Heatmap`, combinando validacion/logging por provider y consolidacion final del endpoint.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-orchestration.js`
+  - `rendimientos-ar/shared/heatmap-observability.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - hacia falta cerrar la refactorizacion tecnica inicial del `Heatmap` con dos mejoras de bajo riesgo:
+    - observabilidad minima para detectar payloads raros por provider;
+    - endpoint mas declarativo y menos repetitivo.
+- Resultado:
+  - se agrego `rendimientos-ar/shared/heatmap-observability.js` para:
+    - normalizar el dataset final antes de responder;
+    - resumir cuantas filas crudas entran y cuantas sobreviven al contrato;
+    - emitir `warn` si algun provider devuelve tiles descartados por contrato;
+  - se amplio `rendimientos-ar/shared/heatmap-orchestration.js` con `getHeatmapExecutionPlan()` para resolver en un solo paso:
+    - rama `USA` vs `Argentina`;
+    - modo `range` vs `daily`;
+    - provider base esperado;
+    - uso potencial de `Polygon`;
+  - `server.js` y `netlify/functions/heatmap.js` ahora:
+    - usan ese plan declarativo;
+    - finalizan la respuesta del `Heatmap` pasando por la capa de observabilidad;
+    - normalizan tambien la rama `Polygon` con el contrato de tile;
+  - no se modifico la UI ni el contrato visible del endpoint.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/shared/heatmap-orchestration.js`
+    - `rendimientos-ar/shared/heatmap-observability.js`
+    - `rendimientos-ar/server.js`
+    - `rendimientos-ar/netlify/functions/heatmap.js`
+  - chequeo operativo local OK:
+    - `USA` con rango `2026-04-14 -> 2026-04-15`: `101` activos;
+    - `Argentina ARS` con rango `2026-04-01 -> 2026-04-15`: `26` activos;
+    - `Argentina USD` daily-only: `21` activos.
+- Decisiones:
+  - se eligio logging minimalista solo cuando el contrato filtra tiles, para no llenar la consola con ruido;
+  - se mantuvo el payload publico igual para no introducir riesgo innecesario en frontend.
+- Pendientes:
+  - chequeo visual manual en la UI;
+  - decidir si se considera el modulo `Heatmap` tecnicamente consolidado o si conviene sumar tests automatizados.
+- Siguiente paso sugerido:
+  - si la UI sigue estable, frenar la refactorizacion aqui y tomar esta base como version consolidada; el paso siguiente de mayor valor ya seria testing automatizado o nuevas mejoras funcionales, no mas reordenamiento interno.
+## 2026-04-21 12:31:00 -03:00
+- Accion: correccion funcional del `Heatmap` para primera carga, rueda diaria por defecto y rango inicial de Argentina.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto tres problemas concretos:
+    - primera carga de `USA` con valores raros hasta apretar `Aplicar`;
+    - `Argentina ARS` mostrando `0%` en variacion diaria al entrar por defecto;
+    - los lunes el rango por defecto tomaba domingo en vez de la rueda previa real.
+- Resultado:
+  - `switchToHeatmap()` ahora fuerza `loadHeatmapV2()` cada vez que se entra a la seccion, en vez de depender de si el contenedor ya tenia hijos;
+  - la helper del rango por defecto dejo de usar literalmente `ayer -> hoy` y ahora calcula:
+    - ultima rueda valida;
+    - rueda previa habil;
+  - el boton `Hasta hoy` vuelve a setear ambos extremos del rango con esa misma logica;
+  - se actualizaron los textos de hint para reflejar `ultima rueda disponible vs rueda previa`.
+- Decisiones:
+  - se privilegio consistencia de carga por encima de ahorrar un fetch al reabrir la pestaña;
+  - no se intento resolver feriados de mercado en esta fase, solo fines de semana y lunes, que eran el problema reportado.
+- Problemas:
+  - ninguno en codigo; la hipotesis principal fue que el `0%` de `Argentina ARS` estaba vinculado a fechas no habiles usadas como rango por defecto.
+- Pendientes:
+  - validar visualmente en la UI que:
+    - `USA` no muestre la primera carga rara;
+    - `Argentina ARS` deje de abrir en `0%` cuando el rango por defecto cae en fin de semana/lunes;
+    - el hint visible coincida con el comportamiento real.
+- Siguiente paso sugerido:
+  - hacer una prueba visual manual del `Heatmap` en `USA` y `Argentina ARS`; si sigue estable, tomar este modulo como consolidado y movernos a otro frente del producto.
+## 2026-04-21 12:43:00 -03:00
+- Accion: ajuste adicional del `Heatmap` para evitar `0%` artificiales en la rueda actual y mejorar el uso de precio live en rangos con fecha final `hoy`.
+- Archivos afectados:
+  - `rendimientos-ar/shared/heatmap-helpers.js`
+  - `rendimientos-ar/shared/heatmap-provider-data912.js`
+  - `rendimientos-ar/server.js`
+  - `rendimientos-ar/netlify/functions/heatmap.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - al revisar el caso reportado de `Argentina ARS`, aparecio una segunda causa posible: cuando el historico diario todavia no incorpora la rueda actual, el rango puede colapsar y devolver `0%` aunque el feed live tenga variacion disponible.
+- Resultado:
+  - `computeArgentinaRangeChange()` ahora puede usar precio live cuando la fecha final supera la ultima fecha historica disponible;
+  - el provider de `Argentina ARS` suma un fallback a `pct_change` live cuando el historico colapsa el rango actual a un mismo dia;
+  - `fetchYahooRangeChange()` en backend local y Netlify ahora tambien puede usar `regularMarketPrice` cuando el historico diario todavia no refleja la fecha final pedida y eso ayudaba a fotos raras en `USA`.
+- Verificacion:
+  - `node --check` OK sobre:
+    - `rendimientos-ar/public/app.js`
+    - `rendimientos-ar/shared/heatmap-helpers.js`
+    - `rendimientos-ar/shared/heatmap-provider-data912.js`
+    - `rendimientos-ar/server.js`
+    - `rendimientos-ar/netlify/functions/heatmap.js`
+- Problemas:
+  - la prueba via `localhost:3000` siguio pegando contra el server ya levantado antes del cambio, asi que para validar el comportamiento final hace falta reiniciar el proceso local;
+  - consultas directas a `data912` desde PowerShell no resultaron confiables en este entorno.
+- Decisiones:
+  - se dejo el fix backend igualmente aplicado porque apunta al caso correcto y no altera el contrato visible del endpoint;
+  - se registro explicitamente que la validacion final depende de reiniciar el server local.
+- Pendientes:
+  - reiniciar el server local y validar visualmente:
+    - primera carga de `USA`;
+    - apertura de `Argentina ARS` sin `0%` artificial;
+    - rango por defecto en lunes y fines de semana.
+- Siguiente paso sugerido:
+  - reiniciar la app local y revisar `Heatmap` en `USA` y `Argentina ARS`; con eso deberiamos poder cerrar esta tanda de fixes del modulo.

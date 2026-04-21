@@ -1,6 +1,37 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const { spawn } = require('child_process');
+const {
+  HEATMAP_UNIVERSE_USA,
+  HEATMAP_UNIVERSE_ARGENTINA_ARS,
+  HEATMAP_UNIVERSE_ARGENTINA_USD,
+} = require('./shared/heatmap-config');
+const {
+  parseHeatmapDate,
+  getArgentinaHeatmapHistorySymbol,
+  normalizeArgentinaHistoricalRow,
+  computeArgentinaRangeChange,
+} = require('./shared/heatmap-helpers');
+const {
+  buildArgentinaLiveHeatmapData,
+  buildArgentinaRangeHeatmapData,
+} = require('./shared/heatmap-provider-data912');
+const {
+  buildYahooQuoteMap,
+  buildYahooChartHeatmapData,
+  buildYahooRangeHeatmapData,
+} = require('./shared/heatmap-provider-yahoo');
+const {
+  getHeatmapExecutionPlan,
+} = require('./shared/heatmap-orchestration');
+const {
+  createHeatmapTile,
+} = require('./shared/heatmap-tile-contract');
+const {
+  finalizeHeatmapDataset,
+  logHeatmapDatasetSummary,
+} = require('./shared/heatmap-observability');
 
 function loadLocalEnvFile() {
   const envPath = path.join(__dirname, '.env');
@@ -31,6 +62,7 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 const CONFIG_PATH = path.join(__dirname, 'public', 'config.json');
 const CER_CSV_PATH = path.join(__dirname, 'data_base', 'CER_serie.csv');
 const POLYGON_API_KEY = process.env.POLYGON_API_KEY || '';
+const OPTIMIZER_PYTHON_SCRIPT = path.join(__dirname, 'python', 'optimizer_runner.py');
 
 const MUNDO_SYMBOLS = [
   { id: 'spx', symbol: 'ES%3DF', name: 'S&P 500', category: 'indices', icon: 'SP' },
@@ -53,109 +85,9 @@ const MUNDO_SYMBOLS = [
   { id: 'eurusd', symbol: 'EURUSD%3DX', name: 'EUR/USD', category: 'fx', icon: 'FX' },
 ];
 
-const HEATMAP_UNIVERSE = [
-  { ticker: 'MSFT', sector: 'Technology', industry: 'Software - Infrastructure', marketCap: 3100000000000 },
-  { ticker: 'ORCL', sector: 'Technology', industry: 'Software - Infrastructure', marketCap: 470000000000 },
-  { ticker: 'PLTR', sector: 'Technology', industry: 'Software - Infrastructure', marketCap: 220000000000 },
-  { ticker: 'SNPS', sector: 'Technology', industry: 'Software - Application', marketCap: 90000000000 },
-  { ticker: 'CRM', sector: 'Technology', industry: 'Software - Application', marketCap: 270000000000 },
-  { ticker: 'ADBE', sector: 'Technology', industry: 'Software - Application', marketCap: 240000000000 },
-  { ticker: 'INTU', sector: 'Technology', industry: 'Software - Application', marketCap: 180000000000 },
-  { ticker: 'NOW', sector: 'Technology', industry: 'Software - Application', marketCap: 160000000000 },
-  { ticker: 'IBM', sector: 'Technology', industry: 'Information Technology Services', marketCap: 240000000000 },
-  { ticker: 'ACN', sector: 'Technology', industry: 'Information Technology Services', marketCap: 210000000000 },
-  { ticker: 'CSCO', sector: 'Technology', industry: 'Communication Equipment', marketCap: 200000000000 },
-  { ticker: 'ANET', sector: 'Technology', industry: 'Communication Equipment', marketCap: 120000000000 },
-  { ticker: 'NVDA', sector: 'Technology', industry: 'Semiconductors', marketCap: 4300000000000 },
-  { ticker: 'AVGO', sector: 'Technology', industry: 'Semiconductors', marketCap: 1600000000000 },
-  { ticker: 'AMD', sector: 'Technology', industry: 'Semiconductors', marketCap: 360000000000 },
-  { ticker: 'MU', sector: 'Technology', industry: 'Semiconductors', marketCap: 140000000000 },
-  { ticker: 'QCOM', sector: 'Technology', industry: 'Semiconductors', marketCap: 250000000000 },
-  { ticker: 'TXN', sector: 'Technology', industry: 'Semiconductors', marketCap: 190000000000 },
-  { ticker: 'AMAT', sector: 'Technology', industry: 'Semiconductor Equipment & Materials', marketCap: 170000000000 },
-  { ticker: 'LRCX', sector: 'Technology', industry: 'Semiconductor Equipment & Materials', marketCap: 120000000000 },
-  { ticker: 'KLAC', sector: 'Technology', industry: 'Semiconductor Equipment & Materials', marketCap: 100000000000 },
-  { ticker: 'INTC', sector: 'Technology', industry: 'Semiconductors', marketCap: 130000000000 },
-  { ticker: 'AAPL', sector: 'Technology', industry: 'Consumer Electronics', marketCap: 3800000000000 },
-  { ticker: 'AMZN', sector: 'Consumer Cyclical', industry: 'Internet Retail', marketCap: 2400000000000 },
-  { ticker: 'BKNG', sector: 'Consumer Cyclical', industry: 'Travel Services', marketCap: 160000000000 },
-  { ticker: 'UBER', sector: 'Consumer Cyclical', industry: 'Software - Application', marketCap: 170000000000 },
-  { ticker: 'TSLA', sector: 'Consumer Cyclical', industry: 'Auto Manufacturers', marketCap: 980000000000 },
-  { ticker: 'HD', sector: 'Consumer Cyclical', industry: 'Home Improvement', marketCap: 360000000000 },
-  { ticker: 'LOW', sector: 'Consumer Cyclical', industry: 'Home Improvement', marketCap: 140000000000 },
-  { ticker: 'MCD', sector: 'Consumer Cyclical', industry: 'Restaurants', marketCap: 220000000000 },
-  { ticker: 'CMG', sector: 'Consumer Cyclical', industry: 'Restaurants', marketCap: 80000000000 },
-  { ticker: 'TJX', sector: 'Consumer Cyclical', industry: 'Apparel Retail', marketCap: 130000000000 },
-  { ticker: 'NKE', sector: 'Consumer Cyclical', industry: 'Apparel Retail', marketCap: 110000000000 },
-  { ticker: 'GOOGL', sector: 'Communication Services', industry: 'Internet Content & Information', marketCap: 2300000000000 },
-  { ticker: 'META', sector: 'Communication Services', industry: 'Internet Content & Information', marketCap: 1500000000000 },
-  { ticker: 'NFLX', sector: 'Communication Services', industry: 'Entertainment', marketCap: 520000000000 },
-  { ticker: 'DIS', sector: 'Communication Services', industry: 'Entertainment', marketCap: 180000000000 },
-  { ticker: 'CMCSA', sector: 'Communication Services', industry: 'Telecom Services', marketCap: 160000000000 },
-  { ticker: 'TMUS', sector: 'Communication Services', industry: 'Telecom Services', marketCap: 330000000000 },
-  { ticker: 'VZ', sector: 'Communication Services', industry: 'Telecom Services', marketCap: 190000000000 },
-  { ticker: 'T', sector: 'Communication Services', industry: 'Telecom Services', marketCap: 130000000000 },
-  { ticker: 'WMT', sector: 'Consumer Defensive', industry: 'Discount Stores', marketCap: 780000000000 },
-  { ticker: 'COST', sector: 'Consumer Defensive', industry: 'Discount Stores', marketCap: 420000000000 },
-  { ticker: 'KO', sector: 'Consumer Defensive', industry: 'Beverages - Non-Alcoholic', marketCap: 320000000000 },
-  { ticker: 'PG', sector: 'Consumer Defensive', industry: 'Household & Personal Products', marketCap: 380000000000 },
-  { ticker: 'PEP', sector: 'Consumer Defensive', industry: 'Beverages - Non-Alcoholic', marketCap: 240000000000 },
-  { ticker: 'PM', sector: 'Consumer Defensive', industry: 'Tobacco', marketCap: 150000000000 },
-  { ticker: 'MO', sector: 'Consumer Defensive', industry: 'Tobacco', marketCap: 90000000000 },
-  { ticker: 'CL', sector: 'Consumer Defensive', industry: 'Household & Personal Products', marketCap: 80000000000 },
-  { ticker: 'KMB', sector: 'Consumer Defensive', industry: 'Household & Personal Products', marketCap: 45000000000 },
-  { ticker: 'LLY', sector: 'Healthcare', industry: 'Drug Manufacturers - General', marketCap: 720000000000 },
-  { ticker: 'JNJ', sector: 'Healthcare', industry: 'Drug Manufacturers - General', marketCap: 370000000000 },
-  { ticker: 'MRK', sector: 'Healthcare', industry: 'Drug Manufacturers - General', marketCap: 210000000000 },
-  { ticker: 'ABBV', sector: 'Healthcare', industry: 'Drug Manufacturers - General', marketCap: 340000000000 },
-  { ticker: 'PFE', sector: 'Healthcare', industry: 'Drug Manufacturers - General', marketCap: 160000000000 },
-  { ticker: 'UNH', sector: 'Healthcare', industry: 'Healthcare Plans', marketCap: 470000000000 },
-  { ticker: 'ABT', sector: 'Healthcare', industry: 'Medical Devices', marketCap: 220000000000 },
-  { ticker: 'TMO', sector: 'Healthcare', industry: 'Diagnostics & Research', marketCap: 200000000000 },
-  { ticker: 'DHR', sector: 'Healthcare', industry: 'Diagnostics & Research', marketCap: 180000000000 },
-  { ticker: 'ISRG', sector: 'Healthcare', industry: 'Medical Devices', marketCap: 160000000000 },
-  { ticker: 'JPM', sector: 'Financial', industry: 'Banks - Diversified', marketCap: 670000000000 },
-  { ticker: 'BAC', sector: 'Financial', industry: 'Banks - Diversified', marketCap: 320000000000 },
-  { ticker: 'WFC', sector: 'Financial', industry: 'Banks - Diversified', marketCap: 260000000000 },
-  { ticker: 'C', sector: 'Financial', industry: 'Banks - Diversified', marketCap: 120000000000 },
-  { ticker: 'PNC', sector: 'Financial', industry: 'Banks - Regional', marketCap: 70000000000 },
-  { ticker: 'V', sector: 'Financial', industry: 'Credit Services', marketCap: 650000000000 },
-  { ticker: 'MA', sector: 'Financial', industry: 'Credit Services', marketCap: 520000000000 },
-  { ticker: 'AXP', sector: 'Financial', industry: 'Credit Services', marketCap: 160000000000 },
-  { ticker: 'BRK-B', sector: 'Financial', industry: 'Insurance - Diversified', marketCap: 1150000000000 },
-  { ticker: 'BLK', sector: 'Financial', industry: 'Asset Management', marketCap: 120000000000 },
-  { ticker: 'SPGI', sector: 'Financial', industry: 'Financial Data & Stock Exchanges', marketCap: 160000000000 },
-  { ticker: 'SCHW', sector: 'Financial', industry: 'Capital Markets', marketCap: 140000000000 },
-  { ticker: 'GS', sector: 'Financial', industry: 'Capital Markets', marketCap: 220000000000 },
-  { ticker: 'MS', sector: 'Financial', industry: 'Capital Markets', marketCap: 250000000000 },
-  { ticker: 'GE', sector: 'Industrials', industry: 'Aerospace & Defense', marketCap: 240000000000 },
-  { ticker: 'RTX', sector: 'Industrials', industry: 'Aerospace & Defense', marketCap: 180000000000 },
-  { ticker: 'BA', sector: 'Industrials', industry: 'Aerospace & Defense', marketCap: 120000000000 },
-  { ticker: 'CAT', sector: 'Industrials', industry: 'Farm & Heavy Construction', marketCap: 180000000000 },
-  { ticker: 'DE', sector: 'Industrials', industry: 'Farm & Heavy Construction', marketCap: 140000000000 },
-  { ticker: 'LMT', sector: 'Industrials', industry: 'Aerospace & Defense', marketCap: 120000000000 },
-  { ticker: 'HON', sector: 'Industrials', industry: 'Conglomerates', marketCap: 140000000000 },
-  { ticker: 'UNP', sector: 'Industrials', industry: 'Railroads', marketCap: 140000000000 },
-  { ticker: 'UPS', sector: 'Industrials', industry: 'Integrated Freight & Logistics', marketCap: 120000000000 },
-  { ticker: 'ETN', sector: 'Industrials', industry: 'Specialty Industrial Machinery', marketCap: 130000000000 },
-  { ticker: 'WM', sector: 'Industrials', industry: 'Waste Management', marketCap: 90000000000 },
-  { ticker: 'XOM', sector: 'Energy', industry: 'Oil & Gas Integrated', marketCap: 510000000000 },
-  { ticker: 'CVX', sector: 'Energy', industry: 'Oil & Gas Integrated', marketCap: 300000000000 },
-  { ticker: 'COP', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: 160000000000 },
-  { ticker: 'SLB', sector: 'Energy', industry: 'Oil & Gas Equipment & Services', marketCap: 90000000000 },
-  { ticker: 'EOG', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: 70000000000 },
-  { ticker: 'MPC', sector: 'Energy', industry: 'Oil & Gas Refining & Marketing', marketCap: 70000000000 },
-  { ticker: 'OXY', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: 60000000000 },
-  { ticker: 'PLD', sector: 'Real Estate', industry: 'REIT - Industrial', marketCap: 110000000000 },
-  { ticker: 'AMT', sector: 'Real Estate', industry: 'REIT - Specialty', marketCap: 95000000000 },
-  { ticker: 'EQIX', sector: 'Real Estate', industry: 'REIT - Specialty', marketCap: 85000000000 },
-  { ticker: 'PSA', sector: 'Real Estate', industry: 'REIT - Industrial', marketCap: 50000000000 },
-  { ticker: 'CCI', sector: 'Real Estate', industry: 'REIT - Specialty', marketCap: 45000000000 },
-  { ticker: 'NEE', sector: 'Utilities', industry: 'Utilities - Regulated Electric', marketCap: 160000000000 },
-  { ticker: 'SO', sector: 'Utilities', industry: 'Utilities - Regulated Electric', marketCap: 95000000000 },
-  { ticker: 'DUK', sector: 'Utilities', industry: 'Utilities - Regulated Electric', marketCap: 90000000000 },
-  { ticker: 'AEP', sector: 'Utilities', industry: 'Utilities - Regulated Electric', marketCap: 55000000000 },
-];
+const HEATMAP_UNIVERSE = HEATMAP_UNIVERSE_USA;
+const ARGENTINA_HEATMAP_ARS = HEATMAP_UNIVERSE_ARGENTINA_ARS;
+const ARGENTINA_HEATMAP_USD = HEATMAP_UNIVERSE_ARGENTINA_USD;
 
 const NEWS_FEEDS = {
   es: 'https://news.google.com/rss/search?q=when:3h+mercados+OR+dolar+OR+bolsa+OR+wall+street+OR+bitcoin+OR+acciones+OR+bonos&hl=es-419&gl=AR&ceid=AR:es-419',
@@ -163,6 +95,7 @@ const NEWS_FEEDS = {
 };
 
 const heatmapReferenceCache = new Map();
+const argentinaHeatmapHistoryCache = new Map();
 
 app.disable('x-powered-by');
 app.use(express.json());
@@ -198,6 +131,94 @@ function jsonOrThrow(response, label) {
     throw new Error(`${label} error: ${response.status}`);
   }
   return response.json();
+}
+
+async function runPythonOptimizer(params) {
+  const pythonCandidates = [
+    process.env.OPTIMIZER_PYTHON_BIN ? { command: process.env.OPTIMIZER_PYTHON_BIN, args: [OPTIMIZER_PYTHON_SCRIPT] } : null,
+    { command: 'python', args: [OPTIMIZER_PYTHON_SCRIPT] },
+    { command: 'py', args: ['-3', OPTIMIZER_PYTHON_SCRIPT] },
+    { command: 'py', args: [OPTIMIZER_PYTHON_SCRIPT] },
+    { command: 'python3', args: [OPTIMIZER_PYTHON_SCRIPT] },
+  ].filter(Boolean);
+
+  let lastError = null;
+
+  for (const candidate of pythonCandidates) {
+    try {
+      const result = await spawnPythonProcess(candidate.command, candidate.args, params);
+      return result;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error('Python runtime not available');
+}
+
+function spawnPythonProcess(command, args, params) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: __dirname,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
+
+    let stdout = '';
+    let stderr = '';
+    let finished = false;
+
+    const timeout = setTimeout(() => {
+      if (finished) return;
+      finished = true;
+      child.kill();
+      reject(new Error('Python optimizer timeout'));
+    }, 120000);
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    child.on('error', (error) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeout);
+      reject(error);
+    });
+
+    child.on('close', (code) => {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timeout);
+
+      if (code !== 0) {
+        const parsedError = tryParseJson(stderr);
+        reject(new Error(parsedError?.error || stderr || `Python exited with code ${code}`));
+        return;
+      }
+
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (error) {
+        reject(new Error(`Invalid optimizer JSON output: ${error.message}`));
+      }
+    });
+
+    child.stdin.write(JSON.stringify(params));
+    child.stdin.end();
+  });
+}
+
+function tryParseJson(value) {
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return null;
+  }
 }
 
 function parseCsvCerSeries(csvText) {
@@ -303,26 +324,7 @@ async function fetchYahooQuoteBatch(tickers) {
       return Array.isArray(json?.quoteResponse?.result) ? json.quoteResponse.result : [];
     }));
 
-    return new Map(
-      responses
-        .flat()
-        .map((item) => {
-          const ticker = item?.symbol;
-          if (!ticker) return null;
-          const price = Number(item.regularMarketPrice);
-          const prevClose = Number(item.regularMarketPreviousClose ?? item.previousClose ?? item.chartPreviousClose);
-          const rawChange = Number(item.regularMarketChangePercent);
-          const computedChange = prevClose && Number.isFinite(price) ? ((price - prevClose) / prevClose) * 100 : null;
-          return [ticker, {
-            ticker,
-            name: item.longName || item.shortName || ticker,
-            price: Number.isFinite(price) ? price : null,
-            change: Number.isFinite(rawChange) ? rawChange : computedChange,
-            marketCap: Number(item.marketCap) || null,
-          }];
-        })
-        .filter(Boolean)
-    );
+    return buildYahooQuoteMap(responses.flat());
   } catch (error) {
     console.warn('Yahoo quote batch unavailable, using chart fallback:', error.message);
     return new Map();
@@ -332,27 +334,10 @@ async function fetchYahooQuoteBatch(tickers) {
 async function fetchYahooChartHeatmapData(universe, quoteMap = new Map()) {
   const results = await Promise.allSettled(universe.map(async (item) => {
     const payload = await fetchYahooRaw(encodeURIComponent(item.ticker), '1d', '5d');
-    const change = payload.prevClose ? ((payload.price - payload.prevClose) / payload.prevClose) * 100 : 0;
-    const quote = quoteMap.get(item.ticker);
-    return {
-      ...item,
-      name: quote?.name || item.ticker,
-      price: payload.price,
-      change: Math.round(change * 100) / 100,
-      marketCap: Number(quote?.marketCap) || Number(item.marketCap) || 0,
-    };
+    return payload;
   }));
-
-  return results
-    .map((result) => (result.status === 'fulfilled' ? result.value : null))
-    .filter((item) => item && item.marketCap > 0 && item.price != null && item.change != null);
-}
-
-function parseHeatmapDate(value) {
-  if (!value) return null;
-  const [year, month, day] = value.split('-').map(Number);
-  if (!year || !month || !day) return null;
-  return new Date(Date.UTC(year, month - 1, day));
+  const chartPayloads = results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+  return buildYahooChartHeatmapData(universe, chartPayloads, quoteMap);
 }
 
 async function fetchYahooRangeChange(symbolEncoded, startDate, endDate = null) {
@@ -368,6 +353,7 @@ async function fetchYahooRangeChange(symbolEncoded, startDate, endDate = null) {
   const result = json?.chart?.result?.[0];
   const meta = result?.meta;
   const closes = result?.indicators?.quote?.[0]?.close || [];
+  const timestamps = result?.timestamp || [];
   const series = closes.filter((value) => value !== null && Number.isFinite(value));
   if (!meta || series.length < 1) {
     throw new Error('Invalid Yahoo Finance range response');
@@ -375,7 +361,20 @@ async function fetchYahooRangeChange(symbolEncoded, startDate, endDate = null) {
   const startPrice = Number(series[0]);
   const lastClose = Number(series[series.length - 1]);
   const livePrice = Number(meta.regularMarketPrice);
-  const endPrice = endDate ? lastClose : (Number.isFinite(livePrice) ? livePrice : lastClose);
+  const lastTimestamp = timestamps.length ? timestamps[timestamps.length - 1] : null;
+  const lastSeriesDate = Number.isFinite(lastTimestamp)
+    ? new Date(lastTimestamp * 1000).toISOString().slice(0, 10)
+    : null;
+  const endIso = endDate ? endDate.toISOString().slice(0, 10) : null;
+  const shouldUseLivePrice = Boolean(
+    endDate
+    && Number.isFinite(livePrice)
+    && lastSeriesDate
+    && lastSeriesDate < endIso
+  );
+  const endPrice = endDate
+    ? (shouldUseLivePrice ? livePrice : lastClose)
+    : (Number.isFinite(livePrice) ? livePrice : lastClose);
   const change = startPrice ? ((endPrice - startPrice) / startPrice) * 100 : 0;
   return {
     price: endPrice,
@@ -388,19 +387,14 @@ async function fetchYahooRangeChange(symbolEncoded, startDate, endDate = null) {
 async function fetchYahooRangeHeatmapData(universe, quoteMap = new Map(), startDate, endDate = null) {
   const results = await Promise.allSettled(universe.map(async (item) => {
     const performance = await fetchYahooRangeChange(encodeURIComponent(item.ticker), startDate, endDate);
-    const quote = quoteMap.get(item.ticker);
-    return {
-      ...item,
-      name: quote?.name || item.ticker,
-      price: performance.price,
-      change: Number.isFinite(performance.change) ? Math.round(performance.change * 100) / 100 : null,
-      marketCap: Number(quote?.marketCap) || Number(item.marketCap) || 0,
-    };
+    return [item.ticker, performance];
   }));
-
-  return results
-    .map((result) => (result.status === 'fulfilled' ? result.value : null))
-    .filter((item) => item && item.marketCap > 0 && item.price != null && item.change != null);
+  const performanceMap = new Map(
+    results
+      .map((result) => (result.status === 'fulfilled' ? result.value : null))
+      .filter(Boolean)
+  );
+  return buildYahooRangeHeatmapData(universe, performanceMap, quoteMap);
 }
 
 async function fetchYahooOverview(symbolEncoded) {
@@ -459,7 +453,7 @@ async function fetchPolygonReferenceHeatmapData(universe) {
     const price = quote?.price ?? null;
     const change = quote?.change;
     const marketCap = Number(reference?.market_cap) || Number(item.marketCap) || 0;
-    return {
+    return createHeatmapTile({
       ...item,
       sector: item.sector,
       industry: reference?.sic_description || item.industry,
@@ -467,8 +461,62 @@ async function fetchPolygonReferenceHeatmapData(universe) {
       price,
       change: Number.isFinite(change) ? Math.round(change * 100) / 100 : null,
       marketCap,
-    };
+    });
   }).filter((item) => item.marketCap > 0 && item.price != null && item.change != null);
+}
+
+function finalizeHeatmapResponse({ market, provider, data }) {
+  const { data: normalizedData, summary } = finalizeHeatmapDataset(data);
+  logHeatmapDatasetSummary({ market, provider, summary, runtime: 'express' });
+  return {
+    data: normalizedData,
+    provider,
+    updated: new Date().toISOString(),
+  };
+}
+
+async function fetchArgentinaHeatmapData(variant = 'argentina-ars') {
+  const universe = variant === 'argentina-usd' ? ARGENTINA_HEATMAP_USD : ARGENTINA_HEATMAP_ARS;
+  const response = await fetchImpl('https://data912.com/live/arg_stocks');
+  const rows = ensureArray(await jsonOrThrow(response, 'data912'));
+  return buildArgentinaLiveHeatmapData(variant, universe, rows);
+}
+
+async function fetchArgentinaHistoricalSeries(symbol) {
+  const normalizedSymbol = String(symbol || '').trim().toUpperCase();
+  if (!normalizedSymbol) return [];
+
+  const cached = argentinaHeatmapHistoryCache.get(normalizedSymbol);
+  if (cached && (Date.now() - cached.cachedAt) < 6 * 60 * 60 * 1000) {
+    return cached.data;
+  }
+
+  const response = await fetchImpl(`https://data912.com/historical/stocks/${encodeURIComponent(normalizedSymbol)}`);
+  const payload = await jsonOrThrow(response, 'data912 historical');
+  const data = ensureArray(payload)
+    .map(normalizeArgentinaHistoricalRow)
+    .filter(Boolean)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  argentinaHeatmapHistoryCache.set(normalizedSymbol, { cachedAt: Date.now(), data });
+  return data;
+}
+
+async function fetchArgentinaRangeHeatmapData(variant = 'argentina-ars', startDate, endDate = null) {
+  const universe = variant === 'argentina-usd' ? ARGENTINA_HEATMAP_USD : ARGENTINA_HEATMAP_ARS;
+  const liveResponse = await fetchImpl('https://data912.com/live/arg_stocks');
+  const liveRows = ensureArray(await jsonOrThrow(liveResponse, 'data912'));
+
+  const historySymbols = [...new Set(universe.map(getArgentinaHeatmapHistorySymbol).filter(Boolean))];
+  const historyResults = await Promise.allSettled(historySymbols.map((symbol) => fetchArgentinaHistoricalSeries(symbol)));
+  const historyMap = new Map(
+    historySymbols.map((symbol, index) => [
+      symbol,
+      historyResults[index].status === 'fulfilled' ? historyResults[index].value : [],
+    ])
+  );
+
+  return buildArgentinaRangeHeatmapData(variant, universe, liveRows, historyMap, startDate, endDate);
 }
 
 function cleanRssText(text) {
@@ -791,16 +839,30 @@ app.get('/api/ons', async (req, res) => {
 
 app.get('/api/heatmap', async (req, res) => {
   try {
-    let data = [];
-    let provider = 'yahoo-fallback';
+    const market = String(req.query.market || 'usa').toLowerCase();
     const startDate = parseHeatmapDate(req.query.start);
     const endDate = parseHeatmapDate(req.query.end);
+    const plan = getHeatmapExecutionPlan({ market, startDate, polygonApiKey: POLYGON_API_KEY });
 
     if (startDate && endDate && startDate.getTime() > endDate.getTime()) {
       return res.status(400).json({ error: 'Invalid heatmap date range' });
     }
 
-    if (POLYGON_API_KEY && !startDate) {
+    if (plan.branch === 'argentina') {
+      const data = plan.useRange
+        ? await fetchArgentinaRangeHeatmapData(market, startDate, endDate)
+        : await fetchArgentinaHeatmapData(market);
+      return res.json(finalizeHeatmapResponse({
+        market,
+        provider: plan.provider,
+        data,
+      }));
+    }
+
+    let data = [];
+    let provider = plan.provider;
+
+    if (plan.tryPolygonReference) {
       try {
         data = await fetchPolygonReferenceHeatmapData(HEATMAP_UNIVERSE);
         provider = 'polygon-reference+yahoo';
@@ -811,15 +873,42 @@ app.get('/api/heatmap', async (req, res) => {
 
     if (!data.length) {
       const yahooQuotes = await fetchYahooQuoteBatch(HEATMAP_UNIVERSE.map((item) => item.ticker));
-      data = startDate
+      data = plan.useRange
         ? await fetchYahooRangeHeatmapData(HEATMAP_UNIVERSE, yahooQuotes, startDate, endDate)
         : await fetchYahooChartHeatmapData(HEATMAP_UNIVERSE, yahooQuotes);
     }
 
-    res.json({ data, provider, updated: new Date().toISOString() });
+    res.json(finalizeHeatmapResponse({ market, provider, data }));
   } catch (err) {
     console.error('Heatmap proxy error:', err.message);
     res.status(502).json({ error: 'Failed to fetch heatmap data' });
+  }
+});
+
+app.post('/api/optimizer', async (req, res) => {
+  try {
+    const tickers = Array.isArray(req.body?.tickers) ? req.body.tickers : [];
+    const years = parseInt(req.body?.years || '5', 10);
+    const rf = Number(req.body?.rf ?? 0.02);
+    const targetReturn = req.body?.targetReturn == null || req.body?.targetReturn === ''
+      ? null
+      : Number(req.body.targetReturn);
+    const minWeight = Number(req.body?.minWeight ?? 0);
+    const randomCount = parseInt(req.body?.randomCount || '25000', 10);
+
+    const payload = await runPythonOptimizer({
+      tickers,
+      years: Number.isFinite(years) ? years : 5,
+      rf: Number.isFinite(rf) ? rf : 0.02,
+      targetReturn: Number.isFinite(targetReturn) ? targetReturn : null,
+      minWeight: Number.isFinite(minWeight) ? minWeight : 0,
+      randomCount: Number.isFinite(randomCount) ? randomCount : 25000,
+    });
+
+    res.json(payload);
+  } catch (error) {
+    console.error('Python optimizer error:', error.message);
+    res.status(502).json({ error: error.message });
   }
 });
 

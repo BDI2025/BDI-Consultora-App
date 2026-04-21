@@ -58,6 +58,19 @@ Pendiente de confirmar luego de la auditoría técnica del repositorio base. La 
 - Documentar cada cambio relevante en `README.md`, `AGENTS.md` y `LOG.md` cuando corresponda.
 - Mantener diferenciados: hallazgo técnico, propuesta de mejora, cambio obligatorio y mejora opcional.
 
+## Estándar Técnico Activo
+- Para el desarrollo de BDI, especialmente en `Optimizador de carteras` y en los módulos de `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`, se adopta como referencia técnica el bloque `Engineering / Compound` incluido en [AGENTS.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/AGENTS.md).
+- Esto implica priorizar:
+  - arquitectura explícita y mantenible;
+  - separación clara entre cálculo, transformación de datos y render;
+  - reglas y mapeos explícitos;
+  - estructuras de datos consistentes;
+  - validaciones técnicas antes de cerrar cambios relevantes.
+- La documentación operativa de BDI no cambia:
+  - [LOG.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/LOG.md) sigue siendo el registro cronológico obligatorio;
+  - [README.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/README.md) refleja cambios de comportamiento, alcance y estructura;
+  - [AGENTS.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/AGENTS.md) conserva las reglas y restricciones activas.
+
 ## Estado Actual Del Proyecto
 - Etapa activa: `Etapa 4 - Plan técnico de implementación`
 - Documentación operativa inicial: creada.
@@ -111,10 +124,11 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
   - plazo fijo.
 - `Renta fija ARS`
   - LECAPs / BONCAPs;
-  - instrumentos a tasa fija en pesos.
+  - instrumentos a tasa fija en pesos;
+  - tabla con TNA, TIR, TEM, duration y duration modificada.
 - `Bonos CER`
   - bonos ajustados por inflación;
-  - lectura de duration, TIR real y sensibilidad.
+  - lectura de duration, TIR real, TEM y sensibilidad.
 - `Renta fija USD`
   - soberanos hard dollar;
   - curva y métricas clave.
@@ -852,6 +866,12 @@ Cuando el servidor arranque, abri:
   - fecha inicial + fecha final;
   - o fecha inicial hasta el momento actual si la fecha final queda vacia.
 - Esto mejora hoy mismo el tamano relativo y la precision de los labels, aun antes de contratar un plan con snapshots completos.
+- El modulo `Heatmap` ahora tambien puede cargar un primer boceto de acciones argentinas:
+  - `USA` mantiene el mapa actual con Yahoo/Polygon;
+  - `Argentina ARS` usa `data912` (`/live/arg_stocks`) y ya puede calcular variacion por rango historico;
+  - `Argentina USD` usa los tickers dolarizados del mismo feed de `data912`, pero por ahora se mantiene solo con variacion diaria para no sugerir un historico que hoy no esta bien soportado;
+  - en ambos mapas argentinos, el tamano relativo se apoya en el mismo proxy live de `monto operado`, para conservar la lectura visual ya estabilizada y no depender de market cap real;
+  - los sectores e industrias son una primera curacion BDI y deberan afinarse con revision manual posterior.
 ## Optimizador De Carteras
 - Se agrego una nueva solapa principal de `Optimizador` dentro de la app.
 - El modulo reutiliza `/api/mundo` para descargar historicos diarios de Yahoo Finance por ticker y periodo (`1y` a `10y`).
@@ -862,15 +882,72 @@ Cuando el servidor arranque, abri:
   - retorno objetivo opcional;
   - peso minimo por activo.
 - Salidas actuales:
-  - espacio riesgo-retorno con portfolios aleatorios y frontera eficiente aproximada;
-  - cartera de maximo Sharpe;
+  - espacio riesgo-retorno con `100000` portfolios aleatorios coloreados por Sharpe Ratio;
+  - frontera eficiente construida sobre `100` puntos de retorno objetivo;
+  - cartera de Sharpe optimo;
   - cartera de minima volatilidad;
-  - cartera cercana a retorno objetivo si se informa;
+  - cartera de retorno objetivo solo si la optimizacion encuentra solucion valida;
+  - linea CML;
   - tabla de pesos;
-  - series acumuladas por activo y por portfolio;
-  - tabla de CAGR;
+  - series acumuladas por activo y por portfolio optimo;
+  - tabla de CAGR y grafico comparativo de CAGR;
   - matriz de correlacion.
+- Layout actual:
+  - en desktop ancho, `Espacio de portfolios` y `Pesos optimos` comparten una grilla `70/30`;
+  - en mobile y pantallas angostas, el modulo vuelve a una sola columna.
 - Implementacion:
-  - el motor fue adaptado a `JavaScript`/frontend para mantener compatibilidad con la arquitectura actual de `Netlify + Node + HTML/CSS/JS`;
-  - no depende de `Python`, `scipy` ni `matplotlib` en runtime del sitio;
-  - la optimizacion usa muestreo aleatorio sobre el simplex y una frontera eficiente aproximada a partir del universo simulado.
+  - el frontend del optimizador ahora intenta primero un endpoint local `POST /api/optimizer` que ejecuta `rendimientos-ar/python/optimizer_runner.py`;
+  - ese runner usa `yfinance`, `numpy`, `pandas` y `scipy.optimize.minimize(method='SLSQP')` para acercarse al script Python original del usuario;
+  - las dependencias de Python quedaron documentadas en `rendimientos-ar/python/requirements.txt`;
+  - instalacion local esperada: `python -m pip install -r rendimientos-ar/python/requirements.txt`;
+  - si Python no esta disponible o falla, el modulo conserva un fallback en `JavaScript` para no romper la pagina;
+  - el flujo buscado sigue al script Python original: descarga de Yahoo, retornos diarios, media/covarianza anualizadas, optimizacion de Sharpe, minima volatilidad, retorno objetivo, frontera eficiente, CAGR y matriz de correlacion.
+
+## Ajustes recientes
+- `Renta fija ARS` y `Bonos CER` suman columna `TEM` en sus tablas de monitoreo.
+- `Renta fija ARS` excluye automaticamente letras o bonos capitalizables que ya vencieron o que vencen en la fecha de liquidacion T+1, evitando TIRs artificiales al cierre del instrumento.
+- Los graficos de monitoreo de activos a cotizacion actual (`Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`) ahora muestran una `regresion polinomica` de grado 2 en `JavaScript` como guia visual; en `Renta fija ARS`, la logica `Nelson-Siegel` sigue preservada en codigo para futuras comparaciones.
+- Los graficos SVG de monitoreo de activos ahora muestran solo puntos y etiquetas, sin lineas de union.
+- `Soberanos` usa un eje Y dinamico para evitar que queden puntos fuera del grafico.
+- `Renta fija ARS`, `Bonos CER` y `Corporativos` ahora tambien ajustan dinamicamente el eje Y para que la escala acompañe mejor a los datos visibles.
+- Las etiquetas de los graficos de renta fija se distribuyen con reglas automaticas de colision, sin offsets manuales por ticker.
+- Los ejes X de los graficos de renta fija ya no se fuerzan a arrancar en `0`; ahora se ajustan automaticamente segun el rango efectivo de cada familia.
+- El `Heatmap` usa un date picker propio para las fechas de USA, evitando el calendario nativo del navegador.
+- El `Heatmap` usa tambien un selector propio para el universo (`USA / Argentina ARS / Argentina USD`), con la misma linea visual que el date picker.
+- El date picker del `Heatmap` ahora permite abrir una vista de meses desde el titulo del calendario y cambiar rapidamente el anio con las flechas laterales.
+- El `Heatmap USA` ahora abre por defecto con la ultima rueda valida frente a la rueda previa, en lugar de usar literalmente `ayer -> hoy`.
+- El `Heatmap` ahora resuelve la rueda diaria por defecto con logica de ultima sesion valida:
+  - si el dia actual es habil, compara contra la rueda previa;
+  - si cae en fin de semana, toma la ultima rueda disponible y la compara contra la anterior;
+  - esto evita rangos triviales o engañosos al abrir `USA` y `Argentina ARS`.
+- Para el `Heatmap` por rango:
+  - `USA` ahora puede usar precio live cuando la fecha final es `hoy` pero el historico diario todavia no incorporo esa rueda;
+  - `Argentina ARS` tambien puede caer a la variacion live del feed cuando el historico de `data912` colapsa el rango actual a un mismo dia y devolveria `0%` artificial.
+- El resumen de estado del `Heatmap` se muestra debajo del grafico, con un formato mas editorial y menos tecnico para salida publica.
+- El modulo `Heatmap` ahora usa un titulo y una descripcion genericos del concepto, para que funcionen igual al cambiar entre `USA`, `Argentina ARS` y `Argentina USD`.
+- La banda de controles del `Heatmap` ahora queda centrada dentro de su box y concentra ahi mismo el hint operativo de fechas.
+- A nivel tecnico, el backend local y la function serverless del `Heatmap` ya comparten una misma fuente de metadata en `rendimientos-ar/shared/heatmap-config.js`, como primera fase de una refactorizacion segura y reversible para reducir duplicacion sin cambiar el resultado visible.
+- El frontend del `Heatmap` tambien lee ahora una config explicita en `rendimientos-ar/public/heatmap-config.js` para definir por mercado si hay rango historico, si el universo es daily-only y cual es el provider base esperado, evitando condicionales dispersos en `app.js`.
+- El backend del `Heatmap` tambien comparte ahora helpers puros en `rendimientos-ar/shared/heatmap-helpers.js` para parseo de fechas, normalizacion de historicos argentinos y calculo de variacion por rango, dejando `server.js` y la function de Netlify mas cerca de un rol de orquestacion.
+- El modulo suma ahora una primera capa de adaptadores por provider en:
+  - `rendimientos-ar/shared/heatmap-provider-data912.js`
+  - `rendimientos-ar/shared/heatmap-provider-yahoo.js`
+  para separar fetch de normalizacion/construccion de tiles y reducir duplicacion entre backend local y Netlify.
+- La seleccion del flujo del endpoint `Heatmap` tambien quedo centralizada en `rendimientos-ar/shared/heatmap-orchestration.js`, para decidir de forma explicita:
+  - si un mercado usa rama argentina o USA;
+  - si corresponde rango historico;
+  - si vale intentar referencia con `Polygon`;
+  - que provider debe declararse en la respuesta.
+- El `Heatmap` ahora tambien formaliza un contrato unico de tile:
+  - backend: `rendimientos-ar/shared/heatmap-tile-contract.js`
+  - frontend: `rendimientos-ar/public/heatmap-tile-contract.js`
+  - este contrato normaliza campos como `ticker`, `name`, `sector`, `industry`, `price`, `change`, `marketCap`, `sizeValue`, `sizeLabel` y `sizeCurrency` antes del render, para que futuras mejoras de fuentes no dependan de objetos armados de forma implicita.
+- El endpoint del `Heatmap` suma ahora una capa de observabilidad liviana en `rendimientos-ar/shared/heatmap-observability.js`:
+  - normaliza y valida el dataset final antes de responder;
+  - registra en logs si algun provider devuelve tiles que quedan fuera del contrato;
+  - esto permite detectar degradaciones de Yahoo, `data912` o `Polygon` sin cambiar la experiencia visible.
+- La orquestacion del endpoint tambien quedo mas declarativa con `getHeatmapExecutionPlan()` en `rendimientos-ar/shared/heatmap-orchestration.js`, para resolver en un solo paso:
+  - rama `USA` vs `Argentina`;
+  - modo `daily` vs `range`;
+  - provider esperado;
+  - intento de referencia con `Polygon`.

@@ -18,8 +18,8 @@ const UI_TEXT = {
     ccl_dollar: 'Contado con Liqui',
     mep_dollar: 'Dólar MEP',
     country_risk: 'Riesgo País',
-    ars_hero_title: 'Liquidez en pesos',
-    ars_hero_desc: 'Compará rendimientos actualizados de billeteras y fondos de liquidez en Argentina.',
+    ars_hero_title: 'Liquidez',
+    ars_hero_desc: 'Compará tasas bancarias y alternativas de corto plazo en pesos para una lectura rápida de liquidez.',
     time_deposit_title: 'Plazo fijo',
     time_deposit_desc: 'Compará tasas de plazo fijo de bancos argentinos. Datos provistos por el BCRA.',
     lecaps_title: 'LECAPs y BONCAPs',
@@ -98,20 +98,26 @@ const UI_TEXT = {
     optimizer_corr_title: 'Matriz de correlación entre activos',
     optimizer_ticker: 'Ticker',
     optimizer_correlation: 'Correlación',
-    heatmap_title: 'Heatmap USA',
-    heatmap_hero_desc: 'Mapa sectorial estilo Finviz con large caps de Estados Unidos y lectura rápida por market cap y variación diaria.',
+    heatmap_title: 'Heatmap',
+    heatmap_hero_desc: 'Un heatmap ordena los activos por tamaño relativo y los colorea según su variación para ofrecer una lectura rápida del mercado.',
     heatmap_loading: 'Cargando heatmap...',
     heatmap_empty: 'No se pudieron cargar datos para el heatmap.',
     heatmap_error: 'Error al cargar heatmap: {message}',
     heatmap_refresh: 'Aplicar',
+    heatmap_market_label: 'Universo',
+    heatmap_market_usa: 'USA',
+    heatmap_market_argentina_ars: 'Argentina ARS',
+    heatmap_market_argentina_usd: 'Argentina USD',
     heatmap_start_label: 'Inicio',
     heatmap_end_label: 'Fin',
     heatmap_now: 'Hasta hoy',
-    heatmap_period_hint: 'Dejá la fecha final vacía para comparar desde el inicio hasta ahora.',
-    heatmap_source: 'Fuente: Yahoo Finance para precio y variación diaria. Tamaño relativo por market cap curado en esta primera versión BDI.',
+    heatmap_period_hint: 'Por defecto se muestra la última rueda disponible frente a la rueda previa.',
+    heatmap_source: 'Datos de mercado provistos por Yahoo Finance. El tamaño relativo acompaña la capitalización de cada compañía.',
     heatmap_source_polygon: 'Fuente: Polygon para precio, variación diaria y referencia corporativa. Tamaño relativo usando market cap real cuando el proveedor lo devuelve.',
     heatmap_source_polygon_reference: 'Fuente: Polygon para market cap y referencia corporativa, con precio y variación diaria desde Yahoo Finance. Mejora el realismo del tamaño relativo del mapa.',
-    heatmap_source_yahoo: 'Fuente: Yahoo Finance para precio y variación diaria. Tamaño relativo por market cap curado en esta primera versión BDI.',
+    heatmap_source_yahoo: 'Datos de mercado provistos por Yahoo Finance. El tamaño relativo acompaña la capitalización de cada compañía.',
+  heatmap_source_argentina_ars: 'Fuente: data912 para precios y variaciones de acciones argentinas en ARS. El tamaño relativo se mantiene con el mismo proxy visual de monto operado.',
+  heatmap_source_argentina_usd: 'Fuente: data912 para acciones argentinas en USD. En este universo, por ahora solo se muestra la variacion diaria y el mismo proxy visual de monto operado.',
     heatmap_legend_negative: 'Caída',
     heatmap_legend_flat: 'Neutral',
     heatmap_legend_positive: 'Suba',
@@ -137,7 +143,7 @@ const UI_TEXT = {
     compound_table_final: 'Capital final',
     compound_table_interest: 'Interés ganado',
     compound_table_vs_cash: 'Dif. vs sin invertir',
-    compound_axis_year: 'Años',
+    compound_axis_year: 'A\u00f1os',
     compound_axis_value: 'Valor acumulado',
     compound_chart_cash: 'Sin invertir',
     compound_chart_invested: 'Invertido',
@@ -200,8 +206,8 @@ const UI_TEXT = {
     ccl_dollar: 'Cash-settled with liquidation',
     mep_dollar: 'MEP dollar',
     country_risk: 'Country risk',
-    ars_hero_title: 'Peso liquidity',
-    ars_hero_desc: 'Compare updated yields from wallets and liquidity funds in Argentina.',
+    ars_hero_title: 'Liquidity',
+    ars_hero_desc: 'Compare bank rates and short-term peso alternatives for a quick liquidity read.',
     time_deposit_title: 'Time deposit',
     time_deposit_desc: 'Compare time deposit rates from Argentine banks. Data provided by the BCRA.',
     lecaps_title: 'LECAPs and BONCAPs',
@@ -280,20 +286,26 @@ const UI_TEXT = {
     optimizer_corr_title: 'Asset correlation matrix',
     optimizer_ticker: 'Ticker',
     optimizer_correlation: 'Correlation',
-    heatmap_title: 'USA heatmap',
-    heatmap_hero_desc: 'Finviz-style sector map with US large caps and a quick read by market cap and daily move.',
+    heatmap_title: 'Heatmap',
+    heatmap_hero_desc: 'A heatmap arranges assets by relative size and colors them by performance to offer a quick market read.',
     heatmap_loading: 'Loading heatmap...',
     heatmap_empty: 'Heatmap data could not be loaded.',
     heatmap_error: 'Error loading heatmap: {message}',
     heatmap_refresh: 'Apply',
+    heatmap_market_label: 'Universe',
+    heatmap_market_usa: 'USA',
+    heatmap_market_argentina_ars: 'Argentina ARS',
+    heatmap_market_argentina_usd: 'Argentina USD',
     heatmap_start_label: 'Start',
     heatmap_end_label: 'End',
     heatmap_now: 'Through today',
-    heatmap_period_hint: 'Leave the end date empty to compare from the start date through now.',
-    heatmap_source: 'Source: Yahoo Finance for price and daily move. Relative size uses a curated market-cap scale in this first BDI version.',
+    heatmap_period_hint: 'By default, the map compares the latest available session against the prior one.',
+    heatmap_source: 'Market data comes from Yahoo Finance. Relative block size follows each company market capitalization.',
     heatmap_source_polygon: 'Source: Polygon for price, daily move and company reference data. Relative size uses real market cap when the provider returns it.',
     heatmap_source_polygon_reference: 'Source: Polygon for market cap and company reference data, with price and daily move from Yahoo Finance. This improves the realism of relative block sizing.',
-    heatmap_source_yahoo: 'Source: Yahoo Finance for price and daily move. Relative size uses a curated market-cap scale in this first BDI version.',
+    heatmap_source_yahoo: 'Market data comes from Yahoo Finance. Relative block size follows each company market capitalization.',
+  heatmap_source_argentina_ars: 'Source: data912 for Argentine equity prices and returns in ARS. Relative size keeps the same traded-amount visual proxy.',
+  heatmap_source_argentina_usd: 'Source: data912 for Argentine equities in USD. In this universe, only the daily move is currently shown, while size keeps the same traded-amount visual proxy.',
     heatmap_legend_negative: 'Down',
     heatmap_legend_flat: 'Flat',
     heatmap_legend_positive: 'Up',
@@ -863,6 +875,12 @@ function calcModifiedDuration(duration, ratePct) {
   return duration / (1 + rate);
 }
 
+function calcTEM(ratePct) {
+  const annualRate = Number(ratePct) / 100;
+  if (!Number.isFinite(annualRate) || annualRate <= -1) return null;
+  return (Math.pow(1 + annualRate, 1 / 12) - 1) * 100;
+}
+
 function renderEspeciales(items) {
   const container = document.getElementById('especiales-list');
   container.innerHTML = '';
@@ -1124,9 +1142,7 @@ function setupTabs() {
     hero.querySelector('h1').textContent = t('heatmap_title');
     hero.querySelector('p').textContent = t('heatmap_hero_desc');
     updatePageTitle('heatmap');
-    if (!document.getElementById('heatmap-chart')?.hasChildNodes()) {
-      loadHeatmap();
-    }
+    loadHeatmapV2();
   }
 
   if (headerArs) headerArs.addEventListener('click', (e) => { e.preventDefault(); switchToArs(); location.hash = 'ars'; });
@@ -1393,18 +1409,23 @@ async function loadLecaps() {
     const today = new Date();
     const settlement = getSettlementDate(today);
 
-    const items = lecaps.letras.filter(l => l.activo).map(l => {
-      // Use live price if available, fallback to config
-      const precio = livePrices[l.ticker] || l.precio;
-      const vto = parseLocalDate(l.fecha_vencimiento);
-      const dias = Math.max(1, Math.round((vto - settlement) / (1000 * 60 * 60 * 24)));
-      const ganancia = l.pago_final / precio;
-      const tna = (ganancia - 1) * (365 / dias) * 100;
-      const tir = (Math.pow(ganancia, 365 / dias) - 1) * 100;
-      const duration = dias / 365;
-      const modifiedDuration = calcModifiedDuration(duration, tir);
-      return { ...l, precio, dias, tna, tir, duration, modifiedDuration, live: !!livePrices[l.ticker] };
-    });
+    const items = lecaps.letras
+      .filter(l => l.activo)
+      .map(l => {
+        // Use live price if available, fallback to config
+        const precio = livePrices[l.ticker] || l.precio;
+        const vto = parseLocalDate(l.fecha_vencimiento);
+        const dias = Math.round((vto - settlement) / (1000 * 60 * 60 * 24));
+        if (!isFinite(precio) || precio <= 0 || !vto || dias <= 0) return null;
+        const ganancia = l.pago_final / precio;
+        const tna = (ganancia - 1) * (365 / dias) * 100;
+        const tir = (Math.pow(ganancia, 365 / dias) - 1) * 100;
+        const tem = calcTEM(tir);
+        const duration = dias / 365;
+        const modifiedDuration = calcModifiedDuration(duration, tir);
+        return { ...l, precio, dias, tna, tir, tem, duration, modifiedDuration, live: !!livePrices[l.ticker] };
+      })
+      .filter(Boolean);
 
     // Sort by days to maturity (ascending)
     items.sort((a, b) => a.dias - b.dias);
@@ -1424,10 +1445,11 @@ async function loadLecaps() {
         <td>${l.pago_final.toFixed(3)}</td>
         <td>${l.dias}</td>
         <td>${vtoStr}</td>
+        <td class="lecap-tna">${l.tna.toFixed(2)}%</td>
+        <td class="col-tem">${l.tem != null ? `${l.tem.toFixed(2)}%` : '—'}</td>
+        <td class="lecap-tir">${l.tir.toFixed(2)}%</td>
         <td class="col-duration">${l.duration.toFixed(2)}</td>
         <td class="col-mod-duration">${l.modifiedDuration.toFixed(2)}</td>
-        <td class="lecap-tna">${l.tna.toFixed(2)}%</td>
-        <td class="lecap-tir">${l.tir.toFixed(2)}%</td>
       </tr>`;
     }).join('');
 
@@ -1441,10 +1463,11 @@ async function loadLecaps() {
               <th class="col-pago">${t('lecap_col_final_payment')}</th>
               <th class="col-dias">${t('lecap_col_days')}</th>
               <th class="col-vto">${t('lecap_col_maturity')}</th>
-              <th class="col-duration">Duration</th>
-              <th class="col-mod-duration">Duration Mod.</th>
               <th class="col-tna">TNA</th>
+              <th class="col-tem">TEM</th>
               <th class="col-tir">TIR</th>
+              <th class="col-duration">Duration</th>
+              <th class="col-mod-duration">Dur. Mod.</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -1478,7 +1501,7 @@ async function loadLecaps() {
     }
 
     // Render scatter plot (TIR vs Días)
-    renderLecapScatter(items);
+    (window.renderLecapScatter || renderLecapScatter)(items);
   } catch (e) {
     console.error('Error loading LECAPs:', e);
     container.innerHTML = `<div class="loading">${t('lecaps_error')}</div>`;
@@ -1691,7 +1714,7 @@ async function loadSoberanos() {
     renderSoberanosTable(container, items);
 
     // Render yield curve
-    renderYieldCurve(items);
+    (window.renderYieldCurve || renderYieldCurve)(items);
 
     const source = document.getElementById('soberanos-source');
     if (source) {
@@ -2728,11 +2751,13 @@ async function loadCER() {
       // Calcular duration
       const duration = calcDuration(precioNormalizado, flujosAjustados, today, ytm);
       const modifiedDuration = calcModifiedDuration(duration, ytm);
+      const tem = calcTEM(ytm);
 
       items.push({
         symbol: bp.symbol,
         priceArs: precioARS,
         ytm,
+        tem,
         duration,
         modifiedDuration,
         vencimiento: bondConfig.vencimiento,
@@ -2748,7 +2773,7 @@ async function loadCER() {
 
     // Render yield curve
     try {
-      renderCERCurve(items);
+      (window.renderCERCurve || renderCERCurve)(items);
     } catch (chartError) {
       console.warn('Chart.js not available, skipping curve:', chartError.message);
     }
@@ -2774,6 +2799,7 @@ function renderCERTable(container, items) {
       <td class="col-duration">${item.modifiedDuration.toFixed(1)}</td>
       <td class="col-vto">${item.vencimiento}</td>
       <td class="lecap-tir">${item.ytm.toFixed(2)}%</td>
+      <td>${item.tem != null ? `${item.tem.toFixed(2)}%` : '—'}</td>
     </tr>`;
   }).join('');
 
@@ -2789,6 +2815,7 @@ function renderCERTable(container, items) {
             <th class="col-duration">DURATION MOD.</th>
             <th class="col-vto">${t('cer_col_maturity')}</th>
             <th>${t('cer_col_real_ytm')}</th>
+            <th>TEM</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -3120,11 +3147,11 @@ async function loadONs() {
     if (!items.length) {
       container.innerHTML = `<p style="text-align:center;color:var(--text-secondary)">${t('ons_empty')}</p>`;
       document.getElementById('ons-source').textContent = t('ons_source_short');
-      renderONsYieldCurve([]);
+      (window.renderONsYieldCurve || renderONsYieldCurve)([]);
       return;
     }
     renderONsTable(container, items);
-    renderONsYieldCurve(items);
+    (window.renderONsYieldCurve || renderONsYieldCurve)(items);
     document.getElementById('ons-source').textContent = t('ons_source_full');
   } catch(err) {
     container.innerHTML = `<p style="color:var(--red)">${t('ons_error', { message: err.message })}</p>`;
@@ -4414,8 +4441,34 @@ function formatHeatmapPrice(value) {
   }).format(value || 0);
 }
 
+function formatHeatmapCurrency(value, currency = 'USD') {
+  return new Intl.NumberFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: value >= 100 ? 0 : 2,
+    maximumFractionDigits: value >= 100 ? 0 : 2,
+  }).format(value || 0);
+}
+
+function formatHeatmapSizeValue(tile) {
+  const sizeValue = Number(tile.sizeValue || tile.marketCap || 0);
+  if ((tile.sizeLabel || '').toLowerCase().includes('market cap')) {
+    return formatMarketCapCompact(sizeValue);
+  }
+  const currency = tile.sizeCurrency || 'USD';
+  if (sizeValue >= 1_000_000_000) {
+    return `${formatHeatmapCurrency(sizeValue / 1_000_000_000, currency)}B`;
+  }
+  if (sizeValue >= 1_000_000) {
+    return `${formatHeatmapCurrency(sizeValue / 1_000_000, currency)}M`;
+  }
+  return formatHeatmapCurrency(sizeValue, currency);
+}
+
 function buildHeatmapTooltip(tile) {
   const isEnglish = currentLanguage === 'en';
+  const sizeLabel = tile.sizeLabel || (isEnglish ? 'Market cap' : 'Market cap');
+  const priceCurrency = tile.sizeCurrency === 'ARS' ? 'ARS' : 'USD';
   return `
     <div class="heatmap-tooltip-head">
       <div>
@@ -4425,8 +4478,8 @@ function buildHeatmapTooltip(tile) {
       <div class="heatmap-tooltip-change ${Number(tile.change || 0) >= 0 ? 'positive' : 'negative'}">${Number(tile.change || 0) >= 0 ? '+' : ''}${Number(tile.change || 0).toFixed(2)}%</div>
     </div>
     <div class="heatmap-tooltip-grid">
-      <div><span>${isEnglish ? 'Price' : 'Precio'}</span><strong>${formatHeatmapPrice(Number(tile.price || 0))}</strong></div>
-      <div><span>${isEnglish ? 'Market cap' : 'Market cap'}</span><strong>${formatMarketCapCompact(Number(tile.marketCap || 0))}</strong></div>
+      <div><span>${isEnglish ? 'Price' : 'Precio'}</span><strong>${formatHeatmapCurrency(Number(tile.price || 0), priceCurrency)}</strong></div>
+      <div><span>${escapeHtml(sizeLabel)}</span><strong>${formatHeatmapSizeValue(tile)}</strong></div>
       <div><span>${isEnglish ? 'Sector' : 'Sector'}</span><strong>${escapeHtml(tile.sector || '-')}</strong></div>
       <div><span>${isEnglish ? 'Industry' : 'Industria'}</span><strong>${escapeHtml(tile.industry || '-')}</strong></div>
     </div>
@@ -4565,26 +4618,88 @@ function renderHeatmap(data) {
   const container = document.getElementById('heatmap-chart');
   const empty = document.getElementById('heatmap-empty');
   if (!container || !empty) return;
+  const activeMarket = document.getElementById('heatmap-market-select')?.value || 'usa';
+  const isArgentina = activeMarket !== 'usa';
+  const sizeLegend = data[0]?.sizeLabel || (currentLanguage === 'en' ? 'Size by market cap' : 'Tamaño por market cap');
 
-  const width = 1380;
-  const height = 820;
-  const sectorHeader = 28;
-  const industryHeader = 16;
-  const innerGap = 3;
-  const outerGap = 10;
+  const width = isArgentina ? 1720 : 1520;
+  const height = isArgentina ? 860 : 820;
+  const sectorHeader = isArgentina ? 30 : 26;
+  const industryHeader = isArgentina ? 18 : 16;
+  const innerGap = isArgentina ? 4 : 3;
+  const outerGap = isArgentina ? 10 : 14;
 
-  const sectors = Array.from(data.reduce((map, item) => {
+  const getSectorLayoutWeight = (sectorName) => {
+    const normalized = String(sectorName || '').toUpperCase();
+    if (isArgentina) {
+      if (normalized === 'ENERGY') return 0.84;
+      if (normalized === 'FINANCIALS' || normalized === 'FINANCIAL') return 0.86;
+      if (normalized === 'CONSUMER STAPLES' || normalized === 'CONSUMER DEFENSIVE') return 1.34;
+      if (normalized === 'REAL ESTATE') return 1.18;
+      if (normalized === 'MATERIALS') return 1.1;
+      if (normalized === 'UTILITIES') return 1.08;
+      return 1;
+    }
+    if (normalized === 'FINANCIAL') return 0.88;
+    if (normalized === 'CONSUMER DEFENSIVE') return 0.9;
+    if (normalized === 'UTILITIES') return 1.28;
+    if (normalized === 'REAL ESTATE') return 1.34;
+    return 1;
+  };
+
+  const getItemLayoutValue = (item) => {
+    const rawValue = Number(item.sizeValue || item.marketCap || 0);
+    if (!isArgentina) return rawValue;
+    const ticker = String(item.ticker || item.symbol || '').toUpperCase();
+    let adjustedValue = Math.pow(Math.max(rawValue, 0), 0.82);
+    if (['YPFD', 'YPFDD'].includes(ticker)) adjustedValue *= 0.48;
+    if (['GGAL', 'GGALD'].includes(ticker)) adjustedValue *= 0.72;
+    if (['BMA', 'BMA.D', 'BMAD'].includes(ticker)) adjustedValue *= 0.64;
+    if (['VALO', 'VALOD'].includes(ticker)) adjustedValue *= 0.78;
+    if (['PAMP', 'PAMPD'].includes(ticker)) adjustedValue *= 0.78;
+    return adjustedValue;
+  };
+
+  const sectorBase = Array.from(data.reduce((map, item) => {
     if (!map.has(item.sector)) map.set(item.sector, []);
     map.get(item.sector).push(item);
     return map;
   }, new Map()).entries()).map(([sector, items]) => ({
     sector,
-    value: items.reduce((sum, item) => sum + item.marketCap, 0),
-    items: items.slice().sort((a, b) => b.marketCap - a.marketCap),
-  })).sort((a, b) => b.value - a.value);
-  const totalMarketCap = sectors.reduce((sum, sector) => sum + sector.value, 0) || 1;
+    actualValue: items.reduce((sum, item) => sum + Number(item.sizeValue || item.marketCap || 0), 0),
+    items: items
+      .slice()
+      .sort((a, b) => Number(b.sizeValue || b.marketCap || 0) - Number(a.sizeValue || a.marketCap || 0))
+      .map((item) => ({ ...item, layoutValue: getItemLayoutValue(item) })),
+  }));
 
-  const rowGroups = partitionHeatmapRows(sectors, 4);
+  const argentinaSectorBaseAverage = isArgentina
+    ? (sectorBase.reduce((sum, sector) => sum + Math.pow(Math.max(sector.items.reduce((acc, item) => acc + item.layoutValue, 0), 0), 0.78), 0) / Math.max(sectorBase.length, 1))
+    : 0;
+
+  const sectors = sectorBase.map((sector) => {
+    const layoutSum = sector.items.reduce((sum, item) => sum + item.layoutValue, 0);
+    const compressedSectorValue = isArgentina
+      ? (Math.pow(Math.max(layoutSum, 0), 0.78) + argentinaSectorBaseAverage * 0.52)
+      : layoutSum;
+    return {
+      ...sector,
+      value: compressedSectorValue * getSectorLayoutWeight(sector.sector),
+    };
+  }).sort((a, b) => b.value - a.value);
+  const totalMarketCap = sectors.reduce((sum, sector) => sum + sector.actualValue, 0) || 1;
+  const compactSectorLabel = (label, boxWidth) => {
+    const normalized = String(label || '').toUpperCase();
+    if (boxWidth >= 150) return normalized;
+    if (normalized === 'REAL ESTATE') return boxWidth < 118 ? 'REAL EST.' : 'REAL ESTATE';
+    if (normalized === 'COMMUNICATION SERVICES') return boxWidth < 132 ? 'COMM. SERVICES' : 'COMM SERVICES';
+    if (normalized === 'CONSUMER DEFENSIVE') return boxWidth < 126 ? 'CONS. DEFENSIVE' : 'CONSUMER DEFENSIVE';
+    if (normalized === 'CONSUMER CYCLICAL') return boxWidth < 126 ? 'CONS. CYCLICAL' : 'CONSUMER CYCLICAL';
+    if (normalized === 'UTILITIES') return boxWidth < 118 ? 'UTIL.' : 'UTILITIES';
+    return normalized;
+  };
+
+  const rowGroups = partitionHeatmapRows(sectors, isArgentina ? 4 : 4);
   let rowCursorY = outerGap;
   const sectorRects = [];
   rowGroups.forEach((row, rowIndex) => {
@@ -4596,10 +4711,11 @@ function renderHeatmap(data) {
   });
 
   const sectorSvg = sectorRects.map((sectorRect, sectorIndex) => {
-    const sx = sectorRect.x;
-    const sy = sectorRect.y;
-    const sw = Math.max(80, sectorRect.width);
-    const sh = Math.max(90, sectorRect.height);
+    const sectorInset = isArgentina ? 1.5 : 3;
+    const sx = sectorRect.x + sectorInset;
+    const sy = sectorRect.y + sectorInset;
+    const sw = Math.max(80, sectorRect.width - sectorInset * 2);
+    const sh = Math.max(90, sectorRect.height - sectorInset * 2);
       const sectorInnerX = sx + 4;
       const sectorInnerY = sy + sectorHeader + 4;
       const sectorInnerW = Math.max(20, sw - 8);
@@ -4611,8 +4727,8 @@ function renderHeatmap(data) {
       return map;
     }, new Map()).entries()).map(([industry, items]) => ({
       industry,
-      value: items.reduce((sum, item) => sum + item.marketCap, 0),
-      items: items.slice().sort((a, b) => b.marketCap - a.marketCap),
+      value: items.reduce((sum, item) => sum + Number(item.layoutValue || item.sizeValue || item.marketCap || 0), 0),
+      items: items.slice().sort((a, b) => Number(b.sizeValue || b.marketCap || 0) - Number(a.sizeValue || a.marketCap || 0)),
     })).sort((a, b) => b.value - a.value);
 
     const industryRects = balancedTreemapLayout(
@@ -4628,10 +4744,13 @@ function renderHeatmap(data) {
         const iy = industryRect.y + 2;
         const iw = Math.max(12, industryRect.width - 4);
         const ih = Math.max(12, industryRect.height - 4);
-        const showIndustryHeader = iw * ih > 16500 && iw > 120 && ih > 72;
+      const industryLabel = String(industryRect.industry || '').toUpperCase();
+      const industryFontSize = iw > 150 ? 7.8 : 6.9;
+      const industryLabelWidth = Math.min(iw - 8, Math.max(52, industryLabel.length * industryFontSize * 0.64 + 16));
+      const showIndustryHeader = iw * ih > (isArgentina ? 15000 : 11500) && iw > 92 && ih > 58;
 
       const tileRects = balancedTreemapLayout(
-        industryRect.items.map((item) => ({ ...item, value: item.marketCap })),
+        industryRect.items.map((item) => ({ ...item, value: Number(item.layoutValue || item.sizeValue || item.marketCap || 0) })),
         ix,
         iy + (showIndustryHeader ? industryHeader : 0),
         iw,
@@ -4659,7 +4778,7 @@ function renderHeatmap(data) {
           const tileStroke = area > 6000 ? 'rgba(6, 10, 18, 0.56)' : 'rgba(6, 10, 18, 0.42)';
           const labelShadow = 'paint-order: stroke; stroke: rgba(8, 12, 20, 0.22); stroke-width: 1.3;';
           return `
-            <g class="heatmap-tile" data-heatmap-tile="true" data-ticker="${escapeHtml(tile.ticker)}" data-name="${escapeHtml(tile.name || tile.ticker)}" data-sector="${escapeHtml(tile.sector || '')}" data-industry="${escapeHtml(tile.industry || '')}" data-price="${tile.price || 0}" data-change="${tile.change || 0}" data-market-cap="${tile.marketCap || 0}">
+            <g class="heatmap-tile" data-heatmap-tile="true" data-ticker="${escapeHtml(tile.ticker)}" data-name="${escapeHtml(tile.name || tile.ticker)}" data-sector="${escapeHtml(tile.sector || '')}" data-industry="${escapeHtml(tile.industry || '')}" data-price="${tile.price || 0}" data-change="${tile.change || 0}" data-market-cap="${tile.marketCap || 0}" data-size-value="${tile.sizeValue || tile.marketCap || 0}" data-size-label="${escapeHtml(tile.sizeLabel || 'Market cap')}" data-size-currency="${escapeHtml(tile.sizeCurrency || 'USD')}">
               <rect class="heatmap-tile-main" x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" width="${tw.toFixed(2)}" height="${th.toFixed(2)}" rx="4.5" fill="${heatmapColor(tile.change)}" stroke="${tileStroke}" stroke-width="0.9"></rect>
               <rect class="heatmap-tile-sheen" x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" width="${tw.toFixed(2)}" height="${Math.max(5, th * 0.16).toFixed(2)}" rx="4.5" fill="rgba(255,255,255,0.04)"></rect>
               ${showLabelBlock ? `
@@ -4676,32 +4795,37 @@ function renderHeatmap(data) {
         return `
           <g>
             ${showIndustryHeader ? `
-              <rect x="${ix.toFixed(2)}" y="${iy.toFixed(2)}" width="${Math.min(iw, Math.max(96, iw * 0.58)).toFixed(2)}" height="${(industryHeader - 3).toFixed(2)}" rx="4" fill="rgba(255,255,255,0.045)" stroke="rgba(255,255,255,0.065)" stroke-width="0.6"></rect>
-              <text x="${(ix + 7).toFixed(2)}" y="${(iy + 10.8).toFixed(2)}" font-size="7.8" font-weight="700" letter-spacing="0.34" fill="rgba(255,255,255,0.72)">${industryRect.industry.toUpperCase()}</text>
+              <rect x="${ix.toFixed(2)}" y="${iy.toFixed(2)}" width="${industryLabelWidth.toFixed(2)}" height="${(industryHeader - 3).toFixed(2)}" rx="4" fill="rgba(255,255,255,0.045)" stroke="rgba(255,255,255,0.065)" stroke-width="0.6"></rect>
+              <text x="${(ix + 7).toFixed(2)}" y="${(iy + 10.8).toFixed(2)}" font-size="${industryFontSize}" font-weight="700" letter-spacing="0.18" fill="rgba(255,255,255,0.72)">${industryLabel}</text>
             ` : ''}
             ${tileSvg}
           </g>
         `;
       }).join('');
 
-      const sectorHeaderVisible = sw > 120 && sh > 52;
-      const sectorShare = `${((sectorRect.value / totalMarketCap) * 100).toFixed(sw > 190 ? 1 : 0)}%`;
+      const sectorLabel = compactSectorLabel(sectorRect.sector, sw);
+      const sectorFontSize = Math.max(8, Math.min(11, Math.floor((sw - 22) / Math.max(sectorLabel.length * 0.78, 6))));
+      const sectorChipWidth = Math.min(sw - 18, Math.max(108, sectorLabel.length * sectorFontSize * 0.78 + 24));
+      const sectorChipHeight = sectorHeader - 8;
+      const sectorChipY = sy + 5;
+      const sectorHeaderVisible = sw > 90 && sh > 46;
+      const sectorShare = `${(((sectorRect.actualValue || sectorRect.value) / totalMarketCap) * 100).toFixed(sw > 190 ? 1 : 0)}%`;
 
       return `
         <g>
           <rect x="${sx.toFixed(2)}" y="${sy.toFixed(2)}" width="${sw.toFixed(2)}" height="${sh.toFixed(2)}" rx="12" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.075)" stroke-width="0.9"></rect>
-          ${sectorHeaderVisible ? `<rect x="${sx.toFixed(2)}" y="${sy.toFixed(2)}" width="${sw.toFixed(2)}" height="${sectorHeader}" rx="12" fill="rgba(255,255,255,0.055)"></rect>` : ''}
-          ${sectorHeaderVisible ? `<line x1="${sx.toFixed(2)}" y1="${(sy + sectorHeader).toFixed(2)}" x2="${(sx + sw).toFixed(2)}" y2="${(sy + sectorHeader).toFixed(2)}" stroke="rgba(255,255,255,0.07)" stroke-width="0.8"></line>` : ''}
-          ${sectorHeaderVisible ? `<text x="${(sx + 12).toFixed(2)}" y="${(sy + 18).toFixed(2)}" font-size="11" font-weight="700" letter-spacing="0.5" fill="#f8fafc">${sectorRect.sector.toUpperCase()}</text>` : ''}
-          ${sectorHeaderVisible && sw > 180 ? `<text x="${(sx + sw - 12).toFixed(2)}" y="${(sy + 18).toFixed(2)}" text-anchor="end" font-size="8.8" font-weight="700" letter-spacing="0.24" fill="rgba(255,255,255,0.54)">${sectorShare}</text>` : ''}
+          ${sectorHeaderVisible ? `<rect x="${(sx + 8).toFixed(2)}" y="${sectorChipY.toFixed(2)}" width="${sectorChipWidth.toFixed(2)}" height="${sectorChipHeight.toFixed(2)}" rx="8" fill="rgba(255,255,255,0.042)" stroke="rgba(255,255,255,0.055)" stroke-width="0.7"></rect>` : ''}
+          ${sectorHeaderVisible ? `<line x1="${(sx + 8).toFixed(2)}" y1="${(sy + sectorHeader - 1).toFixed(2)}" x2="${(sx + sw - 8).toFixed(2)}" y2="${(sy + sectorHeader - 1).toFixed(2)}" stroke="rgba(255,255,255,0.09)" stroke-width="0.8"></line>` : ''}
+          ${sectorHeaderVisible ? `<text x="${(sx + 18).toFixed(2)}" y="${(sectorChipY + sectorChipHeight / 2 + 3).toFixed(2)}" font-size="${sectorFontSize}" font-weight="700" letter-spacing="${sectorFontSize <= 9 ? 0.16 : 0.42}" fill="#f8fafc">${sectorLabel}</text>` : ''}
+          ${sectorHeaderVisible && sw > 220 ? `<text x="${(sx + sw - 12).toFixed(2)}" y="${(sectorChipY + sectorChipHeight / 2 + 3).toFixed(2)}" text-anchor="end" font-size="8.6" font-weight="700" letter-spacing="0.2" fill="rgba(255,255,255,0.5)">${sectorShare}</text>` : ''}
           ${industrySvg}
         </g>
       `;
     }).join('');
 
   container.innerHTML = `
-    <div class="optimizer-svg-shell">
-      <div class="optimizer-svg-frame">
+    <div class="optimizer-svg-shell ${isArgentina ? 'heatmap-shell-argentina' : 'heatmap-shell-usa'}">
+      <div class="optimizer-svg-frame ${isArgentina ? 'heatmap-frame-argentina' : 'heatmap-frame-usa'}">
         <svg class="optimizer-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${t('heatmap_title')}">
           <defs>
             <linearGradient id="heatmapBg" x1="0" x2="0" y1="0" y2="1">
@@ -4725,6 +4849,8 @@ function renderHeatmap(data) {
   `;
 
   empty.style.display = 'none';
+  const sizeLegendEl = container.querySelector('.optimizer-legend-item:last-child');
+  if (sizeLegendEl) sizeLegendEl.textContent = sanitizeHeatmapCopy(sizeLegend);
   setupHeatmapTooltip(container);
 }
 
@@ -4733,23 +4859,27 @@ async function loadHeatmap() {
   const sourceEl = document.getElementById('heatmap-source');
   const emptyEl = document.getElementById('heatmap-empty');
   const chartEl = document.getElementById('heatmap-chart');
+  const marketSelect = document.getElementById('heatmap-market-select');
   const startInput = document.getElementById('heatmap-start-date');
   const endInput = document.getElementById('heatmap-end-date');
-  const start = startInput?.value || '';
-  const end = endInput?.value || '';
+  const market = marketSelect?.value || 'usa';
+  const marketConfig = getHeatmapMarketConfig(market);
+  const start = getHeatmapDateValue(startInput);
+  const end = getHeatmapDateValue(endInput);
   if (statusEl) statusEl.textContent = t('heatmap_loading');
-  if (sourceEl) sourceEl.textContent = resolveHeatmapSource('yahoo-fallback');
+  if (sourceEl) sourceEl.textContent = resolveHeatmapSource(marketConfig.defaultProvider);
   if (emptyEl) emptyEl.style.display = '';
   if (chartEl) chartEl.innerHTML = '';
 
   try {
     const params = new URLSearchParams();
+    params.set('market', market);
     if (start) params.set('start', start);
     if (end) params.set('end', end);
     const response = await fetch(`/api/heatmap${params.toString() ? `?${params.toString()}` : ''}`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const payload = await response.json();
-    const data = Array.isArray(payload?.data) ? payload.data : [];
+    const data = normalizeHeatmapTiles(payload?.data);
     if (!data.length) {
       if (statusEl) statusEl.textContent = t('heatmap_empty');
       if (emptyEl) emptyEl.textContent = t('heatmap_empty');
@@ -4759,7 +4889,19 @@ async function loadHeatmap() {
     if (statusEl) {
       statusEl.textContent = `${data.length} ${currentLanguage === 'en' ? 'stocks loaded' : 'acciones cargadas'} · ${describeHeatmapPeriod(start, end)} · ${currentLanguage === 'en' ? 'updated' : 'actualizado'} ${new Date(payload.updated || Date.now()).toLocaleTimeString(currentLanguage === 'en' ? 'en-US' : 'es-AR', { hour: '2-digit', minute: '2-digit' })}`;
     }
-    if (sourceEl) sourceEl.textContent = resolveHeatmapSource(payload.provider);
+    if (statusEl) {
+      statusEl.textContent = `${data.length} ${currentLanguage === 'en' ? 'stocks loaded' : 'acciones cargadas'} · ${describeHeatmapPeriodForMarket(start, end, market)} · ${currentLanguage === 'en' ? 'updated' : 'actualizado'} ${new Date(payload.updated || Date.now()).toLocaleTimeString(currentLanguage === 'en' ? 'en-US' : 'es-AR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    if (sourceEl) sourceEl.textContent = sanitizeHeatmapCopy(resolveHeatmapSource(payload.provider));
+    if (statusEl) {
+      const updatedAt = new Date(payload.updated || Date.now()).toLocaleTimeString(
+        currentLanguage === 'en' ? 'en-US' : 'es-AR',
+        { hour: '2-digit', minute: '2-digit' }
+      );
+      statusEl.textContent = sanitizeHeatmapCopy(currentLanguage === 'en'
+        ? `${data.length} stocks | ${describeHeatmapPeriodForMarket(start, end, market)} | updated ${updatedAt}`
+        : `${data.length} acciones | ${describeHeatmapPeriodForMarket(start, end, market)} | actualizado ${updatedAt}`);
+    }
   } catch (error) {
     if (statusEl) statusEl.textContent = t('heatmap_error', { message: error.message });
     if (emptyEl) emptyEl.textContent = t('heatmap_empty');
@@ -4767,42 +4909,682 @@ async function loadHeatmap() {
 }
 
 function setupHeatmap() {
-  document.getElementById('heatmap-refresh-btn')?.addEventListener('click', loadHeatmap);
+  const marketSelect = document.getElementById('heatmap-market-select');
+  const startInput = document.getElementById('heatmap-start-date');
+  const endInput = document.getElementById('heatmap-end-date');
+  const defaultRange = getYesterdayAndTodayRange();
+  setupHeatmapDateInputs();
+  setupHeatmapMarketControl();
+  if (startInput) setHeatmapDateValue(startInput, defaultRange.start);
+  if (endInput) setHeatmapDateValue(endInput, defaultRange.end);
+  document.getElementById('heatmap-refresh-btn')?.addEventListener('click', loadHeatmapV2);
   document.getElementById('heatmap-now-btn')?.addEventListener('click', () => {
-    const endInput = document.getElementById('heatmap-end-date');
-    if (endInput) endInput.value = '';
-    loadHeatmap();
+    const latestRange = getYesterdayAndTodayRange();
+    setHeatmapDateValue(document.getElementById('heatmap-start-date'), latestRange.start);
+    setHeatmapDateValue(document.getElementById('heatmap-end-date'), latestRange.end);
+    loadHeatmapV2();
+  });
+  marketSelect?.addEventListener('change', () => {
+    updateHeatmapMarketUI();
+    loadHeatmapV2();
   });
   const statusEl = document.getElementById('heatmap-status');
   const sourceEl = document.getElementById('heatmap-source');
   const emptyEl = document.getElementById('heatmap-empty');
+  const marketLabel = document.getElementById('heatmap-market-label');
   const startLabel = document.getElementById('heatmap-start-label');
   const endLabel = document.getElementById('heatmap-end-label');
-  const periodHint = document.getElementById('heatmap-period-hint');
+  const periodHint = document.getElementById('heatmap-period-hint-legacy') || document.getElementById('heatmap-period-hint');
+  const activeMarket = marketSelect?.value || 'usa';
+  const activeMarketConfig = getHeatmapMarketConfig(activeMarket);
   if (statusEl) statusEl.textContent = t('heatmap_loading');
-  if (sourceEl) sourceEl.textContent = resolveHeatmapSource('yahoo-fallback');
+  if (marketLabel) marketLabel.textContent = t('heatmap_market_label');
+  if (sourceEl) sourceEl.textContent = sanitizeHeatmapCopy(resolveHeatmapSource(activeMarketConfig.defaultProvider));
   if (emptyEl) emptyEl.textContent = currentLanguage === 'en' ? 'Load the map to view the sector layout.' : 'Cargá el mapa para ver la distribución sectorial.';
   if (startLabel) startLabel.textContent = t('heatmap_start_label');
   if (endLabel) endLabel.textContent = t('heatmap_end_label');
-  if (periodHint) periodHint.textContent = t('heatmap_period_hint');
+  if (periodHint) periodHint.textContent = sanitizeHeatmapCopy(t('heatmap_period_hint'));
+  if (emptyEl) emptyEl.textContent = sanitizeHeatmapCopy(emptyEl.textContent);
+  if (marketSelect) {
+    if (marketSelect.options[0]) marketSelect.options[0].textContent = t('heatmap_market_usa');
+    if (marketSelect.options[1]) marketSelect.options[1].textContent = t('heatmap_market_argentina_ars');
+    if (marketSelect.options[2]) marketSelect.options[2].textContent = t('heatmap_market_argentina_usd');
+  }
+  updateHeatmapMarketTriggerLabel();
+  if (heatmapMarketPickerState?.panel && !heatmapMarketPickerState.panel.hidden) renderHeatmapMarketPicker();
   document.getElementById('heatmap-now-btn')?.replaceChildren(document.createTextNode(t('heatmap_now')));
   document.getElementById('heatmap-refresh-btn')?.replaceChildren(document.createTextNode(t('heatmap_refresh')));
+  ['heatmap-start-date', 'heatmap-end-date'].forEach((id) => {
+    const input = document.getElementById(id);
+    if (input) input.placeholder = currentLanguage === 'en' ? 'Select date' : 'Seleccionar fecha';
+    setHeatmapDateValue(input, getHeatmapDateValue(input));
+  });
+  if (heatmapDatePickerState?.activeInput) renderHeatmapDatePickerV3();
+  updateHeatmapMarketUI();
+}
+
+async function loadHeatmapV2() {
+  const statusEl = document.getElementById('heatmap-status');
+  const sourceEl = document.getElementById('heatmap-source');
+  const emptyEl = document.getElementById('heatmap-empty');
+  const chartEl = document.getElementById('heatmap-chart');
+  const marketSelect = document.getElementById('heatmap-market-select');
+  const startInput = document.getElementById('heatmap-start-date');
+  const endInput = document.getElementById('heatmap-end-date');
+  const market = marketSelect?.value || 'usa';
+  const marketConfig = getHeatmapMarketConfig(market);
+  const start = getHeatmapDateValue(startInput);
+  const end = getHeatmapDateValue(endInput);
+
+  if (statusEl) statusEl.textContent = t('heatmap_loading');
+  if (sourceEl) {
+    sourceEl.textContent = resolveHeatmapSource(marketConfig.defaultProvider);
+  }
+  if (emptyEl) emptyEl.style.display = '';
+  if (chartEl) chartEl.innerHTML = '';
+
+  try {
+    const params = new URLSearchParams();
+    params.set('market', market);
+    if (start) params.set('start', start);
+    if (end) params.set('end', end);
+
+    const response = await fetch(`/api/heatmap${params.toString() ? `?${params.toString()}` : ''}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const payload = await response.json();
+    const data = normalizeHeatmapTiles(payload?.data);
+
+    if (!data.length) {
+      if (statusEl) statusEl.textContent = t('heatmap_empty');
+      if (emptyEl) emptyEl.textContent = t('heatmap_empty');
+      return;
+    }
+
+    renderHeatmap(data);
+    if (sourceEl) sourceEl.textContent = sanitizeHeatmapCopy(resolveHeatmapSource(payload.provider));
+    if (statusEl) statusEl.textContent = describeHeatmapStatus(data.length, start, end, market, payload.updated);
+  } catch (error) {
+    if (statusEl) statusEl.textContent = t('heatmap_error', { message: error.message });
+    if (emptyEl) emptyEl.textContent = t('heatmap_empty');
+  }
 }
 
 function resolveHeatmapSource(provider) {
   if (provider === 'polygon-reference+yahoo') return t('heatmap_source_polygon_reference');
   if (provider === 'polygon') return t('heatmap_source_polygon');
+  if (provider === 'data912-argentina-ars') return t('heatmap_source_argentina_ars');
+  if (provider === 'data912-argentina-usd') return t('heatmap_source_argentina_usd');
   return t('heatmap_source_yahoo');
 }
 
-function formatHeatmapDateLabel(value) {
-  if (!value) return currentLanguage === 'en' ? 'now' : 'ahora';
-  const [year, month, day] = value.split('-').map(Number);
-  const date = new Date(year, (month || 1) - 1, day || 1);
+function getHeatmapMarketConfig(market) {
+  const configApi = window.BDI_HEATMAP_CONFIG;
+  if (configApi && typeof configApi.getMarketConfig === 'function') {
+    return configApi.getMarketConfig(market);
+  }
+  return {
+    key: market || 'usa',
+    rangeEnabled: market !== 'argentina-usd',
+    dailyOnly: market === 'argentina-usd',
+    defaultProvider: market === 'argentina-usd'
+      ? 'data912-argentina-usd'
+      : market === 'argentina-ars'
+        ? 'data912-argentina-ars'
+      : 'yahoo-fallback',
+  };
+}
+
+function normalizeHeatmapTiles(items) {
+  const contractApi = window.BDI_HEATMAP_TILE_CONTRACT;
+  if (contractApi && typeof contractApi.normalizeTiles === 'function') {
+    return contractApi.normalizeTiles(items);
+  }
+  return Array.isArray(items) ? items : [];
+}
+
+function sanitizeHeatmapCopy(text) {
+  return String(text || '')
+    .replaceAll('Â·', '|')
+    .replaceAll('variaciÃ³n', 'variacion')
+    .replaceAll('variaciÃƒÂ³n', 'variacion')
+    .replaceAll('TamaÃ±o', 'Tamano')
+    .replaceAll('CargÃ¡', 'Carga')
+    .replaceAll('distribuciÃ³n', 'distribucion');
+}
+
+let heatmapDatePickerState = null;
+let heatmapMarketPickerState = null;
+let compoundFrequencyPickerState = null;
+
+function parseHeatmapISODate(value) {
+  if (!value) return null;
+  const [year, month, day] = String(value).split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+function formatHeatmapInputDate(value) {
+  const date = parseHeatmapISODate(value);
+  if (!date) return '';
   return date.toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+  });
+}
+
+function getHeatmapDateValue(input) {
+  if (!input) return '';
+  return input.dataset.isoValue || '';
+}
+
+function setHeatmapDateValue(input, value) {
+  if (!input) return;
+  const isoValue = value || '';
+  input.dataset.isoValue = isoValue;
+  input.value = formatHeatmapInputDate(isoValue);
+  input.classList.toggle('has-value', Boolean(isoValue));
+}
+
+function formatHeatmapDateLabel(value) {
+  if (!value) return currentLanguage === 'en' ? 'now' : 'ahora';
+  const date = parseHeatmapISODate(value) || new Date();
+  return date.toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function toHeatmapIsoDate(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function getPreviousBusinessDay(date) {
+  const cursor = new Date(date);
+  do {
+    cursor.setDate(cursor.getDate() - 1);
+  } while (cursor.getDay() === 0 || cursor.getDay() === 6);
+  return cursor;
+}
+
+function getYesterdayAndTodayRange() {
+  const today = new Date();
+  const endDate = new Date(today);
+  if (endDate.getDay() === 6) {
+    endDate.setDate(endDate.getDate() - 1);
+  } else if (endDate.getDay() === 0) {
+    endDate.setDate(endDate.getDate() - 2);
+  }
+  const startDate = getPreviousBusinessDay(endDate);
+  return {
+    start: toHeatmapIsoDate(startDate),
+    end: toHeatmapIsoDate(endDate),
+  };
+}
+
+function isSameHeatmapDayRange(start, end) {
+  const range = getYesterdayAndTodayRange();
+  return start === range.start && end === range.end;
+}
+
+function describeHeatmapStatus(dataLength, start, end, market, updatedValue) {
+  const updatedAt = new Date(updatedValue || Date.now()).toLocaleTimeString(
+    currentLanguage === 'en' ? 'en-US' : 'es-AR',
+    { hour: '2-digit', minute: '2-digit' }
+  );
+  const universeLabel = currentLanguage === 'en'
+    ? `${dataLength} names`
+    : `${dataLength} activos`;
+  const marketConfig = getHeatmapMarketConfig(market);
+  let rangeLabel;
+  if (marketConfig.dailyOnly) {
+    rangeLabel = currentLanguage === 'en' ? 'Daily move' : 'Variacion diaria';
+  } else if (isSameHeatmapDayRange(start, end)) {
+    rangeLabel = currentLanguage === 'en' ? 'Latest daily session' : 'Ultima rueda diaria';
+  } else if (start && !end) {
+    rangeLabel = currentLanguage === 'en'
+      ? `Range: ${formatHeatmapDateLabel(start)} - now`
+      : `Rango: ${formatHeatmapDateLabel(start)} a ahora`;
+  } else {
+    rangeLabel = currentLanguage === 'en'
+      ? `Range: ${formatHeatmapDateLabel(start)} - ${formatHeatmapDateLabel(end)}`
+      : `Rango: ${formatHeatmapDateLabel(start)} al ${formatHeatmapDateLabel(end)}`;
+  }
+  return sanitizeHeatmapCopy(
+    currentLanguage === 'en'
+      ? `${universeLabel} | ${rangeLabel} | Updated ${updatedAt}`
+      : `${universeLabel} | ${rangeLabel} | Actualizado ${updatedAt}`
+  );
+}
+
+function formatHeatmapCalendarMonth(date) {
+  return date.toLocaleDateString(currentLanguage === 'en' ? 'en-US' : 'es-AR', {
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+function buildHeatmapMonthGrid(selectedMonth) {
+  const formatter = new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', { month: 'short' });
+  return Array.from({ length: 12 }, (_, index) => {
+    const monthDate = new Date(2024, index, 1);
+    return `<button type="button" class="heatmap-calendar-month ${index === selectedMonth ? 'is-selected' : ''}" data-calendar-month="${index}">${formatter.format(monthDate)}</button>`;
+  }).join('');
+}
+
+function buildHeatmapCalendarDays(viewDate, selectedIso) {
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const monthStart = new Date(year, month, 1);
+  const startWeekday = monthStart.getDay();
+  const today = new Date();
+  const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const cells = [];
+
+  for (let index = 0; index < 42; index += 1) {
+    const dayNumber = index - startWeekday + 1;
+    const cellDate = new Date(year, month, dayNumber);
+    const iso = `${cellDate.getFullYear()}-${String(cellDate.getMonth() + 1).padStart(2, '0')}-${String(cellDate.getDate()).padStart(2, '0')}`;
+    const inMonth = cellDate.getMonth() === month;
+    const classes = [
+      'heatmap-calendar-day',
+      inMonth ? '' : 'is-outside',
+      iso === selectedIso ? 'is-selected' : '',
+      iso === todayIso ? 'is-today' : '',
+    ].filter(Boolean).join(' ');
+    cells.push(`<button type="button" class="${classes}" data-date="${iso}">${cellDate.getDate()}</button>`);
+  }
+
+  return cells.join('');
+}
+
+function closeHeatmapDatePicker() {
+  if (!heatmapDatePickerState?.panel) return;
+  heatmapDatePickerState.panel.hidden = true;
+  heatmapDatePickerState.activeInput = null;
+}
+
+function updateHeatmapMarketTriggerLabel() {
+  const select = document.getElementById('heatmap-market-select');
+  const triggerText = document.getElementById('heatmap-market-trigger-text');
+  if (!select || !triggerText) return;
+  const option = select.options[select.selectedIndex];
+  triggerText.textContent = option ? option.textContent : 'USA';
+}
+
+function closeHeatmapMarketPicker() {
+  if (!heatmapMarketPickerState?.panel || !heatmapMarketPickerState?.trigger) return;
+  heatmapMarketPickerState.panel.hidden = true;
+  heatmapMarketPickerState.trigger.setAttribute('aria-expanded', 'false');
+}
+
+function positionHeatmapMarketPicker() {
+  if (!heatmapMarketPickerState?.panel || !heatmapMarketPickerState?.trigger || heatmapMarketPickerState.panel.hidden) return;
+  const rect = heatmapMarketPickerState.trigger.getBoundingClientRect();
+  const panelWidth = 260;
+  const maxLeft = window.scrollX + window.innerWidth - panelWidth - 16;
+  heatmapMarketPickerState.panel.style.top = `${window.scrollY + rect.bottom + 10}px`;
+  heatmapMarketPickerState.panel.style.left = `${Math.max(16, Math.min(window.scrollX + rect.left, maxLeft))}px`;
+}
+
+function renderHeatmapMarketPicker() {
+  if (!heatmapMarketPickerState?.panel) return;
+  const select = document.getElementById('heatmap-market-select');
+  if (!select) return;
+  heatmapMarketPickerState.panel.innerHTML = Array.from(select.options).map((option) => `
+    <button type="button" class="heatmap-select-option ${option.selected ? 'is-selected' : ''}" data-market-value="${option.value}">${option.textContent}</button>
+  `).join('');
+  heatmapMarketPickerState.panel.hidden = false;
+  heatmapMarketPickerState.trigger?.setAttribute('aria-expanded', 'true');
+  positionHeatmapMarketPicker();
+}
+
+function ensureHeatmapMarketPicker() {
+  if (heatmapMarketPickerState?.panel) return;
+  const panel = document.createElement('div');
+  panel.className = 'heatmap-select-popover';
+  panel.hidden = true;
+  document.body.appendChild(panel);
+
+  panel.addEventListener('mousedown', (event) => event.preventDefault());
+  panel.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const option = event.target.closest('[data-market-value]');
+    if (!option) return;
+    const select = document.getElementById('heatmap-market-select');
+    if (!select) return;
+    select.value = option.dataset.marketValue;
+    updateHeatmapMarketTriggerLabel();
+    closeHeatmapMarketPicker();
+    updateHeatmapMarketUI();
+    loadHeatmapV2();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!heatmapMarketPickerState?.panel || heatmapMarketPickerState.panel.hidden) return;
+    const trigger = event.target.closest('#heatmap-market-trigger');
+    if (trigger || heatmapMarketPickerState.panel.contains(event.target)) return;
+    closeHeatmapMarketPicker();
+  });
+
+  window.addEventListener('resize', positionHeatmapMarketPicker);
+  window.addEventListener('scroll', positionHeatmapMarketPicker, true);
+
+  heatmapMarketPickerState = {
+    panel,
+    trigger: null,
+  };
+}
+
+function positionHeatmapDatePicker() {
+  if (!heatmapDatePickerState?.panel || !heatmapDatePickerState?.activeInput || heatmapDatePickerState.panel.hidden) return;
+  const rect = heatmapDatePickerState.activeInput.getBoundingClientRect();
+  const panelWidth = 312;
+  const maxLeft = window.scrollX + window.innerWidth - panelWidth - 16;
+  heatmapDatePickerState.panel.style.top = `${window.scrollY + rect.bottom + 10}px`;
+  heatmapDatePickerState.panel.style.left = `${Math.max(16, Math.min(window.scrollX + rect.left, maxLeft))}px`;
+}
+
+function renderHeatmapDatePicker() {
+  if (!heatmapDatePickerState?.panel || !heatmapDatePickerState?.activeInput) return;
+  const { panel, activeInput, viewDate } = heatmapDatePickerState;
+  const selectedIso = getHeatmapDateValue(activeInput);
+  const weekdayFormatter = new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', { weekday: 'short' });
+  const weekdays = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(2024, 0, 7 + index);
+    return `<span>${weekdayFormatter.format(day).slice(0, 2)}</span>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="heatmap-calendar-header">
+      <button type="button" class="heatmap-calendar-nav" data-calendar-nav="-1" aria-label="${currentLanguage === 'en' ? 'Previous month' : 'Mes anterior'}">‹</button>
+      <div class="heatmap-calendar-title">${formatHeatmapCalendarMonth(viewDate)}</div>
+      <button type="button" class="heatmap-calendar-nav" data-calendar-nav="1" aria-label="${currentLanguage === 'en' ? 'Next month' : 'Mes siguiente'}">›</button>
+    </div>
+    <div class="heatmap-calendar-weekdays">${weekdays}</div>
+    <div class="heatmap-calendar-grid">${buildHeatmapCalendarDays(viewDate, selectedIso)}</div>
+    <div class="heatmap-calendar-footer">
+      <button type="button" class="heatmap-calendar-link" data-calendar-action="clear">${currentLanguage === 'en' ? 'Clear' : 'Limpiar'}</button>
+      <button type="button" class="heatmap-calendar-link" data-calendar-action="today">${currentLanguage === 'en' ? 'Today' : 'Hoy'}</button>
+    </div>
+  `;
+  panel.hidden = false;
+  positionHeatmapDatePicker();
+}
+
+function renderHeatmapDatePickerV2() {
+  if (!heatmapDatePickerState?.panel || !heatmapDatePickerState?.activeInput) return;
+  const { panel, activeInput, viewDate } = heatmapDatePickerState;
+  const selectedIso = getHeatmapDateValue(activeInput);
+  const weekdayFormatter = new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', { weekday: 'short' });
+  const weekdays = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(2024, 0, 7 + index);
+    return `<span>${weekdayFormatter.format(day).slice(0, 2)}</span>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="heatmap-calendar-header">
+      <button type="button" class="heatmap-calendar-nav" data-calendar-nav="-1" aria-label="${currentLanguage === 'en' ? 'Previous year' : 'Año anterior'}">&lt;</button>
+      <button type="button" class="heatmap-calendar-title heatmap-calendar-title-button" data-calendar-view="months">${formatHeatmapCalendarMonth(viewDate)}</button>
+      <button type="button" class="heatmap-calendar-nav" data-calendar-nav="1" aria-label="${currentLanguage === 'en' ? 'Next year' : 'Año siguiente'}">&gt;</button>
+    </div>
+    ${heatmapDatePickerState.mode === 'months'
+      ? `<div class="heatmap-calendar-months">${buildHeatmapMonthGrid(viewDate.getMonth())}</div>`
+      : `<div class="heatmap-calendar-weekdays">${weekdays}</div><div class="heatmap-calendar-grid">${buildHeatmapCalendarDays(viewDate, selectedIso)}</div>`}
+    <div class="heatmap-calendar-footer">
+      <button type="button" class="heatmap-calendar-link" data-calendar-action="clear">${currentLanguage === 'en' ? 'Clear' : 'Limpiar'}</button>
+      <button type="button" class="heatmap-calendar-link" data-calendar-action="today">${currentLanguage === 'en' ? 'Today' : 'Hoy'}</button>
+    </div>
+  `;
+  panel.hidden = false;
+  positionHeatmapDatePicker();
+}
+
+function renderHeatmapDatePickerV3() {
+  if (!heatmapDatePickerState?.panel || !heatmapDatePickerState?.activeInput) return;
+  const { panel, activeInput, viewDate } = heatmapDatePickerState;
+  const selectedIso = getHeatmapDateValue(activeInput);
+  const isMonthMode = heatmapDatePickerState.mode === 'months';
+  const weekdayFormatter = new Intl.DateTimeFormat(currentLanguage === 'en' ? 'en-US' : 'es-AR', { weekday: 'short' });
+  const weekdays = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(2024, 0, 7 + index);
+    return `<span>${weekdayFormatter.format(day).slice(0, 2)}</span>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="heatmap-calendar-header">
+      <button type="button" class="heatmap-calendar-nav" data-calendar-nav="-1" aria-label="${isMonthMode ? (currentLanguage === 'en' ? 'Previous year' : 'Año anterior') : (currentLanguage === 'en' ? 'Previous month' : 'Mes anterior')}">&lt;</button>
+      <button type="button" class="heatmap-calendar-title heatmap-calendar-title-button" data-calendar-view="months">${formatHeatmapCalendarMonth(viewDate)}</button>
+      <button type="button" class="heatmap-calendar-nav" data-calendar-nav="1" aria-label="${isMonthMode ? (currentLanguage === 'en' ? 'Next year' : 'Año siguiente') : (currentLanguage === 'en' ? 'Next month' : 'Mes siguiente')}">&gt;</button>
+    </div>
+    ${isMonthMode
+      ? `<div class="heatmap-calendar-months">${buildHeatmapMonthGrid(viewDate.getMonth())}</div>`
+      : `<div class="heatmap-calendar-weekdays">${weekdays}</div><div class="heatmap-calendar-grid">${buildHeatmapCalendarDays(viewDate, selectedIso)}</div>`}
+    <div class="heatmap-calendar-footer">
+      <button type="button" class="heatmap-calendar-link" data-calendar-action="clear">${currentLanguage === 'en' ? 'Clear' : 'Limpiar'}</button>
+      <button type="button" class="heatmap-calendar-link" data-calendar-action="today">${currentLanguage === 'en' ? 'Today' : 'Hoy'}</button>
+    </div>
+  `;
+  panel.hidden = false;
+  positionHeatmapDatePicker();
+}
+
+function openHeatmapDatePicker(input) {
+  if (!heatmapDatePickerState?.panel || !input || input.disabled) return;
+  heatmapDatePickerState.activeInput = input;
+  heatmapDatePickerState.viewDate = parseHeatmapISODate(getHeatmapDateValue(input)) || new Date();
+  heatmapDatePickerState.mode = 'days';
+  renderHeatmapDatePickerV3();
+}
+
+function ensureHeatmapDatePicker() {
+  if (heatmapDatePickerState?.panel) return;
+  const panel = document.createElement('div');
+  panel.className = 'heatmap-calendar-popover';
+  panel.hidden = true;
+  document.body.appendChild(panel);
+
+  panel.addEventListener('mousedown', (event) => event.preventDefault());
+  panel.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const nav = event.target.closest('[data-calendar-nav]');
+    if (nav) {
+      const delta = Number(nav.dataset.calendarNav || 0);
+      if (heatmapDatePickerState.mode === 'months') {
+        heatmapDatePickerState.viewDate = new Date(
+          heatmapDatePickerState.viewDate.getFullYear() + delta,
+          heatmapDatePickerState.viewDate.getMonth(),
+          1
+        );
+      } else {
+        heatmapDatePickerState.viewDate = new Date(
+          heatmapDatePickerState.viewDate.getFullYear(),
+          heatmapDatePickerState.viewDate.getMonth() + delta,
+          1
+        );
+      }
+      renderHeatmapDatePickerV3();
+      return;
+    }
+
+    const monthViewBtn = event.target.closest('[data-calendar-view="months"]');
+    if (monthViewBtn) {
+      heatmapDatePickerState.mode = 'months';
+      renderHeatmapDatePickerV3();
+      return;
+    }
+
+    const monthBtn = event.target.closest('[data-calendar-month]');
+    if (monthBtn) {
+      heatmapDatePickerState.viewDate = new Date(
+        heatmapDatePickerState.viewDate.getFullYear(),
+        Number(monthBtn.dataset.calendarMonth || 0),
+        1
+      );
+      heatmapDatePickerState.mode = 'days';
+      renderHeatmapDatePickerV3();
+      return;
+    }
+
+    const dayBtn = event.target.closest('[data-date]');
+    if (dayBtn && heatmapDatePickerState.activeInput) {
+      setHeatmapDateValue(heatmapDatePickerState.activeInput, dayBtn.dataset.date);
+      closeHeatmapDatePicker();
+      return;
+    }
+
+    const actionBtn = event.target.closest('[data-calendar-action]');
+    if (!actionBtn || !heatmapDatePickerState.activeInput) return;
+    if (actionBtn.dataset.calendarAction === 'clear') {
+      setHeatmapDateValue(heatmapDatePickerState.activeInput, '');
+      closeHeatmapDatePicker();
+      return;
+    }
+    const now = new Date();
+    const iso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    setHeatmapDateValue(heatmapDatePickerState.activeInput, iso);
+    closeHeatmapDatePicker();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!heatmapDatePickerState?.panel || heatmapDatePickerState.panel.hidden) return;
+    const clickedInput = event.target.closest('.heatmap-date-input');
+    if (clickedInput || heatmapDatePickerState.panel.contains(event.target)) return;
+    closeHeatmapDatePicker();
+  });
+
+  window.addEventListener('resize', positionHeatmapDatePicker);
+  window.addEventListener('scroll', positionHeatmapDatePicker, true);
+
+  heatmapDatePickerState = {
+    panel,
+    activeInput: null,
+    viewDate: new Date(),
+    mode: 'days',
+  };
+}
+
+function setupHeatmapDateInputs() {
+  ensureHeatmapDatePicker();
+  ['heatmap-start-date', 'heatmap-end-date'].forEach((id) => {
+    const input = document.getElementById(id);
+    if (!input || input.dataset.calendarBound === 'true') return;
+    input.dataset.calendarBound = 'true';
+    setHeatmapDateValue(input, getHeatmapDateValue(input));
+    input.addEventListener('click', () => openHeatmapDatePicker(input));
+    input.addEventListener('focus', () => openHeatmapDatePicker(input));
+  });
+}
+
+function setupHeatmapMarketControl() {
+  ensureHeatmapMarketPicker();
+  const trigger = document.getElementById('heatmap-market-trigger');
+  const select = document.getElementById('heatmap-market-select');
+  if (!trigger || !select || trigger.dataset.marketBound === 'true') return;
+  heatmapMarketPickerState.trigger = trigger;
+  trigger.dataset.marketBound = 'true';
+  updateHeatmapMarketTriggerLabel();
+  trigger.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (heatmapMarketPickerState.panel.hidden) {
+      renderHeatmapMarketPicker();
+      return;
+    }
+    closeHeatmapMarketPicker();
+  });
+}
+
+function updateCompoundFrequencyTriggerLabel() {
+  const select = document.getElementById('compound-frequency');
+  const triggerText = document.getElementById('compound-frequency-trigger-text');
+  if (!select || !triggerText) return;
+  const option = select.options[select.selectedIndex];
+  triggerText.textContent = option ? option.textContent : '';
+}
+
+function closeCompoundFrequencyPicker() {
+  if (!compoundFrequencyPickerState?.panel || !compoundFrequencyPickerState?.trigger) return;
+  compoundFrequencyPickerState.panel.hidden = true;
+  compoundFrequencyPickerState.trigger.setAttribute('aria-expanded', 'false');
+}
+
+function positionCompoundFrequencyPicker() {
+  if (!compoundFrequencyPickerState?.panel || !compoundFrequencyPickerState?.trigger || compoundFrequencyPickerState.panel.hidden) return;
+  const rect = compoundFrequencyPickerState.trigger.getBoundingClientRect();
+  const panelWidth = 260;
+  const maxLeft = window.scrollX + window.innerWidth - panelWidth - 16;
+  compoundFrequencyPickerState.panel.style.top = `${window.scrollY + rect.bottom + 10}px`;
+  compoundFrequencyPickerState.panel.style.left = `${Math.max(16, Math.min(window.scrollX + rect.left, maxLeft))}px`;
+}
+
+function renderCompoundFrequencyPicker() {
+  if (!compoundFrequencyPickerState?.panel) return;
+  const select = document.getElementById('compound-frequency');
+  if (!select) return;
+  compoundFrequencyPickerState.panel.innerHTML = Array.from(select.options).map((option) => `
+    <button type="button" class="heatmap-select-option ${option.selected ? 'is-selected' : ''}" data-compound-frequency="${option.value}">${option.textContent}</button>
+  `).join('');
+  compoundFrequencyPickerState.panel.hidden = false;
+  compoundFrequencyPickerState.trigger?.setAttribute('aria-expanded', 'true');
+  positionCompoundFrequencyPicker();
+}
+
+function ensureCompoundFrequencyPicker() {
+  if (compoundFrequencyPickerState?.panel) return;
+  const panel = document.createElement('div');
+  panel.className = 'heatmap-select-popover compound-select-popover';
+  panel.hidden = true;
+  document.body.appendChild(panel);
+
+  panel.addEventListener('mousedown', (event) => event.preventDefault());
+  panel.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const option = event.target.closest('[data-compound-frequency]');
+    if (!option) return;
+    const select = document.getElementById('compound-frequency');
+    if (!select) return;
+    select.value = option.dataset.compoundFrequency;
+    updateCompoundFrequencyTriggerLabel();
+    closeCompoundFrequencyPicker();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!compoundFrequencyPickerState?.panel || compoundFrequencyPickerState.panel.hidden) return;
+    const trigger = event.target.closest('#compound-frequency-trigger');
+    if (trigger || compoundFrequencyPickerState.panel.contains(event.target)) return;
+    closeCompoundFrequencyPicker();
+  });
+
+  window.addEventListener('resize', positionCompoundFrequencyPicker);
+  window.addEventListener('scroll', positionCompoundFrequencyPicker, true);
+
+  compoundFrequencyPickerState = {
+    panel,
+    trigger: null,
+  };
+}
+
+function setupCompoundFrequencyControl() {
+  ensureCompoundFrequencyPicker();
+  const trigger = document.getElementById('compound-frequency-trigger');
+  const select = document.getElementById('compound-frequency');
+  if (!trigger || !select) return;
+  compoundFrequencyPickerState.trigger = trigger;
+  updateCompoundFrequencyTriggerLabel();
+  if (trigger.dataset.frequencyBound === 'true') return;
+  trigger.dataset.frequencyBound = 'true';
+  select.addEventListener('change', updateCompoundFrequencyTriggerLabel);
+  trigger.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (compoundFrequencyPickerState.panel.hidden) {
+      renderCompoundFrequencyPicker();
+      return;
+    }
+    closeCompoundFrequencyPicker();
   });
 }
 
@@ -4814,6 +5596,62 @@ function describeHeatmapPeriod(start, end) {
   return currentLanguage === 'en'
     ? `from ${formatHeatmapDateLabel(start)} to ${formatHeatmapDateLabel(end)}`
     : `desde ${formatHeatmapDateLabel(start)} hasta ${formatHeatmapDateLabel(end)}`;
+}
+
+function describeHeatmapPeriodForMarket(start, end, market) {
+  if (market !== 'usa') return currentLanguage === 'en' ? 'daily move' : 'variaciÃ³n diaria';
+  return describeHeatmapPeriod(start, end);
+}
+
+function updateHeatmapMarketUI() {
+  const market = document.getElementById('heatmap-market-select')?.value || 'usa';
+  const marketConfig = getHeatmapMarketConfig(market);
+  const titleEl = document.getElementById('heatmap-section-title');
+  const descEl = document.getElementById('heatmap-section-desc');
+  const startInput = document.getElementById('heatmap-start-date');
+  const endInput = document.getElementById('heatmap-end-date');
+  const startControl = document.getElementById('heatmap-start-label')?.parentElement;
+  const endControl = document.getElementById('heatmap-end-label')?.parentElement;
+  const nowBtn = document.getElementById('heatmap-now-btn');
+  const hint = document.getElementById('heatmap-period-hint-legacy') || document.getElementById('heatmap-period-hint');
+  const rangeEnabled = !!marketConfig.rangeEnabled;
+
+  if (titleEl) {
+    titleEl.textContent = t('heatmap_title');
+  }
+
+  if (descEl) {
+    descEl.textContent = t('heatmap_hero_desc');
+  }
+
+  [startInput, endInput].forEach((input) => {
+    if (input) {
+      input.disabled = !rangeEnabled;
+      input.placeholder = currentLanguage === 'en' ? 'Select date' : 'Seleccionar fecha';
+    }
+  });
+  [startControl, endControl, nowBtn].forEach((el) => {
+    if (el) el.style.display = rangeEnabled ? '' : 'none';
+  });
+  if (!rangeEnabled) closeHeatmapDatePicker();
+  if (hint) {
+    hint.textContent = rangeEnabled
+      ? (currentLanguage === 'en'
+        ? 'By default, the map opens with the latest available session against the prior one.'
+        : 'Por defecto, el mapa abre con la ultima rueda disponible frente a la rueda previa.')
+      : (currentLanguage === 'en'
+        ? 'In Argentina USD, historical range is not available yet, so the map shows only the latest daily move.'
+        : 'En Argentina USD, por ahora no hay rango historico disponible, asi que el mapa muestra solo la variacion diaria mas reciente.');
+  }
+  if (descEl) descEl.textContent = sanitizeHeatmapCopy(descEl.textContent);
+  if (hint) hint.textContent = sanitizeHeatmapCopy(hint.textContent);
+}
+
+// Keep period wording consistent across USA and Argentina heatmaps once range support is enabled.
+function describeHeatmapPeriodForMarket(start, end, market) {
+  const marketConfig = getHeatmapMarketConfig(market);
+  if (marketConfig.dailyOnly) return currentLanguage === 'en' ? 'daily move' : 'variacion diaria';
+  return describeHeatmapPeriod(start, end);
 }
 
 function formatCompoundAxisCurrency(value) {
@@ -4838,7 +5676,7 @@ function buildCompoundLabel(monthIndex) {
   if (currentLanguage === 'en') {
     return years === 1 ? '1 year' : `${years.toFixed(years % 1 === 0 ? 0 : 1)} years`;
   }
-  return years === 1 ? '1 año' : `${years.toFixed(years % 1 === 0 ? 0 : 1)} años`;
+  return years === 1 ? '1 a\u00f1o' : `${years.toFixed(years % 1 === 0 ? 0 : 1)} a\u00f1os`;
 }
 
 function getEffectiveMonthlyRate(annualRatePct, frequencyPerYear) {
@@ -4912,15 +5750,15 @@ function renderCompoundBreakdown(results) {
   if (!breakdownEl || !sectionEl) return;
 
   const rows = [
-    { label: t('compound_chart_cash'), annualRatePct: 0, finalValue: results.base.finalCash, earnedInterest: results.base.finalCash - results.base.contributed, diffVsCash: 0 },
-    { label: t('compound_low'), annualRatePct: results.low.annualRatePct, finalValue: results.low.finalValue, earnedInterest: results.low.earnedInterest, diffVsCash: results.low.diffVsCash },
-    { label: t('compound_base'), annualRatePct: results.base.annualRatePct, finalValue: results.base.finalValue, earnedInterest: results.base.earnedInterest, diffVsCash: results.base.diffVsCash },
-    { label: t('compound_high'), annualRatePct: results.high.annualRatePct, finalValue: results.high.finalValue, earnedInterest: results.high.earnedInterest, diffVsCash: results.high.diffVsCash },
+    { tone: 'cash', label: t('compound_chart_cash'), annualRatePct: 0, finalValue: results.base.finalCash, earnedInterest: results.base.finalCash - results.base.contributed, diffVsCash: 0 },
+    { tone: 'low', label: t('compound_low'), annualRatePct: results.low.annualRatePct, finalValue: results.low.finalValue, earnedInterest: results.low.earnedInterest, diffVsCash: results.low.diffVsCash },
+    { tone: 'base', label: t('compound_base'), annualRatePct: results.base.annualRatePct, finalValue: results.base.finalValue, earnedInterest: results.base.earnedInterest, diffVsCash: results.base.diffVsCash },
+    { tone: 'high', label: t('compound_high'), annualRatePct: results.high.annualRatePct, finalValue: results.high.finalValue, earnedInterest: results.high.earnedInterest, diffVsCash: results.high.diffVsCash },
   ];
 
   breakdownEl.innerHTML = `
     <div class="compound-breakdown-wrap">
-      <table class="optimizer-table">
+      <table class="optimizer-table compound-breakdown-table">
         <thead>
           <tr>
             <th>${t('compound_table_scenario')}</th>
@@ -4933,13 +5771,13 @@ function renderCompoundBreakdown(results) {
         </thead>
         <tbody>
           ${rows.map((row) => `
-            <tr>
-              <td>${row.label}</td>
+            <tr class="compound-breakdown-row compound-breakdown-row--${row.tone}">
+              <td class="compound-breakdown-scenario">${row.label}</td>
               <td>${formatCompoundPercent(row.annualRatePct)}</td>
-              <td>${formatCompoundCurrency(results.base.contributed)}</td>
-              <td>${formatCompoundCurrency(row.finalValue)}</td>
-              <td>${formatCompoundCurrency(row.earnedInterest)}</td>
-              <td>${formatCompoundCurrency(row.diffVsCash)}</td>
+              <td class="compound-breakdown-money">${formatCompoundCurrency(results.base.contributed)}</td>
+              <td class="compound-breakdown-money">${formatCompoundCurrency(row.finalValue)}</td>
+              <td class="compound-breakdown-money">${formatCompoundCurrency(row.earnedInterest)}</td>
+              <td class="compound-breakdown-money">${formatCompoundCurrency(row.diffVsCash)}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -4959,7 +5797,7 @@ function renderCompoundChart(results) {
 
   const width = 920;
   const height = 520;
-  const margin = { top: 22, right: 24, bottom: 58, left: 96 };
+  const margin = { top: 22, right: 24, bottom: 58, left: 132 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
 
@@ -4976,7 +5814,7 @@ function renderCompoundChart(results) {
   const minValue = Math.min(...allValues);
   const maxValue = Math.max(...allValues);
   const pad = Math.max((maxValue - minValue) * 0.08, Math.abs(maxValue) * 0.04, 1);
-  const yMin = Math.min(0, minValue - pad);
+  const yMin = minValue >= 0 ? 0 : minValue - pad;
   const yMax = maxValue + pad;
 
   const xScale = (month) => margin.left + (month / maxMonth) * plotWidth;
@@ -4998,7 +5836,7 @@ function renderCompoundChart(results) {
     return Math.min(maxMonth, year);
   }).filter((value, idx, arr) => idx === 0 || value !== arr[idx - 1]);
 
-  const yTicks = Array.from({ length: 5 }, (_, idx) => yMin + ((yMax - yMin) / 4) * idx);
+  const yTicks = Array.from({ length: 6 }, (_, idx) => yMin + ((yMax - yMin) / 5) * idx);
   const lastPoint = allSeries[allSeries.length - 1];
   const endX = xScale(lastPoint.month);
   const endCashY = yScale(lastPoint.cash);
@@ -5024,7 +5862,7 @@ function renderCompoundChart(results) {
           ${yTicks.map((tick) => `
             <g>
               <line class="bdi-chart-grid" x1="${margin.left}" y1="${yScale(tick)}" x2="${width - margin.right}" y2="${yScale(tick)}"></line>
-              <text class="bdi-chart-tick" x="${margin.left - 10}" y="${yScale(tick) + 4}" text-anchor="end">${formatCompoundAxisCurrency(tick)}</text>
+              <text class="bdi-chart-tick" x="${margin.left - 12}" y="${yScale(tick) + 4}" text-anchor="end">${formatCompoundAxisCurrency(tick)}</text>
             </g>
           `).join('')}
           ${xTicks.map((tick) => `
@@ -5045,7 +5883,7 @@ function renderCompoundChart(results) {
           <line class="bdi-chart-axis" x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}"></line>
           <line class="bdi-chart-axis" x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${height - margin.bottom}"></line>
           <text class="bdi-chart-label" x="${margin.left + plotWidth / 2}" y="${height - 12}" text-anchor="middle">${t('compound_axis_year')}</text>
-          <text class="bdi-chart-label" transform="translate(24 ${margin.top + plotHeight / 2}) rotate(-90)" text-anchor="middle">${t('compound_axis_value')}</text>
+          <text class="bdi-chart-label" transform="translate(34 ${margin.top + plotHeight / 2}) rotate(-90)" text-anchor="middle">${t('compound_axis_value')}</text>
         </svg>
       </div>
       <div class="optimizer-legend">
@@ -5103,6 +5941,7 @@ function syncCompoundFrequencyLabels() {
   Array.from(select.options).forEach((option) => {
     option.textContent = t(`compound_frequency_${option.value}`);
   });
+  updateCompoundFrequencyTriggerLabel();
 }
 
 function updateCompoundStaticText() {
@@ -5151,6 +5990,7 @@ function setupCompoundCalculator() {
   document.getElementById('compound-run-btn')?.addEventListener('click', runCompoundCalculator);
   updateCompoundStaticText();
   syncCompoundFrequencyLabels();
+  setupCompoundFrequencyControl();
   const statusEl = document.getElementById('compound-status');
   const emptyEl = document.getElementById('compound-chart-empty');
   const summaryEl = document.getElementById('compound-summary');
@@ -5263,13 +6103,22 @@ async function runPortfolioOptimizer() {
   if (corrEl) corrEl.innerHTML = '';
 
   try {
-    const histories = await fetchOptimizerHistories(tickers, years);
-    const prepared = prepareOptimizerDataset(histories);
-    if (!prepared || prepared.assets.length === 0) {
-      throw new Error(t('optimizer_no_histories'));
+    let model = null;
+    let engine = 'python';
+
+    try {
+      model = await fetchPythonOptimizerModel({ tickers, years, rf, minWeight, targetReturn, randomCount: 100000 });
+    } catch (pythonError) {
+      console.warn('Python optimizer unavailable, falling back to JS engine:', pythonError.message);
+      engine = 'js-fallback';
+      const histories = await fetchOptimizerHistories(tickers, years);
+      const prepared = prepareOptimizerDataset(histories);
+      if (!prepared || prepared.assets.length === 0) {
+        throw new Error(t('optimizer_no_histories'));
+      }
+      model = buildOptimizerModel(prepared, rf, minWeight, targetReturn);
     }
 
-    const model = buildOptimizerModel(prepared, rf, minWeight, targetReturn);
     setOptimizerResultsVisible(true);
     setOptimizerChartVisibility(true);
     renderOptimizerSummary(model);
@@ -5281,7 +6130,9 @@ async function runPortfolioOptimizer() {
     renderOptimizerPerformance(model);
 
     if (statusEl) {
-      statusEl.textContent = t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years });
+      statusEl.textContent = engine === 'python'
+        ? `${t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years })} · ${currentLanguage === 'en' ? 'Python engine' : 'Motor Python'}`
+        : `${t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years })} · ${currentLanguage === 'en' ? 'JS fallback' : 'Fallback JS'}`;
     }
   } catch (error) {
     setOptimizerResultsVisible(false);
@@ -5289,6 +6140,76 @@ async function runPortfolioOptimizer() {
     if (statusEl) statusEl.textContent = t('optimizer_error', { message: error.message });
     console.error('Optimizer error:', error);
   }
+}
+
+async function fetchPythonOptimizerModel({ tickers, years, rf, minWeight, targetReturn, randomCount }) {
+  const response = await fetch('/api/optimizer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      tickers,
+      years,
+      rf,
+      minWeight,
+      targetReturn,
+      randomCount,
+    }),
+  });
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload?.error || `HTTP ${response.status}`);
+  }
+
+  const payload = await response.json();
+  return hydratePythonOptimizerModel(payload);
+}
+
+function hydratePythonOptimizerModel(payload) {
+  const model = {
+    ...payload,
+    assets: Array.isArray(payload.assets) ? payload.assets : [],
+    dates: Array.isArray(payload.dates) ? payload.dates : [],
+    rf: Number(payload.rf || 0),
+    minWeight: Number(payload.minWeight || 0),
+    targetReturn: payload.targetReturn == null ? null : Number(payload.targetReturn),
+    randomPortfolios: Array.isArray(payload.randomPortfolios) ? payload.randomPortfolios : [],
+    frontier: Array.isArray(payload.frontier) ? payload.frontier : [],
+    correlation: Array.isArray(payload.correlation) ? payload.correlation : [],
+    assetSeries: Array.isArray(payload.assetSeries) ? payload.assetSeries : [],
+    cagrRows: Array.isArray(payload.cagrRows) ? payload.cagrRows : [],
+  };
+
+  const optimizedPortfolios = [
+    { key: 'max_sharpe', label: currentLanguage === 'en' ? 'Optimal Sharpe' : 'Sharpe Óptimo', color: '#e0b100', data: payload.maxSharpe },
+    { key: 'min_vol', label: currentLanguage === 'en' ? 'Minimum Volatility' : 'Mínima Volatilidad', color: '#e25555', data: payload.minVol },
+  ];
+
+  if (payload.targetPortfolio) {
+    optimizedPortfolios.push({
+      key: 'target',
+      label: currentLanguage === 'en'
+        ? `Target Portfolio ${(Number(payload.targetReturn || 0) * 100).toFixed(2)}%`
+        : `Portfolio Objetivo ${(Number(payload.targetReturn || 0) * 100).toFixed(2)}%`,
+      color: '#157347',
+      data: payload.targetPortfolio,
+    });
+  }
+
+  model.maxSharpe = payload.maxSharpe;
+  model.minVol = payload.minVol;
+  model.targetPortfolio = payload.targetPortfolio || null;
+  model.optimizedPortfolios = optimizedPortfolios;
+  model.portfolioSeries = (Array.isArray(payload.portfolioSeries) ? payload.portfolioSeries : []).map((series) => {
+    const mapped = optimizedPortfolios.find((portfolio) => portfolio.key === series.key);
+    return {
+      ...series,
+      label: mapped?.label || series.label,
+      color: mapped?.color || series.color,
+    };
+  });
+
+  return model;
 }
 
 async function fetchOptimizerHistories(tickers, years) {
@@ -5346,25 +6267,56 @@ function buildOptimizerModel(prepared, rf, minWeight, targetReturn) {
   const numAssets = assets.length;
   const meanReturns = returnsByAsset.map((series) => average(series) * 252);
   const covMatrix = covarianceMatrix(returnsByAsset, 252);
-  const randomCount = numAssets === 1 ? 1 : 18000;
+  const randomCount = numAssets === 1 ? 1 : 100000;
   const randomPortfolios = [];
-
-  for (let i = 0; i < randomCount; i++) {
-    const weights = generateRandomWeights(numAssets, minWeight);
-    const stats = portfolioStats(weights, meanReturns, covMatrix, rf);
-    randomPortfolios.push({ weights, ...stats });
-  }
-
-  const minVol = optimizeMinVariancePortfolio(meanReturns, covMatrix, rf, minWeight);
-  const frontierSolutions = buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, minVol.ret);
-  const maxSharpe = frontierSolutions.reduce((best, item) => item.sharpe > best.sharpe ? item : best, frontierSolutions[0] || minVol);
+  const w0 = Array(numAssets).fill(1 / numAssets);
+  const optSharpe = optimizePortfolio({
+    objective: 'negSharpe',
+    initialWeights: w0,
+    meanReturns,
+    covMatrix,
+    rf,
+    minWeight,
+  });
+  const maxSharpe = { ...portfolioStats(optSharpe.x, meanReturns, covMatrix, rf), weights: optSharpe.x.slice(), success: optSharpe.success };
+  const optVol = optimizePortfolio({
+    objective: 'minVol',
+    initialWeights: w0,
+    meanReturns,
+    covMatrix,
+    rf,
+    minWeight,
+  });
+  const minVol = { ...portfolioStats(optVol.x, meanReturns, covMatrix, rf), weights: optVol.x.slice(), success: optVol.success };
 
   let targetPortfolio = null;
   if (targetReturn != null) {
-    targetPortfolio = optimizeTargetReturnPortfolio(meanReturns, covMatrix, rf, minWeight, targetReturn);
+    const optTarget = optimizePortfolio({
+      objective: 'minVol',
+      initialWeights: w0,
+      meanReturns,
+      covMatrix,
+      rf,
+      minWeight,
+      targetReturn,
+    });
+    if (optTarget.success) {
+      targetPortfolio = {
+        ...portfolioStats(optTarget.x, meanReturns, covMatrix, rf),
+        weights: optTarget.x.slice(),
+        success: true,
+      };
+    }
   }
 
+  const frontierSolutions = buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, w0);
   const frontier = frontierSolutions.map((item) => ({ x: item.vol * 100, y: item.ret * 100 }));
+  for (let i = 0; i < randomCount; i++) {
+    const weights = sampleDirichletWeights(numAssets);
+    if (minWeight > 0 && weights.some((weight) => weight < minWeight)) continue;
+    const stats = portfolioStats(weights, meanReturns, covMatrix, rf);
+    randomPortfolios.push({ weights, ...stats });
+  }
   const assetSeries = assets.map((asset, index) => ({ label: asset, values: cumulativeSeries(returnsByAsset[index]) }));
   const optimizedPortfolios = [
     { key: 'max_sharpe', label: 'Máx Sharpe', color: '#e0b100', data: maxSharpe },
@@ -5373,6 +6325,18 @@ function buildOptimizerModel(prepared, rf, minWeight, targetReturn) {
   if (targetPortfolio) {
     optimizedPortfolios.push({ key: 'target', label: `Objetivo ${formatPct(targetReturn * 100, 1)}`, color: '#157347', data: targetPortfolio });
   }
+
+  optimizedPortfolios.forEach((portfolio) => {
+    if (portfolio.key === 'max_sharpe') {
+      portfolio.label = currentLanguage === 'en' ? 'Optimal Sharpe' : 'Sharpe Óptimo';
+    } else if (portfolio.key === 'min_vol') {
+      portfolio.label = currentLanguage === 'en' ? 'Minimum Volatility' : 'Mínima Volatilidad';
+    } else if (portfolio.key === 'target') {
+      portfolio.label = currentLanguage === 'en'
+        ? `Target Portfolio ${(targetReturn * 100).toFixed(2)}%`
+        : `Portfolio Objetivo ${(targetReturn * 100).toFixed(2)}%`;
+    }
+  });
 
   const portfolioSeries = optimizedPortfolios.map((portfolio) => ({
     ...portfolio,
@@ -5419,14 +6383,11 @@ function correlationMatrix(seriesByAsset) {
   );
 }
 
-function generateRandomWeights(numAssets, minWeight = 0) {
+function sampleDirichletWeights(numAssets) {
   if (numAssets === 1) return [1];
-  const values = Array.from({ length: numAssets }, () => -Math.log(Math.random()));
-  const rawSum = values.reduce((sum, value) => sum + value, 0);
-  const raw = values.map((value) => value / rawSum);
-  if (!minWeight) return raw;
-  const residual = 1 - minWeight * numAssets;
-  return raw.map((value) => minWeight + value * residual);
+  const values = Array.from({ length: numAssets }, () => -Math.log(Math.max(Math.random(), 1e-12)));
+  const total = values.reduce((sum, value) => sum + value, 0) || 1;
+  return values.map((value) => value / total);
 }
 
 function portfolioStats(weights, meanReturns, covMatrix, rf) {
@@ -5449,100 +6410,128 @@ function quadraticForm(weights, matrix) {
   return total;
 }
 
-function approximateFrontier(portfolios) {
-  const valid = portfolios.filter((item) => Number.isFinite(item.ret) && Number.isFinite(item.vol)).sort((a, b) => a.ret - b.ret);
-  if (!valid.length) return [];
-  const minRet = valid[0].ret;
-  const maxRet = valid[valid.length - 1].ret;
-  const buckets = 30;
-  const step = buckets > 1 ? (maxRet - minRet) / (buckets - 1 || 1) : 0;
-  const frontier = [];
-
-  for (let i = 0; i < buckets; i++) {
-    const target = minRet + step * i;
-    const candidates = valid.filter((item) => Math.abs(item.ret - target) <= Math.max(step * 0.65, 0.0025));
-    const best = (candidates.length ? candidates : valid).slice().sort((a, b) => Math.abs(a.ret - target) - Math.abs(b.ret - target) || a.vol - b.vol)[0];
-    if (!best) continue;
-    const last = frontier[frontier.length - 1];
-    if (!last || Math.abs(last.vol - best.vol) > 0.0005 || Math.abs(last.ret - best.ret) > 0.0005) {
-      frontier.push({ x: best.vol * 100, y: best.ret * 100 });
-    }
+function optimizePortfolio({ objective, initialWeights, meanReturns, covMatrix, rf, minWeight, targetReturn = null }) {
+  const starts = [initialWeights.slice()];
+  if (initialWeights.length > 1) {
+    starts.push(...Array.from({ length: 7 }, () => projectWeightsToBounds(sampleDirichletWeights(initialWeights.length), minWeight)));
   }
 
-  return frontier;
+  let best = null;
+  for (const start of starts) {
+    const candidate = runProjectedOptimizer(start, { objective, meanReturns, covMatrix, rf, minWeight, targetReturn });
+    if (!best || candidate.score < best.score) best = candidate;
+  }
+
+  const tolerance = targetReturn == null ? 1e-4 : 0.0025;
+  return {
+    success: !!best && Number.isFinite(best.score) && (targetReturn == null || Math.abs(best.ret - targetReturn) <= tolerance),
+    x: best ? best.weights.slice() : initialWeights.slice(),
+    score: best ? best.score : Number.POSITIVE_INFINITY,
+  };
 }
 
-function optimizeMinVariancePortfolio(meanReturns, covMatrix, rf, minWeight) {
-  const numAssets = meanReturns.length;
-  let weights = Array(numAssets).fill(1 / numAssets);
-  let best = { weights: weights.slice(), ...portfolioStats(weights, meanReturns, covMatrix, rf) };
-  let step = 0.12;
+function runProjectedOptimizer(startWeights, config) {
+  const { objective, meanReturns, covMatrix, rf, minWeight, targetReturn } = config;
+  let weights = projectWeightsToBounds(startWeights, minWeight);
+  let current = evaluateOptimizerCandidate(weights, objective, meanReturns, covMatrix, rf, targetReturn);
+  let best = { ...current, weights: weights.slice() };
+  let step = objective === 'negSharpe' ? 0.18 : 0.12;
 
-  for (let iter = 0; iter < 2400; iter++) {
-    const gradient = covarianceGradient(weights, covMatrix);
-    const candidate = projectWeightsToBounds(weights.map((value, index) => value - step * gradient[index]), minWeight);
-    const stats = portfolioStats(candidate, meanReturns, covMatrix, rf);
-    if (stats.vol < best.vol) best = { weights: candidate.slice(), ...stats };
-    weights = candidate;
-    step *= 0.997;
+  for (let iter = 0; iter < 2200; iter++) {
+    const gradient = optimizerGradient(weights, objective, meanReturns, covMatrix, rf, targetReturn);
+    let improved = false;
+
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const candidateWeights = projectWeightsToBounds(
+        weights.map((value, index) => value - step * gradient[index]),
+        minWeight
+      );
+      const candidate = evaluateOptimizerCandidate(candidateWeights, objective, meanReturns, covMatrix, rf, targetReturn);
+      if (candidate.score + 1e-10 < current.score) {
+        weights = candidateWeights;
+        current = candidate;
+        improved = true;
+        if (candidate.score < best.score) best = { ...candidate, weights: candidateWeights.slice() };
+        step *= 1.02;
+        break;
+      }
+      step *= 0.5;
+    }
+
+    if (!improved) {
+      const jitteredWeights = projectWeightsToBounds(
+        weights.map((value, index) => value + ((Math.random() - 0.5) * 0.02 * (index % 2 === 0 ? 1 : -1))),
+        minWeight
+      );
+      const jittered = evaluateOptimizerCandidate(jitteredWeights, objective, meanReturns, covMatrix, rf, targetReturn);
+      if (jittered.score < current.score) {
+        weights = jitteredWeights;
+        current = jittered;
+        if (jittered.score < best.score) best = { ...jittered, weights: jitteredWeights.slice() };
+      }
+    }
   }
 
   return best;
 }
 
-function optimizeTargetReturnPortfolio(meanReturns, covMatrix, rf, minWeight, targetReturn) {
-  const numAssets = meanReturns.length;
-  let weights = Array(numAssets).fill(1 / numAssets);
-  let best = null;
-  let step = 0.08;
-  const penalty = 1400;
-
-  for (let iter = 0; iter < 3200; iter++) {
-    const ret = dot(weights, meanReturns);
-    const baseGradient = covarianceGradient(weights, covMatrix);
-    const penaltyGradient = meanReturns.map((value) => 2 * penalty * (ret - targetReturn) * value);
-    const gradient = baseGradient.map((value, index) => value + penaltyGradient[index]);
-    const candidate = projectWeightsToBounds(weights.map((value, index) => value - step * gradient[index]), minWeight);
-    const stats = portfolioStats(candidate, meanReturns, covMatrix, rf);
-    const score = stats.vol + Math.abs(stats.ret - targetReturn) * 20;
-    if (!best || score < best.score) {
-      best = { weights: candidate.slice(), score, ...stats };
-    }
-    weights = candidate;
-    step *= 0.998;
+function evaluateOptimizerCandidate(weights, objective, meanReturns, covMatrix, rf, targetReturn) {
+  const stats = portfolioStats(weights, meanReturns, covMatrix, rf);
+  let score = objective === 'negSharpe' ? -stats.sharpe : stats.vol;
+  if (targetReturn != null) {
+    score += 1800 * Math.pow(stats.ret - targetReturn, 2);
   }
-
-  return best || { weights: Array(numAssets).fill(1 / numAssets), ...portfolioStats(Array(numAssets).fill(1 / numAssets), meanReturns, covMatrix, rf) };
+  return { ...stats, score };
 }
 
-function buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, minVolReturn) {
-  const minTarget = Math.min(...meanReturns);
-  const maxTarget = Math.max(...meanReturns);
-  const count = 72;
+function optimizerGradient(weights, objective, meanReturns, covMatrix, rf, targetReturn) {
+  const stats = portfolioStats(weights, meanReturns, covMatrix, rf);
+  const safeVol = Math.max(stats.vol, 1e-10);
+  const covTimesWeights = multiplyMatrixVector(covMatrix, weights);
+  let gradient;
+
+  if (objective === 'negSharpe') {
+    gradient = meanReturns.map((assetReturn, index) => -((assetReturn / safeVol) - (((stats.ret - rf) * covTimesWeights[index]) / Math.pow(safeVol, 3))));
+  } else {
+    gradient = covTimesWeights.map((value) => value / safeVol);
+  }
+
+  if (targetReturn != null) {
+    const penaltyGradient = meanReturns.map((assetReturn) => 3600 * (stats.ret - targetReturn) * assetReturn);
+    gradient = gradient.map((value, index) => value + penaltyGradient[index]);
+  }
+
+  return gradient;
+}
+
+function buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, w0) {
+  const returnsRange = linspace(Math.min(...meanReturns), Math.max(...meanReturns), 100);
   const frontier = [];
 
-  for (let i = 0; i < count; i++) {
-    const target = minTarget + ((maxTarget - minTarget) * i / (count - 1));
-    const solution = optimizeTargetReturnPortfolio(meanReturns, covMatrix, rf, minWeight, target);
-    if (!Number.isFinite(solution?.vol) || !Number.isFinite(solution?.ret)) continue;
-    const last = frontier[frontier.length - 1];
-    if (!last || Math.abs(last.vol - solution.vol) > 0.0003 || Math.abs(last.ret - solution.ret) > 0.0003) {
-      frontier.push(solution);
-    }
-  }
+  returnsRange.forEach((target) => {
+    const solution = optimizePortfolio({
+      objective: 'minVol',
+      initialWeights: w0,
+      meanReturns,
+      covMatrix,
+      rf,
+      minWeight,
+      targetReturn: target,
+    });
+    if (!solution.success) return;
+    frontier.push({ ...portfolioStats(solution.x, meanReturns, covMatrix, rf), weights: solution.x.slice() });
+  });
 
-  frontier.sort((a, b) => a.ret - b.ret || a.vol - b.vol);
-  return frontier.filter((item) => item.ret >= (minVolReturn - 0.08));
+  return frontier;
 }
 
-function covarianceGradient(weights, covMatrix) {
-  const gradient = Array(weights.length).fill(0);
-  for (let i = 0; i < weights.length; i++) {
-    let total = 0;
-    for (let j = 0; j < weights.length; j++) total += covMatrix[i][j] * weights[j];
-    gradient[i] = 2 * total;
-  }
-  return gradient;
+function multiplyMatrixVector(matrix, vector) {
+  return matrix.map((row) => row.reduce((sum, value, index) => sum + value * vector[index], 0));
+}
+
+function linspace(start, end, count) {
+  if (count <= 1) return [start];
+  return Array.from({ length: count }, (_, index) => start + ((end - start) * index / (count - 1)));
 }
 
 function projectWeightsToBounds(values, minWeight) {
@@ -5636,26 +6625,39 @@ function renderOptimizerFrontier(model) {
   ];
   const scatterX = randomData.map((p) => p.x).sort((a, b) => a - b);
   const scatterY = randomData.map((p) => p.y).sort((a, b) => a - b);
-  const xMin = Math.max(0, percentile(scatterX, 0.01) * 0.85);
-  const xMax = Math.max(...points.map((p) => p.x), percentile(scatterX, 0.995)) * 1.02;
-  const yMin = Math.min(percentile(scatterY, 0.005), model.rf * 100, ...model.frontier.map((p) => p.y)) * 0.92;
-  const yMax = Math.max(percentile(scatterY, 0.995), ...model.frontier.map((p) => p.y), model.maxSharpe.ret * 100) * 1.05;
+  const rawXMin = 0;
+  const rawXMax = Math.max(percentile(scatterX, 0.995), ...points.map((p) => p.x)) * 1.04;
+  const rawYMin = Math.max(0, Math.min(percentile(scatterY, 0.005), model.rf * 100, ...points.map((p) => p.y)) * 0.92);
+  const rawYMax = Math.max(percentile(scatterY, 0.995), ...points.map((p) => p.y)) * 1.06;
+  const xTicks = buildNiceTicks(rawXMin, rawXMax, 6);
+  const yTicks = buildNiceTicks(rawYMin, rawYMax, 6);
+  const xMin = xTicks[0];
+  const xMax = xTicks[xTicks.length - 1];
+  const yMin = yTicks[0];
+  const yMax = yTicks[yTicks.length - 1];
   const sharpeValues = randomData.map((p) => p.sharpe);
   const minSharpe = Math.min(...sharpeValues);
   const maxSharpe = Math.max(...sharpeValues);
   const sharpeLegendId = `optimizer-sharpe-gradient-${Date.now()}`;
-  const margin = { top: 48, right: 96, bottom: 62, left: 74 };
+  const margin = { top: 88, right: 118, bottom: 88, left: 88 };
   const scaleX = (value) => margin.left + ((value - xMin) / ((xMax - xMin) || 1)) * (width - margin.left - margin.right);
   const scaleY = (value) => height - margin.bottom - ((value - yMin) / ((yMax - yMin) || 1)) * (height - margin.top - margin.bottom);
-  const frontierPath = buildSmoothSvgPath(model.frontier.map((point) => ({ x: scaleX(point.x), y: scaleY(point.y) })));
-  const cmlStart = { x: 0, y: model.rf * 100 };
+  const frontierPath = buildLinearSvgPath(model.frontier.map((point) => ({ x: scaleX(point.x), y: scaleY(point.y) })));
+  const cmlXStart = 0;
+  const cmlYStart = model.rf * 100;
   const cmlMaxX = (((yMax / 100) - model.rf) / Math.max(model.maxSharpe.sharpe, 0.0001)) * 100;
-  const cmlTargetX = Math.min(xMax, cmlMaxX);
+  const cmlTargetX = Math.max(xMin, Math.min(xMax, cmlMaxX));
+  const cmlStart = { x: cmlXStart, y: Math.max(yMin, Math.min(yMax, cmlYStart)) };
   const cmlEnd = { x: cmlTargetX, y: (model.rf + model.maxSharpe.sharpe * (cmlTargetX / 100)) * 100 };
   const cmlPath = `M ${scaleX(cmlStart.x).toFixed(2)} ${scaleY(cmlStart.y).toFixed(2)} L ${scaleX(cmlEnd.x).toFixed(2)} ${scaleY(cmlEnd.y).toFixed(2)}`;
-  const scatterDots = randomData.slice(0, 9000).map((point) => `<circle cx="${scaleX(point.x).toFixed(2)}" cy="${scaleY(point.y).toFixed(2)}" r="1.65" fill="${optimizerSharpeColor(point.sharpe, minSharpe, maxSharpe)}" />`).join('');
-  const xTicks = buildLinearTicks(xMin, xMax, 6);
-  const yTicks = buildLinearTicks(yMin, yMax, 6);
+  const scatterDots = randomData
+    .filter((_, index) => index % Math.max(1, Math.ceil(randomData.length / 12000)) === 0)
+    .map((point) => `<circle cx="${scaleX(point.x).toFixed(2)}" cy="${scaleY(point.y).toFixed(2)}" r="1.65" fill="${optimizerSharpeColor(point.sharpe, minSharpe, maxSharpe)}" />`)
+    .join('');
+  const legendX = 24;
+  const legendY = 24;
+  const legendWidth = 178;
+  const legendHeight = model.targetPortfolio ? 116 : 96;
 
   canvas.innerHTML = `
     <div class="optimizer-svg-shell">
@@ -5669,25 +6671,25 @@ function renderOptimizerFrontier(model) {
             </linearGradient>
           </defs>
           <rect x="0" y="0" width="${width}" height="${height}" fill="transparent" />
-          ${xTicks.map((tick) => `<g><line x1="${scaleX(tick)}" y1="${margin.top}" x2="${scaleX(tick)}" y2="${height - margin.bottom}" stroke="rgba(15,23,42,0.08)" /><text x="${scaleX(tick)}" y="${height - 18}" font-size="11" text-anchor="middle" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
-          ${yTicks.map((tick) => `<g><line x1="${margin.left}" y1="${scaleY(tick)}" x2="${width - margin.right}" y2="${scaleY(tick)}" stroke="rgba(15,23,42,0.08)" /><text x="${margin.left - 10}" y="${scaleY(tick) + 4}" font-size="11" text-anchor="end" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
+          ${xTicks.map((tick) => `<g><line x1="${scaleX(tick)}" y1="${margin.top}" x2="${scaleX(tick)}" y2="${height - margin.bottom}" stroke="rgba(15,23,42,0.08)" /><text x="${scaleX(tick)}" y="${height - 34}" font-size="11" text-anchor="middle" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
+          ${yTicks.map((tick) => `<g><line x1="${margin.left}" y1="${scaleY(tick)}" x2="${width - margin.right}" y2="${scaleY(tick)}" stroke="rgba(15,23,42,0.08)" /><text x="${margin.left - 14}" y="${scaleY(tick) + 4}" font-size="11" text-anchor="end" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
           ${scatterDots}
           <path d="${frontierPath}" fill="none" stroke="#1f5eff" stroke-width="3" />
           <path d="${cmlPath}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" />
           ${renderOptimizerStar(scaleX(model.maxSharpe.vol * 100), scaleY(model.maxSharpe.ret * 100), '#e0b100', 11)}
           ${renderOptimizerMarker(scaleX(model.minVol.vol * 100), scaleY(model.minVol.ret * 100), '#ef4444', 6.5)}
           ${model.targetPortfolio ? renderOptimizerDiamond(scaleX(model.targetPortfolio.vol * 100), scaleY(model.targetPortfolio.ret * 100), '#157347', 7) : ''}
-          <g transform="translate(24, 22)">
-            <rect x="0" y="0" width="154" height="96" rx="12" fill="rgba(255,255,255,0.86)" stroke="rgba(15,23,42,0.08)" />
+          <g transform="translate(${legendX}, ${legendY})">
+            <rect x="0" y="0" width="${legendWidth}" height="${legendHeight}" rx="12" fill="rgba(255,255,255,0.92)" stroke="rgba(15,23,42,0.08)" />
             <g transform="translate(14,18)">
               <line x1="0" y1="0" x2="24" y2="0" stroke="#1f5eff" stroke-width="3" />
               <text x="34" y="4" font-size="12" fill="#334155">${t('optimizer_frontier_line')}</text>
               <path d="M 0 22 L 24 22" stroke="#dc2626" stroke-width="2" stroke-dasharray="7 5" />
               <text x="34" y="26" font-size="12" fill="#334155">${t('optimizer_frontier_cml')}</text>
               ${renderOptimizerStar(12, 46, '#e0b100', 10)}
-              <text x="34" y="50" font-size="12" fill="#334155">${t('optimizer_summary_max_sharpe')}</text>
+              <text x="34" y="50" font-size="12" fill="#334155">${currentLanguage === 'en' ? 'Optimal Sharpe' : 'Sharpe Óptimo'}</text>
               <circle cx="12" cy="70" r="6.5" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
-              <text x="34" y="74" font-size="12" fill="#334155">${t('optimizer_frontier_min_vol')}</text>
+              <text x="34" y="74" font-size="12" fill="#334155">${currentLanguage === 'en' ? 'Minimum Volatility' : 'Mínima Volatilidad'}</text>
             </g>
           </g>
           <g transform="translate(${width - 34}, ${margin.top + 8})">
@@ -5697,7 +6699,7 @@ function renderOptimizerFrontier(model) {
             <text x="18" y="10" font-size="10" fill="#64748b">${maxSharpe.toFixed(2)}</text>
           </g>
           <text x="${width / 2}" y="${height - 10}" font-size="13" text-anchor="middle" fill="#475569">${t('optimizer_frontier_vol_axis')}</text>
-          <text x="20" y="${height / 2}" font-size="13" text-anchor="middle" fill="#475569" transform="rotate(-90 20 ${height / 2})">${t('optimizer_frontier_ret_axis')}</text>
+          <text x="24" y="${height / 2}" font-size="13" text-anchor="middle" fill="#475569" transform="rotate(-90 24 ${height / 2})">${t('optimizer_frontier_ret_axis')}</text>
         </svg>
       </div>
     </div>
@@ -5724,22 +6726,18 @@ function renderOptimizerPerformance(model) {
     color: optimizerPalette(index),
     endValue: series.values[series.values.length - 1] || 0,
   }));
-  const highlightedAssets = enrichedAssets
-    .slice()
-    .sort((a, b) => Math.abs(b.endValue) - Math.abs(a.endValue))
-    .slice(0, Math.min(5, enrichedAssets.length))
-    .map((series) => series.label);
-
   renderOptimizerLineSvg(
     assetCanvas,
     enrichedAssets.map((series) => ({
       ...series,
-      highlighted: highlightedAssets.includes(series.label),
-      muted: !highlightedAssets.includes(series.label),
+      highlighted: true,
+      muted: false,
     })),
-    t('optimizer_assets_title'),
+    currentLanguage === 'en' ? 'Accumulated returns (%) by asset' : 'Rendimientos acumulados (%) de cada activo',
     {
-      subtitle: t('optimizer_assets_subtitle'),
+      subtitle: currentLanguage === 'en'
+        ? 'Adjusted-close cumulative growth for each downloaded asset.'
+        : 'Crecimiento acumulado desde precios ajustados para cada activo descargado.',
       legendMode: 'compact',
     }
   );
@@ -5752,9 +6750,11 @@ function renderOptimizerPerformance(model) {
       highlighted: true,
       muted: false,
     })),
-    t('optimizer_portfolios_title'),
+    currentLanguage === 'en' ? 'Accumulated returns (%) of optimal portfolios' : 'Rendimientos acumulados (%) de portafolios óptimos',
     {
-      subtitle: t('optimizer_portfolios_subtitle'),
+      subtitle: currentLanguage === 'en'
+        ? 'Evolution of the optimized portfolios built from the same return series.'
+        : 'Evolución de los portafolios óptimos construidos sobre la misma serie de retornos.',
       legendMode: 'labels',
     }
   );
@@ -5851,6 +6851,27 @@ function buildLinearTicks(min, max, count) {
   return ticks;
 }
 
+function buildNiceTicks(min, max, count = 6) {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [0];
+  if (min === max) return [min];
+  const span = Math.abs(max - min);
+  const roughStep = span / Math.max(1, count - 1);
+  const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+  const residual = roughStep / magnitude;
+  let niceResidual = 1;
+  if (residual > 5) niceResidual = 10;
+  else if (residual > 2) niceResidual = 5;
+  else if (residual > 1) niceResidual = 2;
+  const step = niceResidual * magnitude;
+  const niceMin = Math.floor(min / step) * step;
+  const niceMax = Math.ceil(max / step) * step;
+  const ticks = [];
+  for (let value = niceMin; value <= niceMax + step * 0.5; value += step) {
+    ticks.push(Number(value.toFixed(10)));
+  }
+  return ticks;
+}
+
 function percentile(sortedValues, ratio) {
   if (!sortedValues.length) return 0;
   const index = Math.min(sortedValues.length - 1, Math.max(0, ratio * (sortedValues.length - 1)));
@@ -5875,6 +6896,11 @@ function buildSmoothSvgPath(points) {
   const last = points[points.length - 1];
   path += ` T ${last.x.toFixed(2)} ${last.y.toFixed(2)}`;
   return path;
+}
+
+function buildLinearSvgPath(points) {
+  if (!points.length) return '';
+  return points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(' ');
 }
 
 function renderOptimizerMarker(x, y, color, radius) {
@@ -5905,7 +6931,41 @@ function renderOptimizerCagr(model) {
   const el = document.getElementById('optimizer-cagr');
   if (!el) return;
   const rows = model.cagrRows.map((row) => `<tr><td>${row.label}</td><td>${row.type === 'Activo' ? t('optimizer_type_asset') : t('optimizer_type_portfolio')}</td><td>${formatPct(row.cagr * 100, 2)}</td></tr>`).join('');
-  el.innerHTML = `<div class="optimizer-table-wrap"><table class="optimizer-table"><thead><tr><th>${t('optimizer_cagr_asset_portfolio')}</th><th>${t('optimizer_cagr_type')}</th><th>${t('optimizer_cagr_annual')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const bars = model.cagrRows.map((row, index) => ({
+    ...row,
+    color: row.type === 'Activo'
+      ? optimizerPalette(index)
+      : (row.label.includes('Objetivo') || row.label.includes('Target') ? '#157347' : row.label.includes('Sharpe') ? '#e0b100' : '#e25555'),
+  }));
+  const width = 640;
+  const height = 300;
+  const margin = { top: 36, right: 18, bottom: 96, left: 56 };
+  const yMax = Math.max(...bars.map((bar) => bar.cagr * 100), 0);
+  const scaleY = (value) => height - margin.bottom - ((value - 0) / ((yMax - 0) || 1)) * (height - margin.top - margin.bottom);
+  const barWidth = Math.max(18, ((width - margin.left - margin.right) / Math.max(bars.length, 1)) * 0.62);
+  const gap = ((width - margin.left - margin.right) / Math.max(bars.length, 1));
+
+  el.innerHTML = `
+    <div class="optimizer-table-wrap"><table class="optimizer-table"><thead><tr><th>${t('optimizer_cagr_asset_portfolio')}</th><th>${t('optimizer_cagr_type')}</th><th>${t('optimizer_cagr_annual')}</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="optimizer-svg-shell" style="margin-top:18px">
+      <div class="optimizer-svg-frame">
+        <svg class="optimizer-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid meet" aria-label="Comparación CAGR anual">
+          <text x="${width / 2}" y="22" font-size="16" font-weight="700" text-anchor="middle" fill="#0f172a">${currentLanguage === 'en' ? 'Annual CAGR comparison' : 'Comparación CAGR anual Activos y Portfolios'}</text>
+          ${buildLinearTicks(0, yMax, 5).map((tick) => `<g><line x1="${margin.left}" y1="${scaleY(tick)}" x2="${width - margin.right}" y2="${scaleY(tick)}" stroke="rgba(15,23,42,0.08)" /><text x="${margin.left - 10}" y="${scaleY(tick) + 4}" font-size="11" text-anchor="end" fill="#64748b">${tick.toFixed(1)}%</text></g>`).join('')}
+          ${bars.map((bar, index) => {
+            const x = margin.left + (index * gap) + ((gap - barWidth) / 2);
+            const y = scaleY(bar.cagr * 100);
+            const heightValue = Math.max(0, height - margin.bottom - y);
+            return `
+              <rect x="${x}" y="${y}" width="${barWidth}" height="${heightValue}" rx="6" fill="${bar.color}" opacity="${bar.type === 'Activo' ? 0.88 : 1}" />
+              <text x="${x + barWidth / 2}" y="${y - 6}" font-size="10" text-anchor="middle" fill="#475569">${(bar.cagr * 100).toFixed(2)}%</text>
+              <text x="${x + barWidth / 2}" y="${height - margin.bottom + 14}" font-size="10" text-anchor="end" fill="#475569" transform="rotate(-45 ${x + barWidth / 2} ${height - margin.bottom + 14})">${bar.label}</text>
+            `;
+          }).join('')}
+        </svg>
+      </div>
+    </div>
+  `;
 }
 
 function renderOptimizerCorrelation(model) {
@@ -5976,8 +7036,10 @@ function renderOptimizerCorrelation(model) {
 
 function optimizerCorrelationColor(value) {
   const clamped = Math.max(0, Math.min(1, value));
-  const red = 255;
-  const green = Math.round(220 - clamped * 160);
-  const blue = Math.round(220 - clamped * 180);
+  const start = { r: 173, g: 216, b: 230 };
+  const end = { r: 255, g: 0, b: 0 };
+  const red = Math.round(start.r + (end.r - start.r) * clamped);
+  const green = Math.round(start.g + (end.g - start.g) * clamped);
+  const blue = Math.round(start.b + (end.b - start.b) * clamped);
   return `rgb(${red}, ${green}, ${blue})`;
 }
