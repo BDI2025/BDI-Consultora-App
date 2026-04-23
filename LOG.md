@@ -3896,6 +3896,22 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - evaluar en una etapa posterior si conviene quitar tambien los fallbacks legacy de `app.js` una vez que la nueva capa quede considerada definitiva.
 - Siguiente paso sugerido:
   - hacer una ultima prueba visual rapida de `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Mi cartera`, y si sigue todo bien, dar por cerrada la migracion de metadata manual de renta fija.
+
+## 2026-04-23 20:02:00 -03:00
+- Accion: correccion de routing del endpoint `Heatmap` para despliegue en Netlify.
+- Archivos afectados:
+  - `rendimientos-ar/netlify.toml`
+  - `LOG.md`
+- Motivo: el usuario reporto `Error al cargar heatmap: HTTP 404` en todos los universos; la investigacion mostro que `/api/heatmap` existia en `server.js` y en `netlify/functions/heatmap.js`, pero faltaba el redirect correspondiente en Netlify.
+- Resultado:
+  - se agrego el redirect `from = "/api/heatmap"` hacia `/.netlify/functions/heatmap`;
+  - esto alinea el deploy de Netlify con el comportamiento local de `server.js`.
+- Decisiones tomadas:
+  - corregir solo la capa de routing, sin tocar la logica del provider ni el frontend del heatmap.
+- Pendientes:
+  - redeploy en Netlify o reinicio del entorno que use `netlify.toml` para que tome la nueva regla.
+- Siguiente paso sugerido:
+  - disparar un nuevo deploy y probar otra vez `USA`, `Argentina ARS` y `Argentina USD`.
 - Pendientes:
   - migrar `cer` y `lecaps` a la misma capa;
   - cuando todas las familias esten migradas, evaluar una limpieza controlada de `config.json`.
