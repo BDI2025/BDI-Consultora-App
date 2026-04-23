@@ -3912,6 +3912,22 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - redeploy en Netlify o reinicio del entorno que use `netlify.toml` para que tome la nueva regla.
 - Siguiente paso sugerido:
   - disparar un nuevo deploy y probar otra vez `USA`, `Argentina ARS` y `Argentina USD`.
+
+## 2026-04-23 20:10:00 -03:00
+- Accion: mejora de precision visual en los porcentajes del `Heatmap`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `LOG.md`
+- Motivo: el usuario pidio que los tiles grandes muestren mas precision en la variacion porcentual, pasando de formato `x.x%` a `x.xx%` cuando hay espacio suficiente.
+- Resultado:
+  - los tiles grandes del heatmap ahora usan `2` decimales para la variacion;
+  - los tiles mas chicos conservan el formato compacto de `1` decimal para no saturar visualmente el mapa.
+- Decisiones tomadas:
+  - aplicar la logica solo al label interno del tile, sin tocar tooltip ni contratos de datos.
+- Pendientes:
+  - validar visualmente si el umbral de tamaño elegido se siente correcto o si conviene hacerlo un poco mas estricto.
+- Siguiente paso sugerido:
+  - refrescar el heatmap y revisar especialmente empresas grandes como las mega caps o los bancos principales.
 - Pendientes:
   - migrar `cer` y `lecaps` a la misma capa;
   - cuando todas las familias esten migradas, evaluar una limpieza controlada de `config.json`.

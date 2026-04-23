@@ -4801,17 +4801,19 @@ function renderHeatmap(data) {
           const showMiniTicker = !showLabelBlock && tiny && tw > 44 && th > 24;
           const tileStroke = area > 6000 ? 'rgba(6, 10, 18, 0.56)' : 'rgba(6, 10, 18, 0.42)';
           const labelShadow = 'paint-order: stroke; stroke: rgba(8, 12, 20, 0.22); stroke-width: 1.3;';
+          const changeDecimals = huge || (showLabelBlock && tw > 150 && th > 84) ? 2 : 1;
+          const changeLabel = `${tile.change > 0 ? '+' : ''}${tile.change.toFixed(changeDecimals)}%`;
           return `
             <g class="heatmap-tile" data-heatmap-tile="true" data-ticker="${escapeHtml(tile.ticker)}" data-name="${escapeHtml(tile.name || tile.ticker)}" data-sector="${escapeHtml(tile.sector || '')}" data-industry="${escapeHtml(tile.industry || '')}" data-price="${tile.price || 0}" data-change="${tile.change || 0}" data-market-cap="${tile.marketCap || 0}" data-size-value="${tile.sizeValue || tile.marketCap || 0}" data-size-label="${escapeHtml(tile.sizeLabel || 'Market cap')}" data-size-currency="${escapeHtml(tile.sizeCurrency || 'USD')}">
               <rect class="heatmap-tile-main" x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" width="${tw.toFixed(2)}" height="${th.toFixed(2)}" rx="4.5" fill="${heatmapColor(tile.change)}" stroke="${tileStroke}" stroke-width="0.9"></rect>
               <rect class="heatmap-tile-sheen" x="${tx.toFixed(2)}" y="${ty.toFixed(2)}" width="${tw.toFixed(2)}" height="${Math.max(5, th * 0.16).toFixed(2)}" rx="4.5" fill="rgba(255,255,255,0.04)"></rect>
               ${showLabelBlock ? `
                 <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 - 4).toFixed(2)}" text-anchor="middle" font-size="${symbolSize}" font-weight="700" fill="#ffffff" style="${labelShadow}">${tile.ticker}</text>
-                <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 + (huge ? 24 : 16)).toFixed(2)}" text-anchor="middle" font-size="${changeSize}" font-weight="700" fill="rgba(255,255,255,0.96)" style="${labelShadow}">${tile.change > 0 ? '+' : ''}${tile.change.toFixed(1)}%</text>
+                <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 + (huge ? 24 : 16)).toFixed(2)}" text-anchor="middle" font-size="${changeSize}" font-weight="700" fill="rgba(255,255,255,0.96)" style="${labelShadow}">${changeLabel}</text>
               ` : showMiniTicker && showTicker ? `
                 <text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th / 2 + 3).toFixed(2)}" text-anchor="middle" font-size="${symbolSize}" font-weight="700" fill="#ffffff" style="${labelShadow}">${tile.ticker}</text>
               ` : ''}
-              ${showChange && !showLabelBlock ? `<text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th - 7).toFixed(2)}" text-anchor="middle" font-size="7.8" font-weight="700" fill="rgba(255,255,255,0.94)" style="${labelShadow}">${tile.change > 0 ? '+' : ''}${tile.change.toFixed(1)}%</text>` : ''}
+              ${showChange && !showLabelBlock ? `<text x="${(tx + tw / 2).toFixed(2)}" y="${(ty + th - 7).toFixed(2)}" text-anchor="middle" font-size="7.8" font-weight="700" fill="rgba(255,255,255,0.94)" style="${labelShadow}">${changeLabel}</text>` : ''}
             </g>
           `;
         }).join('');
