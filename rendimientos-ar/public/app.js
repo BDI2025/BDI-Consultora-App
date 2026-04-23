@@ -649,7 +649,7 @@ function getLogoForItem(item) {
   if (ENTITY_LOGOS[item.nombre]) return ENTITY_LOGOS[item.nombre];
   // Match Ualá variants
   if (item.nombre && item.nombre.startsWith('Ualá')) return ENTITY_LOGOS['Ualá'];
-  // Match COCOS
+  // Match exact broker name
   if (item.nombre && item.nombre.toUpperCase() === 'COCOS') return ENTITY_LOGOS['COCOS'];
   return null;
 }
@@ -1392,7 +1392,7 @@ async function loadLecaps() {
       fetch('/api/lecaps').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] }))
     ]);
 
-    const lecaps = config.lecaps;
+    const lecaps = getLecapMetadataConfig(config);
     if (!lecaps || !lecaps.letras || !lecaps.letras.length) {
       container.innerHTML = '<div class="loading">No se pudieron cargar los datos de LECAPs.</div>';
       return;
@@ -1659,7 +1659,7 @@ async function loadSoberanos() {
       fetch('/api/soberanos').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] }))
     ]);
 
-    const soberanos = config.soberanos || {};
+    const soberanos = getSovereignMetadataMap(config);
     const bondPrices = apiRes.data || [];
 
     if (!bondPrices.length) {
@@ -2687,7 +2687,7 @@ async function loadCER() {
       fetch('/api/cer-precios').then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] }))
     ]);
 
-    const bonosCER = config.bonos_cer || {};
+    const bonosCER = getCerMetadataMap(config);
     const cerActual = cerData?.cer || 0; // CER T-10 para cálculos
     const cerUltimoPublicado = cerUltimo?.cer || 0; // Último CER para mostrar en UI
     const fechaUltimoCER = cerUltimo?.fecha || '';
@@ -3606,12 +3606,36 @@ async function getPortfolioConfig() {
   return _portfolioConfig;
 }
 
+function getSovereignMetadataMap(config) {
+  return window.BDIFixedIncomeData?.soberanos?.adapters?.getConfigMap?.()
+    || config?.soberanos
+    || {};
+}
+
+function getCerMetadataMap(config) {
+  return window.BDIFixedIncomeData?.cer?.adapters?.getConfigMap?.()
+    || config?.bonos_cer
+    || {};
+}
+
+function getLecapMetadataConfig(config) {
+  return window.BDIFixedIncomeData?.lecaps?.adapters?.getConfig?.()
+    || config?.lecaps
+    || { letras: [] };
+}
+
+function getLecapMetadataByTicker(config, ticker) {
+  return window.BDIFixedIncomeData?.lecaps?.adapters?.getByTicker?.(ticker)
+    || (config?.lecaps?.letras || []).find((item) => item.ticker === ticker)
+    || null;
+}
+
 function getTickersForType(config, type) {
   switch (type) {
-    case 'soberano': return Object.keys(config.soberanos || {});
+    case 'soberano': return Object.keys(getSovereignMetadataMap(config));
     case 'on': return Object.keys(config.ons || {});
-    case 'cer': return Object.keys(config.bonos_cer || {});
-    case 'lecap': return (config.lecaps?.letras || []).filter(l => l.activo).map(l => l.ticker);
+    case 'cer': return Object.keys(getCerMetadataMap(config));
+    case 'lecap': return (getLecapMetadataConfig(config).letras || []).filter(l => l.activo).map(l => l.ticker);
     case 'fci': return (config.fcis || []).filter(f => f.activo).map(f => f.nombre);
     case 'garantizado': return [...(config.garantizados || []), ...(config.especiales || [])].filter(g => g.activo).map(g => g.nombre);
     case 'cash': return ['USD', 'ARS'];
@@ -4270,7 +4294,7 @@ async function renderPortfolioCashflows(config) {
     const qty = parseFloat(holding.quantity) || 0;
 
     if (holding.asset_type === 'soberano') {
-      const bond = config.soberanos?.[holding.ticker];
+      const bond = getSovereignMetadataMap(config)?.[holding.ticker];
       if (!bond?.flujos) continue;
       for (const f of bond.flujos) {
         const fecha = typeof f.fecha === 'string' ? parseLocalDate(f.fecha) : f.fecha;
@@ -4290,7 +4314,7 @@ async function renderPortfolioCashflows(config) {
     }
 
     if (holding.asset_type === 'cer' && cerActual) {
-      const bond = config.bonos_cer?.[holding.ticker];
+      const bond = getCerMetadataMap(config)?.[holding.ticker];
       if (!bond?.flujos) continue;
       const coefCER = cerActual / (bond.cer_emision || 1);
       let amortAcum = 0;
@@ -4306,7 +4330,7 @@ async function renderPortfolioCashflows(config) {
     }
 
     if (holding.asset_type === 'lecap') {
-      const lecap = (config.lecaps?.letras || []).find(l => l.ticker === holding.ticker);
+      const lecap = getLecapMetadataByTicker(config, holding.ticker);
       if (!lecap) continue;
       const fecha = parseLocalDate(lecap.fecha_vencimiento);
       if (fecha <= today) continue;
@@ -5679,68 +5703,56 @@ function buildCompoundLabel(monthIndex) {
   return years === 1 ? '1 a\u00f1o' : `${years.toFixed(years % 1 === 0 ? 0 : 1)} a\u00f1os`;
 }
 
-function getEffectiveMonthlyRate(annualRatePct, frequencyPerYear) {
-  const annualRate = annualRatePct / 100;
-  if (!Number.isFinite(annualRate) || !Number.isFinite(frequencyPerYear) || frequencyPerYear <= 0) return 0;
-  if (annualRate <= -1) return -1;
-  const effectiveAnnual = Math.pow(1 + annualRate / frequencyPerYear, frequencyPerYear) - 1;
-  return Math.pow(1 + effectiveAnnual, 1 / 12) - 1;
-}
-
-function runCompoundScenario({ initial, contribution, years, annualRatePct, frequency }) {
-  const months = Math.max(1, Math.round(years * 12));
-  const monthlyRate = getEffectiveMonthlyRate(annualRatePct, frequency);
-  const series = [];
-  let cashOnly = initial;
-  let invested = initial;
-
-  series.push({ month: 0, cash: cashOnly, invested });
-
-  for (let month = 1; month <= months; month += 1) {
-    cashOnly += contribution;
-    invested = invested * (1 + monthlyRate) + contribution;
-    series.push({ month, cash: cashOnly, invested });
-  }
-
-  const contributed = initial + contribution * months;
-  const finalValue = series[series.length - 1]?.invested || 0;
-  const finalCash = series[series.length - 1]?.cash || 0;
-
-  return {
-    annualRatePct,
-    contributed,
-    finalCash,
-    finalValue,
-    earnedInterest: finalValue - contributed,
-    diffVsCash: finalValue - finalCash,
-    series,
-  };
-}
-
 function renderCompoundSummary(results) {
   const summaryEl = document.getElementById('compound-summary');
   if (!summaryEl) return;
+  const viewModels = window.BDICompoundViewModels;
+  const model = viewModels?.buildCompoundSummaryModel?.(results) || {
+    years: results.years,
+    cards: [
+      { kind: 'contributed', contributed: results.base.contributed },
+      { kind: 'cash', finalCash: results.base.finalCash },
+      { kind: 'base', finalValue: results.base.finalValue, annualRatePct: results.base.annualRatePct, earnedInterest: results.base.earnedInterest },
+      { kind: 'range', lowFinalValue: results.low.finalValue, highFinalValue: results.high.finalValue, lowAnnualRatePct: results.low.annualRatePct, highAnnualRatePct: results.high.annualRatePct },
+    ],
+  };
   summaryEl.innerHTML = `
-    <article class="compound-summary-card">
-      <div class="label">${t('compound_summary_contributed')}</div>
-      <div class="value">${formatCompoundCurrency(results.base.contributed)}</div>
-      <div class="meta">${results.years} ${currentLanguage === 'en' ? 'years horizon' : 'años de horizonte'}</div>
-    </article>
-    <article class="compound-summary-card">
-      <div class="label">${t('compound_summary_without')}</div>
-      <div class="value">${formatCompoundCurrency(results.base.finalCash)}</div>
-      <div class="meta">${t('compound_chart_cash')}</div>
-    </article>
-    <article class="compound-summary-card">
-      <div class="label">${t('compound_summary_base')}</div>
-      <div class="value">${formatCompoundCurrency(results.base.finalValue)}</div>
-      <div class="meta">${formatCompoundPercent(results.base.annualRatePct)} · ${t('compound_summary_interest')}: ${formatCompoundCurrency(results.base.earnedInterest)}</div>
-    </article>
-    <article class="compound-summary-card">
-      <div class="label">${t('compound_summary_range')}</div>
-      <div class="value">${formatCompoundCurrency(results.low.finalValue)} - ${formatCompoundCurrency(results.high.finalValue)}</div>
-      <div class="meta">${formatCompoundPercent(results.low.annualRatePct)} / ${formatCompoundPercent(results.high.annualRatePct)}</div>
-    </article>
+    ${model.cards.map((card) => {
+      if (card.kind === 'contributed') {
+        return `
+          <article class="compound-summary-card">
+            <div class="label">${t('compound_summary_contributed')}</div>
+            <div class="value">${formatCompoundCurrency(card.contributed)}</div>
+            <div class="meta">${model.years} ${currentLanguage === 'en' ? 'years horizon' : 'años de horizonte'}</div>
+          </article>
+        `;
+      }
+      if (card.kind === 'cash') {
+        return `
+          <article class="compound-summary-card">
+            <div class="label">${t('compound_summary_without')}</div>
+            <div class="value">${formatCompoundCurrency(card.finalCash)}</div>
+            <div class="meta">${t('compound_chart_cash')}</div>
+          </article>
+        `;
+      }
+      if (card.kind === 'base') {
+        return `
+          <article class="compound-summary-card">
+            <div class="label">${t('compound_summary_base')}</div>
+            <div class="value">${formatCompoundCurrency(card.finalValue)}</div>
+            <div class="meta">${formatCompoundPercent(card.annualRatePct)} · ${t('compound_summary_interest')}: ${formatCompoundCurrency(card.earnedInterest)}</div>
+          </article>
+        `;
+      }
+      return `
+        <article class="compound-summary-card">
+          <div class="label">${t('compound_summary_range')}</div>
+          <div class="value">${formatCompoundCurrency(card.lowFinalValue)} - ${formatCompoundCurrency(card.highFinalValue)}</div>
+          <div class="meta">${formatCompoundPercent(card.lowAnnualRatePct)} / ${formatCompoundPercent(card.highAnnualRatePct)}</div>
+        </article>
+      `;
+    }).join('')}
   `;
 }
 
@@ -5748,13 +5760,17 @@ function renderCompoundBreakdown(results) {
   const breakdownEl = document.getElementById('compound-breakdown');
   const sectionEl = document.getElementById('compound-breakdown-section');
   if (!breakdownEl || !sectionEl) return;
-
-  const rows = [
-    { tone: 'cash', label: t('compound_chart_cash'), annualRatePct: 0, finalValue: results.base.finalCash, earnedInterest: results.base.finalCash - results.base.contributed, diffVsCash: 0 },
-    { tone: 'low', label: t('compound_low'), annualRatePct: results.low.annualRatePct, finalValue: results.low.finalValue, earnedInterest: results.low.earnedInterest, diffVsCash: results.low.diffVsCash },
-    { tone: 'base', label: t('compound_base'), annualRatePct: results.base.annualRatePct, finalValue: results.base.finalValue, earnedInterest: results.base.earnedInterest, diffVsCash: results.base.diffVsCash },
-    { tone: 'high', label: t('compound_high'), annualRatePct: results.high.annualRatePct, finalValue: results.high.finalValue, earnedInterest: results.high.earnedInterest, diffVsCash: results.high.diffVsCash },
-  ];
+  const viewModels = window.BDICompoundViewModels;
+  const model = viewModels?.buildCompoundBreakdownModel?.(results) || {
+    frequency: results.frequency,
+    contributed: results.base.contributed,
+    rows: [
+      { tone: 'cash', labelKey: 'compound_chart_cash', annualRatePct: 0, finalValue: results.base.finalCash, earnedInterest: results.base.finalCash - results.base.contributed, diffVsCash: 0 },
+      { tone: 'low', labelKey: 'compound_low', annualRatePct: results.low.annualRatePct, finalValue: results.low.finalValue, earnedInterest: results.low.earnedInterest, diffVsCash: results.low.diffVsCash },
+      { tone: 'base', labelKey: 'compound_base', annualRatePct: results.base.annualRatePct, finalValue: results.base.finalValue, earnedInterest: results.base.earnedInterest, diffVsCash: results.base.diffVsCash },
+      { tone: 'high', labelKey: 'compound_high', annualRatePct: results.high.annualRatePct, finalValue: results.high.finalValue, earnedInterest: results.high.earnedInterest, diffVsCash: results.high.diffVsCash },
+    ],
+  };
 
   breakdownEl.innerHTML = `
     <div class="compound-breakdown-wrap">
@@ -5770,11 +5786,11 @@ function renderCompoundBreakdown(results) {
           </tr>
         </thead>
         <tbody>
-          ${rows.map((row) => `
+          ${model.rows.map((row) => `
             <tr class="compound-breakdown-row compound-breakdown-row--${row.tone}">
-              <td class="compound-breakdown-scenario">${row.label}</td>
+              <td class="compound-breakdown-scenario">${t(row.labelKey)}</td>
               <td>${formatCompoundPercent(row.annualRatePct)}</td>
-              <td class="compound-breakdown-money">${formatCompoundCurrency(results.base.contributed)}</td>
+              <td class="compound-breakdown-money">${formatCompoundCurrency(model.contributed)}</td>
               <td class="compound-breakdown-money">${formatCompoundCurrency(row.finalValue)}</td>
               <td class="compound-breakdown-money">${formatCompoundCurrency(row.earnedInterest)}</td>
               <td class="compound-breakdown-money">${formatCompoundCurrency(row.diffVsCash)}</td>
@@ -5782,7 +5798,7 @@ function renderCompoundBreakdown(results) {
           `).join('')}
         </tbody>
       </table>
-      <p class="compound-chart-note">${t('compound_frequency_label')}: ${t(`compound_frequency_${results.frequency}`)}</p>
+      <p class="compound-chart-note">${t('compound_frequency_label')}: ${t(`compound_frequency_${model.frequency}`)}</p>
     </div>
   `;
 
@@ -5794,28 +5810,24 @@ function renderCompoundChart(results) {
   const wrap = document.getElementById('compound-chart-wrap');
   const empty = document.getElementById('compound-chart-empty');
   if (!container || !wrap || !empty) return;
+  const viewModels = window.BDICompoundViewModels;
+  const chartModel = viewModels?.buildCompoundChartModel?.(results) || null;
 
   const width = 920;
   const height = 520;
   const margin = { top: 22, right: 24, bottom: 58, left: 132 };
   const plotWidth = width - margin.left - margin.right;
   const plotHeight = height - margin.top - margin.bottom;
-
-  const allSeries = results.base.series.map((point, idx) => ({
+  const allSeries = chartModel?.allSeries || results.base.series.map((point, idx) => ({
     month: point.month,
     cash: point.cash,
     low: results.low.series[idx]?.invested ?? point.invested,
     base: point.invested,
     high: results.high.series[idx]?.invested ?? point.invested,
   }));
-
-  const maxMonth = allSeries[allSeries.length - 1]?.month || 1;
-  const allValues = allSeries.flatMap((point) => [point.cash, point.low, point.base, point.high]);
-  const minValue = Math.min(...allValues);
-  const maxValue = Math.max(...allValues);
-  const pad = Math.max((maxValue - minValue) * 0.08, Math.abs(maxValue) * 0.04, 1);
-  const yMin = minValue >= 0 ? 0 : minValue - pad;
-  const yMax = maxValue + pad;
+  const maxMonth = chartModel?.maxMonth || (allSeries[allSeries.length - 1]?.month || 1);
+  const yMin = chartModel?.yMin ?? Math.min(...allSeries.flatMap((point) => [point.cash, point.low, point.base, point.high]));
+  const yMax = chartModel?.yMax ?? Math.max(...allSeries.flatMap((point) => [point.cash, point.low, point.base, point.high]));
 
   const xScale = (month) => margin.left + (month / maxMonth) * plotWidth;
   const yScale = (value) => margin.top + plotHeight - ((value - yMin) / (yMax - yMin || 1)) * plotHeight;
@@ -5831,22 +5843,25 @@ function renderCompoundChart(results) {
     'Z',
   ].join(' ');
 
-  const xTicks = Array.from({ length: Math.min(results.years, 6) + 1 }, (_, idx) => {
+  const xTicks = chartModel?.xTicks || Array.from({ length: Math.min(results.years, 6) + 1 }, (_, idx) => {
     const year = Math.round((idx * maxMonth) / Math.min(results.years, 6));
     return Math.min(maxMonth, year);
   }).filter((value, idx, arr) => idx === 0 || value !== arr[idx - 1]);
 
-  const yTicks = Array.from({ length: 6 }, (_, idx) => yMin + ((yMax - yMin) / 5) * idx);
-  const lastPoint = allSeries[allSeries.length - 1];
+  const yTicks = chartModel?.yTicks || Array.from({ length: 6 }, (_, idx) => yMin + ((yMax - yMin) / 5) * idx);
+  const lastPoint = chartModel?.lastPoint || allSeries[allSeries.length - 1];
   const endX = xScale(lastPoint.month);
   const endCashY = yScale(lastPoint.cash);
   const endBaseY = yScale(lastPoint.base);
 
-  const legendItems = [
-    { color: '#64748b', label: t('compound_chart_cash') },
-    { color: '#94a3b8', label: t('compound_chart_band'), dashed: true },
-    { color: '#157347', label: `${t('compound_chart_invested')} · ${t('compound_base')}` },
-  ];
+  const legendItems = (chartModel?.legendItems || [
+    { color: '#64748b', labelKey: 'compound_chart_cash' },
+    { color: '#94a3b8', labelKey: 'compound_chart_band', dashed: true },
+    { color: '#157347', labelKey: 'compound_chart_invested', suffixKey: 'compound_base' },
+  ]).map((item) => ({
+    ...item,
+    label: item.suffixKey ? `${t(item.labelKey)} · ${t(item.suffixKey)}` : t(item.labelKey),
+  }));
 
   container.innerHTML = `
     <div class="optimizer-svg-shell">
@@ -5901,37 +5916,99 @@ function renderCompoundChart(results) {
   wrap.style.display = 'block';
 }
 
+function renderCompoundSummary(results) {
+  const renderers = window.BDICompoundRenderers;
+  if (!renderers?.renderCompoundSummary) return;
+  renderers.renderCompoundSummary(results, {
+    document,
+    currentLanguage,
+    t,
+    formatCompoundCurrency,
+    viewModels: window.BDICompoundViewModels,
+  });
+}
+
+function renderCompoundBreakdown(results) {
+  const renderers = window.BDICompoundRenderers;
+  if (!renderers?.renderCompoundBreakdown) return;
+  renderers.renderCompoundBreakdown(results, {
+    document,
+    t,
+    formatCompoundCurrency,
+    viewModels: window.BDICompoundViewModels,
+  });
+}
+
+function renderCompoundChart(results) {
+  const renderers = window.BDICompoundRenderers;
+  if (!renderers?.renderCompoundChart) return;
+  renderers.renderCompoundChart(results, {
+    document,
+    currentLanguage,
+    t,
+    formatCompoundCurrency,
+    viewModels: window.BDICompoundViewModels,
+  });
+}
+
 function runCompoundCalculator() {
-  const initial = parseFloat(document.getElementById('compound-initial')?.value || '0');
-  const contribution = parseFloat(document.getElementById('compound-contribution')?.value || '0');
-  const years = parseFloat(document.getElementById('compound-years')?.value || '0');
-  const rate = parseFloat(document.getElementById('compound-rate')?.value || '0');
-  const variance = Math.max(0, parseFloat(document.getElementById('compound-variance')?.value || '0'));
-  const frequency = parseInt(document.getElementById('compound-frequency')?.value || '12', 10);
+  const compoundCore = window.BDICompoundCore;
+  const compoundUi = window.BDICompoundUI;
+  const compoundRenderers = window.BDICompoundRenderers;
+  const { initial, contribution, years, rate, variance, frequency } =
+    compoundUi?.readCompoundCalculatorInputs?.(document) || {
+      initial: parseFloat(document.getElementById('compound-initial')?.value || '0'),
+      contribution: parseFloat(document.getElementById('compound-contribution')?.value || '0'),
+      years: parseFloat(document.getElementById('compound-years')?.value || '0'),
+      rate: parseFloat(document.getElementById('compound-rate')?.value || '0'),
+      variance: Math.max(0, parseFloat(document.getElementById('compound-variance')?.value || '0')),
+      frequency: parseInt(document.getElementById('compound-frequency')?.value || '12', 10),
+    };
   const statusEl = document.getElementById('compound-status');
 
-  if (!Number.isFinite(initial) || !Number.isFinite(contribution) || !Number.isFinite(years) || years <= 0 || !Number.isFinite(rate) || !Number.isFinite(frequency) || frequency <= 0) {
+  if (!compoundCore || typeof compoundCore.buildCompoundResults !== 'function' || typeof compoundCore.isValidCompoundInputSet !== 'function') {
+    if (statusEl) statusEl.textContent = currentLanguage === 'en'
+      ? 'Compound calculator core is not available.'
+      : 'El motor de interés compuesto no está disponible.';
+    return;
+  }
+
+  if (!compoundRenderers
+    || typeof compoundRenderers.renderCompoundSummary !== 'function'
+    || typeof compoundRenderers.renderCompoundChart !== 'function'
+    || typeof compoundRenderers.renderCompoundBreakdown !== 'function') {
+    if (statusEl) statusEl.textContent = currentLanguage === 'en'
+      ? 'Compound calculator render layer is not available.'
+      : 'La capa de render de interÃ©s compuesto no estÃ¡ disponible.';
+    return;
+  }
+
+  if (!compoundCore.isValidCompoundInputSet({ initial, contribution, years, rate, frequency })) {
     if (statusEl) statusEl.textContent = t('compound_status_invalid');
     return;
   }
 
-  const lowRate = Math.max(-99.9, rate - variance);
-  const highRate = Math.max(lowRate, rate + variance);
-
-  const results = {
+  const results = compoundCore.buildCompoundResults({
+    initial,
+    contribution,
     years,
+    rate,
+    variance,
     frequency,
-    low: runCompoundScenario({ initial, contribution, years, annualRatePct: lowRate, frequency }),
-    base: runCompoundScenario({ initial, contribution, years, annualRatePct: rate, frequency }),
-    high: runCompoundScenario({ initial, contribution, years, annualRatePct: highRate, frequency }),
-  };
+  });
 
   renderCompoundSummary(results);
   renderCompoundChart(results);
   renderCompoundBreakdown(results);
 
   if (statusEl) {
-    statusEl.textContent = `${t('compound_frequency_label')}: ${t(`compound_frequency_${frequency}`)} · ${currentLanguage === 'en' ? 'Base rate' : 'Tasa base'} ${formatCompoundPercent(rate)} · ${currentLanguage === 'en' ? 'Variance' : 'Varianza'} ±${formatCompoundPercent(variance)}`;
+    statusEl.textContent = compoundUi?.buildCompoundStatusMessage?.({
+      frequency,
+      rate,
+      variance,
+      language: currentLanguage,
+      t,
+    }) || `${t('compound_frequency_label')}: ${t(`compound_frequency_${frequency}`)} · ${currentLanguage === 'en' ? 'Base rate' : 'Tasa base'} ${formatCompoundPercent(rate)} · ${currentLanguage === 'en' ? 'Variance' : 'Varianza'} ±${formatCompoundPercent(variance)}`;
   }
 }
 

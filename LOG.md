@@ -1,93 +1,93 @@
-# LOG.md
+﻿# LOG.md
 
 ## 2026-03-25 12:28:35 -03:00
-- Acción: inspección inicial del workspace seleccionado.
+- AcciÃ³n: inspecciÃ³n inicial del workspace seleccionado.
 - Archivos afectados: ninguno.
 - Motivo: verificar el estado real del proyecto antes de cualquier cambio.
 - Resultado:
-  - la carpeta raíz `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` no contiene todavía un repositorio Git del producto;
-  - se detectó únicamente la carpeta `Estilo visual BDI/`;
+  - la carpeta raÃ­z `C:\Users\juand\Documents\GitHub\BDI-Consultora-App` no contiene todavÃ­a un repositorio Git del producto;
+  - se detectÃ³ Ãºnicamente la carpeta `Estilo visual BDI/`;
   - dentro de esa carpeta hay un manual de marca en PDF y un isotipo PNG.
 - Problemas encontrados:
-  - el código fuente de la app a transformar no está presente en el workspace local;
-  - `git status` en la raíz falló porque no existe repo inicializado;
-  - `rg --files` no pudo ejecutarse por acceso denegado en este entorno, por lo que la inspección local se hizo con `Get-ChildItem`.
+  - el cÃ³digo fuente de la app a transformar no estÃ¡ presente en el workspace local;
+  - `git status` en la raÃ­z fallÃ³ porque no existe repo inicializado;
+  - `rg --files` no pudo ejecutarse por acceso denegado en este entorno, por lo que la inspecciÃ³n local se hizo con `Get-ChildItem`.
 - Intentos fallidos:
-  - `rg --files` en la raíz del workspace.
-  - `git status --short --branch` en la raíz y en `Estilo visual BDI/`.
+  - `rg --files` en la raÃ­z del workspace.
+  - `git status --short --branch` en la raÃ­z y en `Estilo visual BDI/`.
 - Decisiones tomadas:
-  - crear documentación operativa base antes de avanzar;
-  - dejar explícito que la auditoría del repo fuente se está haciendo de forma remota mientras no exista un clon local.
+  - crear documentaciÃ³n operativa base antes de avanzar;
+  - dejar explÃ­cito que la auditorÃ­a del repo fuente se estÃ¡ haciendo de forma remota mientras no exista un clon local.
 - Pendientes:
-  - completar auditoría técnica del repositorio `rendimientos-ar`;
+  - completar auditorÃ­a tÃ©cnica del repositorio `rendimientos-ar`;
   - documentar arquitectura, endpoints, dependencias y riesgos;
-  - definir estrategia de incorporación del código fuente al workspace.
+  - definir estrategia de incorporaciÃ³n del cÃ³digo fuente al workspace.
 - Siguiente paso sugerido:
-  - cerrar la auditoría inicial y luego decidir si conviene clonar el repo base dentro de esta carpeta o construir una base propia inspirada en él.
+  - cerrar la auditorÃ­a inicial y luego decidir si conviene clonar el repo base dentro de esta carpeta o construir una base propia inspirada en Ã©l.
 
 ## 2026-03-25 12:28:35 -03:00
-- Acción: creación de documentación persistente inicial.
+- AcciÃ³n: creaciÃ³n de documentaciÃ³n persistente inicial.
 - Archivos afectados:
   - `README.md`
   - `AGENTS.md`
   - `LOG.md`
 - Motivo: cumplir la disciplina documental obligatoria del proyecto y dejar memoria operativa persistente.
 - Resultado:
-  - se creó `README.md` con objetivo, estado del workspace, restricciones, estructura actual y próximos pasos;
-  - se creó `AGENTS.md` con reglas operativas, alcance, TO DO y NOT DO;
-  - se creó `LOG.md` como registro cronológico del proyecto.
-- Problemas encontrados: ninguno durante la creación de estos archivos.
+  - se creÃ³ `README.md` con objetivo, estado del workspace, restricciones, estructura actual y prÃ³ximos pasos;
+  - se creÃ³ `AGENTS.md` con reglas operativas, alcance, TO DO y NOT DO;
+  - se creÃ³ `LOG.md` como registro cronolÃ³gico del proyecto.
+- Problemas encontrados: ninguno durante la creaciÃ³n de estos archivos.
 - Decisiones tomadas:
-  - mantener el nombre operativo del proyecto como `BDI App Cocos` hasta definir branding definitivo del producto;
-  - registrar explícitamente que la carpeta raíz no es aún un repositorio Git.
+  - mantener el nombre operativo del proyecto como `BDI Consultora App` hasta definir branding definitivo del producto;
+  - registrar explÃ­citamente que la carpeta raÃ­z no es aÃºn un repositorio Git.
 - Pendientes:
-  - actualizar estos archivos al finalizar la auditoría inicial con hallazgos más precisos;
-  - incorporar la estructura real del código fuente cuando exista en local.
+  - actualizar estos archivos al finalizar la auditorÃ­a inicial con hallazgos mÃ¡s precisos;
+  - incorporar la estructura real del cÃ³digo fuente cuando exista en local.
 - Siguiente paso sugerido:
-  - terminar el diagnóstico técnico del proyecto base y convertirlo en una propuesta de migración BDI sin alterar todavía el funcionamiento.
+  - terminar el diagnÃ³stico tÃ©cnico del proyecto base y convertirlo en una propuesta de migraciÃ³n BDI sin alterar todavÃ­a el funcionamiento.
 
 ## 2026-03-25 12:28:35 -03:00
-- Acción: auditoría remota inicial del repositorio fuente `arisbdar/rendimientos-ar` y de la app publicada `rendimientos.co`.
+- AcciÃ³n: auditorÃ­a remota inicial del repositorio fuente `arisbdar/rendimientos-ar` y de la app publicada `rendimientos.co`.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: documentar la arquitectura actual del producto base antes de cualquier clonación o implementación local.
+- Motivo: documentar la arquitectura actual del producto base antes de cualquier clonaciÃ³n o implementaciÃ³n local.
 - Resultado:
-  - se identificó stack basado en frontend estático + Express local + Netlify Functions;
-  - se relevaron endpoints públicos, fuentes de datos y estructura principal del repo;
-  - se detectó presencia de `supabase/` y endpoint `/api/auth-config`, lo que sugiere dependencia de auth/portfolio no documentada del todo;
-  - se confirmó que producción depende de redirects y funciones de Netlify;
-  - se dejó asentada advertencia legal por ausencia visible de archivo `LICENSE`, aunque `package.json` declara `ISC`.
+  - se identificÃ³ stack basado en frontend estÃ¡tico + Express local + Netlify Functions;
+  - se relevaron endpoints pÃºblicos, fuentes de datos y estructura principal del repo;
+  - se detectÃ³ presencia de `supabase/` y endpoint `/api/auth-config`, lo que sugiere dependencia de auth/portfolio no documentada del todo;
+  - se confirmÃ³ que producciÃ³n depende de redirects y funciones de Netlify;
+  - se dejÃ³ asentada advertencia legal por ausencia visible de archivo `LICENSE`, aunque `package.json` declara `ISC`.
 - Problemas encontrados:
-  - el código fuente no está aún en el workspace local;
-  - la inspección remota permite ver estructura y documentación, pero no reemplaza una revisión de código local completa;
-  - no fue posible validar todavía el detalle interno de todas las Netlify functions ni de `server.js`.
+  - el cÃ³digo fuente no estÃ¡ aÃºn en el workspace local;
+  - la inspecciÃ³n remota permite ver estructura y documentaciÃ³n, pero no reemplaza una revisiÃ³n de cÃ³digo local completa;
+  - no fue posible validar todavÃ­a el detalle interno de todas las Netlify functions ni de `server.js`.
 - Intentos fallidos:
-  - apertura parcial de algunos archivos remotos vía raw/click que devolvieron cache miss.
+  - apertura parcial de algunos archivos remotos vÃ­a raw/click que devolvieron cache miss.
 - Decisiones tomadas:
-  - basar esta primera auditoría en señales consistentes del README remoto, `package.json`, `netlify.toml` y la app publicada;
-  - no asumir compatibilidad comercial automática por la licencia hasta revisarla mejor.
+  - basar esta primera auditorÃ­a en seÃ±ales consistentes del README remoto, `package.json`, `netlify.toml` y la app publicada;
+  - no asumir compatibilidad comercial automÃ¡tica por la licencia hasta revisarla mejor.
 - Pendientes:
-  - decidir si se clona el repo base dentro del workspace para una auditoría local completa;
+  - decidir si se clona el repo base dentro del workspace para una auditorÃ­a local completa;
   - revisar material de marca BDI para alimentar sistema visual;
-  - pasar a propuesta de producto BDI y plan técnico de migración.
+  - pasar a propuesta de producto BDI y plan tÃ©cnico de migraciÃ³n.
 - Siguiente paso sugerido:
-  - definir estrategia de incorporación del código fuente al workspace y luego avanzar con la propuesta de producto/navegación BDI sobre una base auditada.
+  - definir estrategia de incorporaciÃ³n del cÃ³digo fuente al workspace y luego avanzar con la propuesta de producto/navegaciÃ³n BDI sobre una base auditada.
 
 ## 2026-03-25 12:43:00 -03:00
-- Acción: verificación del clon local del repositorio fuente dentro del workspace.
+- AcciÃ³n: verificaciÃ³n del clon local del repositorio fuente dentro del workspace.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: confirmar que el proyecto base ya está disponible localmente y actualizar el contexto operativo.
+- Motivo: confirmar que el proyecto base ya estÃ¡ disponible localmente y actualizar el contexto operativo.
 - Resultado:
-  - se detectó la carpeta `rendimientos-ar/` dentro de `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`;
+  - se detectÃ³ la carpeta `rendimientos-ar/` dentro de `C:\Users\juand\Documents\GitHub\BDI-Consultora-App`;
   - el repo contiene `.git`, `public/`, `netlify/`, `supabase/`, `test/`, `server.js`, `netlify.toml` y `package.json`;
-  - `git status --short --branch` dentro del clon devolvió `## main...origin/main`, sin cambios locales.
-- Problemas encontrados: ninguno en la verificación del clon.
+  - `git status --short --branch` dentro del clon devolviÃ³ `## main...origin/main`, sin cambios locales.
+- Problemas encontrados: ninguno en la verificaciÃ³n del clon.
 - Decisiones tomadas:
-  - pasar de auditoría remota a auditoría local real;
-  - mantener la documentación raíz como fuente de contexto del proyecto contenedor.
+  - pasar de auditorÃ­a remota a auditorÃ­a local real;
+  - mantener la documentaciÃ³n raÃ­z como fuente de contexto del proyecto contenedor.
 - Pendientes:
   - mapear arquitectura funcional local;
   - explicar dependencias y flujo de datos en lenguaje simple.
@@ -95,113 +95,113 @@
   - revisar archivos clave del clon: `server.js`, `public/index.html`, `public/app.js`, `netlify/functions/*`, `supabase/*`.
 
 ## 2026-03-25 12:43:00 -03:00
-- Acción: auditoría local inicial de archivos clave del repo clonado.
+- AcciÃ³n: auditorÃ­a local inicial de archivos clave del repo clonado.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: identificar funcionamiento real, dependencias efectivas y riesgos de mantenimiento sobre código local.
+- Motivo: identificar funcionamiento real, dependencias efectivas y riesgos de mantenimiento sobre cÃ³digo local.
 - Resultado:
-  - se confirmó uso de `express` y `node-fetch`;
-  - se confirmó integración real con `Supabase` para login Google, tabla `holdings` y tracking `page_views`;
-  - se identificó que `public/app.js` centraliza gran parte de la lógica del producto;
-  - se verificó la existencia de 12 Netlify Functions;
-  - se detectó un posible error local: `server.js` intenta leer `data_base/CER_serie.csv`, pero la carpeta `data_base` no existe;
-  - se detectaron problemas de codificación de caracteres en varios archivos (`Ã`, `â`), probablemente por encoding inconsistente.
+  - se confirmÃ³ uso de `express` y `node-fetch`;
+  - se confirmÃ³ integraciÃ³n real con `Supabase` para login Google, tabla `holdings` y tracking `page_views`;
+  - se identificÃ³ que `public/app.js` centraliza gran parte de la lÃ³gica del producto;
+  - se verificÃ³ la existencia de 12 Netlify Functions;
+  - se detectÃ³ un posible error local: `server.js` intenta leer `data_base/CER_serie.csv`, pero la carpeta `data_base` no existe;
+  - se detectaron problemas de codificaciÃ³n de caracteres en varios archivos (`Ãƒ`, `Ã¢`), probablemente por encoding inconsistente.
 - Problemas encontrados:
   - entorno local posiblemente incompleto para CER;
   - variables de entorno Supabase ausentes en `.env.example`.
 - Intentos fallidos:
-  - inspección de `data_base/` devolvió ruta inexistente.
+  - inspecciÃ³n de `data_base/` devolviÃ³ ruta inexistente.
 - Decisiones tomadas:
   - marcar como riesgo obligatorio la rotura potencial de CER en local;
-  - explicar al usuario términos base como HTML y PWA en lenguaje simple.
+  - explicar al usuario tÃ©rminos base como HTML y PWA en lenguaje simple.
 - Pendientes:
   - cerrar el mapa detallado de flujo de datos;
-  - pasar luego a la propuesta BDI de producto y navegación.
+  - pasar luego a la propuesta BDI de producto y navegaciÃ³n.
 - Siguiente paso sugerido:
-  - documentar por sección qué endpoint alimenta cada bloque de la app y qué conviene conservar, aislar o refactorizar primero.
+  - documentar por secciÃ³n quÃ© endpoint alimenta cada bloque de la app y quÃ© conviene conservar, aislar o refactorizar primero.
 
 ## 2026-03-25 12:50:00 -03:00
-- Acción: verificación adicional de consistencia entre código, funciones y documentación; intento de ejecución de tests.
+- AcciÃ³n: verificaciÃ³n adicional de consistencia entre cÃ³digo, funciones y documentaciÃ³n; intento de ejecuciÃ³n de tests.
 - Archivos afectados:
   - `LOG.md`
-- Motivo: detectar desfasajes entre README y código real, y validar el estado básico del proyecto sin editarlo.
+- Motivo: detectar desfasajes entre README y cÃ³digo real, y validar el estado bÃ¡sico del proyecto sin editarlo.
 - Resultado:
-  - se confirmó que `README.md` del repo original quedó parcialmente desfasado respecto del código;
-  - el README menciona `visits.js` y `/api/visits`, pero esa función no existe en `netlify/functions/`;
-  - `public/app.js` busca un botón `theme-toggle`, pero `public/index.html` no lo incluye;
-  - `public/manifest.json` todavía menciona CEDEARs, aunque esa sección no está implementada en la interfaz principal;
+  - se confirmÃ³ que `README.md` del repo original quedÃ³ parcialmente desfasado respecto del cÃ³digo;
+  - el README menciona `visits.js` y `/api/visits`, pero esa funciÃ³n no existe en `netlify/functions/`;
+  - `public/app.js` busca un botÃ³n `theme-toggle`, pero `public/index.html` no lo incluye;
+  - `public/manifest.json` todavÃ­a menciona CEDEARs, aunque esa secciÃ³n no estÃ¡ implementada en la interfaz principal;
   - `netlify/functions/auth-config.js` restringe CORS a dominios productivos del proyecto original, lo que es relevante para el futuro rebranding/despliegue BDI;
-  - el intento de correr tests con `npm test` falló porque `npm` no está disponible en el entorno actual.
+  - el intento de correr tests con `npm test` fallÃ³ porque `npm` no estÃ¡ disponible en el entorno actual.
 - Problemas encontrados:
-  - documentación original inconsistente con el estado real del código;
-  - imposibilidad de ejecutar tests automáticos en este entorno por falta de `npm`.
+  - documentaciÃ³n original inconsistente con el estado real del cÃ³digo;
+  - imposibilidad de ejecutar tests automÃ¡ticos en este entorno por falta de `npm`.
 - Intentos fallidos:
   - `npm test`.
 - Decisiones tomadas:
-  - considerar el README original como fuente útil pero no autoritativa;
-  - marcar los desfasajes detectados como deuda técnica/documental a corregir en la migración.
+  - considerar el README original como fuente Ãºtil pero no autoritativa;
+  - marcar los desfasajes detectados como deuda tÃ©cnica/documental a corregir en la migraciÃ³n.
 - Pendientes:
   - cerrar el mapa explicativo de arquitectura para el usuario;
   - proponer luego la estructura BDI de producto.
 - Siguiente paso sugerido:
-  - entregar una auditoría técnica explicada paso a paso, separando hallazgos confirmados, riesgos y consecuencias para la migración.
+  - entregar una auditorÃ­a tÃ©cnica explicada paso a paso, separando hallazgos confirmados, riesgos y consecuencias para la migraciÃ³n.
 
 ## 2026-03-25 12:56:00 -03:00
-- Acción: inicio de Etapa 2, propuesta de producto BDI basada en la auditoría técnica local.
+- AcciÃ³n: inicio de Etapa 2, propuesta de producto BDI basada en la auditorÃ­a tÃ©cnica local.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: traducir el diagnóstico técnico en una propuesta concreta de navegación, jerarquía de secciones y enfoque de producto.
+- Motivo: traducir el diagnÃ³stico tÃ©cnico en una propuesta concreta de navegaciÃ³n, jerarquÃ­a de secciones y enfoque de producto.
 - Resultado:
-  - se dejó documentado un cambio de enfoque desde comparador generalista hacia dashboard consultivo institucional;
-  - se propuso una nueva navegación BDI: Inicio, Liquidez, Renta fija ARS, Bonos CER, Renta fija USD, Corporativos y Portfolio en revisión;
-  - se diferenciaron módulos a conservar, reordenar y revisar;
-  - se documentó una propuesta inicial de tono, jerarquía editorial y home BDI.
+  - se dejÃ³ documentado un cambio de enfoque desde comparador generalista hacia dashboard consultivo institucional;
+  - se propuso una nueva navegaciÃ³n BDI: Inicio, Liquidez, Renta fija ARS, Bonos CER, Renta fija USD, Corporativos y Portfolio en revisiÃ³n;
+  - se diferenciaron mÃ³dulos a conservar, reordenar y revisar;
+  - se documentÃ³ una propuesta inicial de tono, jerarquÃ­a editorial y home BDI.
 - Problemas encontrados: ninguno nuevo en esta etapa de propuesta.
 - Decisiones tomadas:
   - no proponer nuevas features complejas no justificadas;
-  - mantener Portfolio como módulo opcional o secundario hasta validar su prioridad real en el producto BDI.
+  - mantener Portfolio como mÃ³dulo opcional o secundario hasta validar su prioridad real en el producto BDI.
 - Pendientes:
   - entregar al usuario la Etapa 2 explicada en lenguaje simple;
   - pasar luego a Etapa 3 con sistema visual BDI.
 - Siguiente paso sugerido:
-  - definir identidad visual, paleta, tipografía, componentes y responsive design antes de tocar la UI existente.
+  - definir identidad visual, paleta, tipografÃ­a, componentes y responsive design antes de tocar la UI existente.
 
 ## 2026-03-25 13:05:00 -03:00
-- Acción: relevamiento de insumos de marca BDI para la Etapa 3.
+- AcciÃ³n: relevamiento de insumos de marca BDI para la Etapa 3.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
 - Motivo: basar la propuesta visual en la marca real disponible dentro del proyecto.
 - Resultado:
-  - se verificó la existencia de `Manual de marca.pdf` y `Marca_02 Isotipo 6.png` en `Estilo visual BDI/`;
-  - se inspeccionó visualmente el isotipo, que muestra una dirección de marca sobria con blanco, verde y degradado;
+  - se verificÃ³ la existencia de `Manual de marca.pdf` y `Marca_02 Isotipo 6.png` en `Estilo visual BDI/`;
+  - se inspeccionÃ³ visualmente el isotipo, que muestra una direcciÃ³n de marca sobria con blanco, verde y degradado;
   - no fue posible extraer texto utilizable del PDF con las herramientas disponibles en este entorno;
-  - se documentó explícitamente esta limitación para no atribuir al manual reglas no confirmadas.
+  - se documentÃ³ explÃ­citamente esta limitaciÃ³n para no atribuir al manual reglas no confirmadas.
 - Problemas encontrados:
-  - `python`, `py` y utilidades comunes de extracción PDF no están disponibles en la sesión;
-  - el PDF parece comprimido y no devuelve texto legible con inspección simple.
+  - `python`, `py` y utilidades comunes de extracciÃ³n PDF no estÃ¡n disponibles en la sesiÃ³n;
+  - el PDF parece comprimido y no devuelve texto legible con inspecciÃ³n simple.
 - Intentos fallidos:
   - `python --version`
   - `py --version`
-  - búsqueda de utilidades como `pdftotext`, `mutool`, `pdfinfo`, `magick`
-  - extracción simple de cadenas desde el PDF.
+  - bÃºsqueda de utilidades como `pdftotext`, `mutool`, `pdfinfo`, `magick`
+  - extracciÃ³n simple de cadenas desde el PDF.
 - Decisiones tomadas:
-  - apoyar la Etapa 3 en el isotipo validado visualmente y en criterios prudentes de diseño institucional;
-  - no presentar como oficiales detalles del manual que no pudieron leerse automáticamente.
+  - apoyar la Etapa 3 en el isotipo validado visualmente y en criterios prudentes de diseÃ±o institucional;
+  - no presentar como oficiales detalles del manual que no pudieron leerse automÃ¡ticamente.
 - Pendientes:
   - entregar propuesta visual completa BDI;
-  - cuando el entorno lo permita, contrastar implementación final con el PDF manual.
+  - cuando el entorno lo permita, contrastar implementaciÃ³n final con el PDF manual.
 - Siguiente paso sugerido:
-  - proponer sistema visual BDI para la app: color, tipografía, componentes, navegación y responsive design.
+  - proponer sistema visual BDI para la app: color, tipografÃ­a, componentes, navegaciÃ³n y responsive design.
 
 ## 2026-03-25 13:18:00 -03:00
-- Acción: incorporación de confirmaciones visuales del manual de marca aportadas por el usuario y verificación del estado Git local.
+- AcciÃ³n: incorporaciÃ³n de confirmaciones visuales del manual de marca aportadas por el usuario y verificaciÃ³n del estado Git local.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: afinar la Etapa 3 con colores confirmados y explicar por qué GitHub Desktop no muestra los archivos documentales.
+- Motivo: afinar la Etapa 3 con colores confirmados y explicar por quÃ© GitHub Desktop no muestra los archivos documentales.
 - Resultado:
   - se confirmaron colores de marca a partir de capturas del manual:
     - `#232323`
@@ -210,45 +210,45 @@
     - `#4CBDC2`
     - `#EEEEEF`
     - `#FFFFFF`
-  - se verificó que `BDI-App-Cocos` no es repo Git;
-  - se verificó que `rendimientos-ar` sí es repo Git, con remoto `origin` apuntando a `https://github.com/arisbdar/rendimientos-ar.git`;
-  - se documentó que los archivos creados en la raíz no aparecen en GitHub Desktop porque están fuera del repo abierto.
+  - se verificÃ³ que `BDI-Consultora-App` no es repo Git;
+  - se verificÃ³ que `rendimientos-ar` sÃ­ es repo Git, con remoto `origin` apuntando a `https://github.com/arisbdar/rendimientos-ar.git`;
+  - se documentÃ³ que los archivos creados en la raÃ­z no aparecen en GitHub Desktop porque estÃ¡n fuera del repo abierto.
 - Problemas encontrados:
-  - la estructura actual separa documentación raíz y repo clonado, lo que genera confusión operativa en GitHub Desktop.
+  - la estructura actual separa documentaciÃ³n raÃ­z y repo clonado, lo que genera confusiÃ³n operativa en GitHub Desktop.
 - Decisiones tomadas:
   - explicarle al usuario la causa exacta sin mover ni renombrar archivos;
-  - usar la paleta confirmada por capturas como base más confiable para la Etapa 3.
+  - usar la paleta confirmada por capturas como base mÃ¡s confiable para la Etapa 3.
 - Pendientes:
   - redefinir la propuesta visual final con la paleta confirmada;
-  - definir con el usuario cómo quiere estructurar el repo propio antes de implementar.
+  - definir con el usuario cÃ³mo quiere estructurar el repo propio antes de implementar.
 - Siguiente paso sugerido:
   - proponer opciones concretas para pasar de repo ajeno clonado a repo propio de BDI sin perder trazabilidad ni romper el trabajo.
 
 ## 2026-03-25 13:24:00 -03:00
-- Acción: registro de decisión de avanzar hacia repo propio de BDI con independencia real.
+- AcciÃ³n: registro de decisiÃ³n de avanzar hacia repo propio de BDI con independencia real.
 - Archivos afectados:
   - `README.md`
   - `AGENTS.md`
   - `LOG.md`
-- Motivo: dejar asentada la dirección elegida por el usuario antes de ejecutar cambios estructurales sobre Git.
+- Motivo: dejar asentada la direcciÃ³n elegida por el usuario antes de ejecutar cambios estructurales sobre Git.
 - Resultado:
-  - se documentó que el objetivo ya no es trabajar indefinidamente sobre el clon de `arisbdar/rendimientos-ar`;
-  - se dejó asentado que la meta es convertir `BDI-App-Cocos` en la raíz principal del proyecto versionado;
-  - se registró que una independencia real requerirá actuar sobre los metadatos Git del clon interno o redefinir la estructura del proyecto.
+  - se documentÃ³ que el objetivo ya no es trabajar indefinidamente sobre el clon de `arisbdar/rendimientos-ar`;
+  - se dejÃ³ asentado que la meta es convertir `BDI-Consultora-App` en la raÃ­z principal del proyecto versionado;
+  - se registrÃ³ que una independencia real requerirÃ¡ actuar sobre los metadatos Git del clon interno o redefinir la estructura del proyecto.
 - Problemas encontrados:
-  - la estructura actual tiene documentación en la raíz y código dentro de un repo anidado;
+  - la estructura actual tiene documentaciÃ³n en la raÃ­z y cÃ³digo dentro de un repo anidado;
   - eso impide una experiencia clara en GitHub Desktop.
 - Decisiones tomadas:
-  - no ejecutar aún una modificación destructiva de metadatos Git sin explicar primero la consecuencia al usuario;
-  - preparar una explicación simple del paso técnico necesario.
+  - no ejecutar aÃºn una modificaciÃ³n destructiva de metadatos Git sin explicar primero la consecuencia al usuario;
+  - preparar una explicaciÃ³n simple del paso tÃ©cnico necesario.
 - Pendientes:
-  - obtener confirmación final para cortar el vínculo Git del clon interno y convertir la raíz en repo propio;
-  - luego unificar estado Git y continuar implementación.
+  - obtener confirmaciÃ³n final para cortar el vÃ­nculo Git del clon interno y convertir la raÃ­z en repo propio;
+  - luego unificar estado Git y continuar implementaciÃ³n.
 - Siguiente paso sugerido:
-  - explicar claramente al usuario qué significa “hacerlo propio” a nivel Git y pedir confirmación para el cambio estructural mínimo necesario.
+  - explicar claramente al usuario quÃ© significa â€œhacerlo propioâ€ a nivel Git y pedir confirmaciÃ³n para el cambio estructural mÃ­nimo necesario.
 
 ## 2026-03-25 13:32:00 -03:00
-- Acción: conversión del proyecto a repo propio de BDI.
+- AcciÃ³n: conversiÃ³n del proyecto a repo propio de BDI.
 - Archivos afectados:
   - metadatos Git del proyecto
   - `README.md`
@@ -256,67 +256,67 @@
   - `LOG.md`
 - Motivo: materializar la independencia real del proyecto respecto del repo original clonado.
 - Resultado:
-  - se eliminó `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\.git`;
-  - se inicializó Git en `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`;
-  - `git status` en la raíz ahora muestra una sola unidad de trabajo con:
+  - se eliminÃ³ `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\.git`;
+  - se inicializÃ³ Git en `C:\Users\juand\Documents\GitHub\BDI-Consultora-App`;
+  - `git status` en la raÃ­z ahora muestra una sola unidad de trabajo con:
     - `AGENTS.md`
     - `LOG.md`
     - `README.md`
     - `Estilo visual BDI/`
     - `rendimientos-ar/`
-  - `git remote -v` en la raíz no devuelve remotos, lo que confirma independencia respecto del repo anterior.
-- Problemas encontrados: ninguno durante la conversión.
+  - `git remote -v` en la raÃ­z no devuelve remotos, lo que confirma independencia respecto del repo anterior.
+- Problemas encontrados: ninguno durante la conversiÃ³n.
 - Decisiones tomadas:
-  - mantener la estructura física actual del proyecto sin mover carpetas;
-  - unificar Git en la raíz primero y posponer cualquier reestructuración adicional.
+  - mantener la estructura fÃ­sica actual del proyecto sin mover carpetas;
+  - unificar Git en la raÃ­z primero y posponer cualquier reestructuraciÃ³n adicional.
 - Pendientes:
-  - abrir la raíz `BDI-App-Cocos` en GitHub Desktop;
+  - abrir la raÃ­z `BDI-Consultora-App` en GitHub Desktop;
   - opcionalmente crear un remoto nuevo de BDI y vincularlo;
-  - continuar luego con Etapa 4 y la implementación.
+  - continuar luego con Etapa 4 y la implementaciÃ³n.
 - Siguiente paso sugerido:
-  - explicarle al usuario cómo verificar visualmente el nuevo repo en GitHub Desktop y luego seguir con el plan técnico de implementación.
+  - explicarle al usuario cÃ³mo verificar visualmente el nuevo repo en GitHub Desktop y luego seguir con el plan tÃ©cnico de implementaciÃ³n.
 
 ## 2026-03-25 13:38:00 -03:00
-- Acción: confirmación de apertura del repo raíz en GitHub Desktop.
+- AcciÃ³n: confirmaciÃ³n de apertura del repo raÃ­z en GitHub Desktop.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: registrar el estado operativo luego de la conversión a repo propio.
+- Motivo: registrar el estado operativo luego de la conversiÃ³n a repo propio.
 - Resultado:
-  - el usuario confirmó que GitHub Desktop ya pudo abrir `BDI-App-Cocos`;
-  - apareció advertencia de seguridad esperable por ownership y fue aceptada;
-  - GitHub Desktop mostró más de 119 archivos para el primer commit, lo cual es consistente con un repo nuevo que incluye código, documentación y assets.
+  - el usuario confirmÃ³ que GitHub Desktop ya pudo abrir `BDI-Consultora-App`;
+  - apareciÃ³ advertencia de seguridad esperable por ownership y fue aceptada;
+  - GitHub Desktop mostrÃ³ mÃ¡s de 119 archivos para el primer commit, lo cual es consistente con un repo nuevo que incluye cÃ³digo, documentaciÃ³n y assets.
 - Problemas encontrados: ninguno nuevo; comportamiento esperado.
 - Decisiones tomadas:
-  - considerar validada la nueva raíz Git del proyecto desde el punto de vista operativo del usuario.
+  - considerar validada la nueva raÃ­z Git del proyecto desde el punto de vista operativo del usuario.
 - Pendientes:
-  - confirmar si el usuario creó ya el primer commit o solo aceptó la incorporación del repo;
-  - seguir con Etapa 4 y luego implementación.
+  - confirmar si el usuario creÃ³ ya el primer commit o solo aceptÃ³ la incorporaciÃ³n del repo;
+  - seguir con Etapa 4 y luego implementaciÃ³n.
 - Siguiente paso sugerido:
-  - explicar al usuario por qué ese volumen de archivos es normal y continuar con el plan técnico de implementación.
+  - explicar al usuario por quÃ© ese volumen de archivos es normal y continuar con el plan tÃ©cnico de implementaciÃ³n.
 
 ## 2026-03-25 13:45:00 -03:00
-- Acción: elaboración de Etapa 4, plan técnico de implementación.
+- AcciÃ³n: elaboraciÃ³n de Etapa 4, plan tÃ©cnico de implementaciÃ³n.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
-- Motivo: definir un orden de trabajo seguro antes de modificar código de la app BDI.
+- Motivo: definir un orden de trabajo seguro antes de modificar cÃ³digo de la app BDI.
 - Resultado:
-  - se documentó un plan por bloques, desde branding base hasta refactor técnico y deploy;
-  - se identificaron archivos prioritarios, archivos nuevos recomendados y áreas a no tocar en la primera ola;
-  - se registró estrategia de testing manual y estrategia de despliegue.
+  - se documentÃ³ un plan por bloques, desde branding base hasta refactor tÃ©cnico y deploy;
+  - se identificaron archivos prioritarios, archivos nuevos recomendados y Ã¡reas a no tocar en la primera ola;
+  - se registrÃ³ estrategia de testing manual y estrategia de despliegue.
 - Problemas encontrados: ninguno nuevo.
 - Decisiones tomadas:
   - separar rebranding visual de refactor profundo para reducir riesgo;
-  - postergar trabajo fuerte sobre Supabase y portfolio hasta estabilizar el core público.
+  - postergar trabajo fuerte sobre Supabase y portfolio hasta estabilizar el core pÃºblico.
 - Pendientes:
   - entregar el plan al usuario de forma clara;
-  - luego iniciar la implementación incremental.
+  - luego iniciar la implementaciÃ³n incremental.
 - Siguiente paso sugerido:
   - comenzar con Bloque 1: identidad visual y branding base.
 
 ## 2026-03-25 14:05:00 -03:00
-- Acción: implementación inicial de Bloque 1, branding base BDI.
+- AcciÃ³n: implementaciÃ³n inicial de Bloque 1, branding base BDI.
 - Archivos afectados:
   - `rendimientos-ar/public/index.html`
   - `rendimientos-ar/public/styles.css`
@@ -324,73 +324,73 @@
   - `rendimientos-ar/netlify/functions/auth-config.js`
   - `README.md`
   - `LOG.md`
-- Motivo: iniciar la transformación visible del producto sin tocar todavía lógica financiera profunda.
+- Motivo: iniciar la transformaciÃ³n visible del producto sin tocar todavÃ­a lÃ³gica financiera profunda.
 - Resultado:
-  - se reescribió `index.html` con metadatos, header y textos base alineados a BDI;
-  - se actualizaron colores, tipografías y estilos principales en `styles.css`;
+  - se reescribiÃ³ `index.html` con metadatos, header y textos base alineados a BDI;
+  - se actualizaron colores, tipografÃ­as y estilos principales en `styles.css`;
   - se rebrandearon nombre y theme color del manifest;
   - se agregaron dominios BDI permitidos en `auth-config.js`.
 - Problemas encontrados:
-  - archivos con encoding inconsistente dificultaron parches quirúrgicos;
-  - no hay `node` ni `npm` en esta sesión, por lo que no se pudo levantar preview local desde el entorno del agente.
+  - archivos con encoding inconsistente dificultaron parches quirÃºrgicos;
+  - no hay `node` ni `npm` en esta sesiÃ³n, por lo que no se pudo levantar preview local desde el entorno del agente.
 - Intentos fallidos:
   - parches parciales sobre archivos con texto roto por encoding, especialmente `index.html`, `manifest.json` y `app.js`.
 - Decisiones tomadas:
-  - reescribir archivos chicos y visibles cuando el encoding bloqueó reemplazos estables;
-  - dejar `app.js` para una pasada posterior más controlada, sin forzar una reescritura riesgosa.
+  - reescribir archivos chicos y visibles cuando el encoding bloqueÃ³ reemplazos estables;
+  - dejar `app.js` para una pasada posterior mÃ¡s controlada, sin forzar una reescritura riesgosa.
 - Pendientes:
-  - ajustar textos dinámicos y títulos en `app.js`;
-  - revisar preview visual en máquina del usuario;
-  - continuar con navegación BDI y home.
+  - ajustar textos dinÃ¡micos y tÃ­tulos en `app.js`;
+  - revisar preview visual en mÃ¡quina del usuario;
+  - continuar con navegaciÃ³n BDI y home.
 - Siguiente paso sugerido:
   - revisar este primer bloque en GitHub Desktop y luego avanzar con la segunda pasada de branding sobre `app.js`.
 
 ## 2026-03-25 14:20:00 -03:00
-- Acción: cierre parcial del Bloque 1 con overrides de copy y navegación.
+- AcciÃ³n: cierre parcial del Bloque 1 con overrides de copy y navegaciÃ³n.
 - Archivos afectados:
   - `rendimientos-ar/public/index.html`
   - `rendimientos-ar/public/bdi-overrides.js`
   - `README.md`
   - `LOG.md`
-- Motivo: evitar una reescritura riesgosa de `app.js` mientras se corrige branding visible y textos dinámicos.
+- Motivo: evitar una reescritura riesgosa de `app.js` mientras se corrige branding visible y textos dinÃ¡micos.
 - Resultado:
-  - se agregó `bdi-overrides.js` cargado después de `app.js`;
-  - el nuevo script sincroniza títulos de hero y `document.title` según sección/hash;
-  - esto reduce el impacto de los problemas de encoding en `app.js` sin tocar la lógica financiera central.
+  - se agregÃ³ `bdi-overrides.js` cargado despuÃ©s de `app.js`;
+  - el nuevo script sincroniza tÃ­tulos de hero y `document.title` segÃºn secciÃ³n/hash;
+  - esto reduce el impacto de los problemas de encoding en `app.js` sin tocar la lÃ³gica financiera central.
 - Problemas encontrados:
-  - `app.js` continúa siendo frágil para parches extensos por encoding inconsistente.
+  - `app.js` continÃºa siendo frÃ¡gil para parches extensos por encoding inconsistente.
 - Decisiones tomadas:
-  - usar overrides progresivos en vez de forzar una reescritura temprana del archivo monolítico;
-  - reservar una refactorización más limpia de `app.js` para una etapa posterior.
+  - usar overrides progresivos en vez de forzar una reescritura temprana del archivo monolÃ­tico;
+  - reservar una refactorizaciÃ³n mÃ¡s limpia de `app.js` para una etapa posterior.
 - Pendientes:
   - validar visualmente el bloque completo cuando el usuario pueda levantar la app localmente;
-  - continuar con home/navegación y luego modularización.
+  - continuar con home/navegaciÃ³n y luego modularizaciÃ³n.
 - Siguiente paso sugerido:
-  - explicar al usuario cómo funciona la app a nivel básico (`index.html`, `app.js`, servidor local) y después seguir con la siguiente mejora visual/estructural.
+  - explicar al usuario cÃ³mo funciona la app a nivel bÃ¡sico (`index.html`, `app.js`, servidor local) y despuÃ©s seguir con la siguiente mejora visual/estructural.
 
 ## 2026-03-25 14:32:00 -03:00
-- Acción: profundización visual de la home BDI.
+- AcciÃ³n: profundizaciÃ³n visual de la home BDI.
 - Archivos afectados:
   - `rendimientos-ar/public/index.html`
   - `rendimientos-ar/public/styles.css`
   - `README.md`
   - `LOG.md`
-- Motivo: hacer que la portada se sienta más consultiva e institucional sin introducir nuevas dependencias ni romper la lógica existente.
+- Motivo: hacer que la portada se sienta mÃ¡s consultiva e institucional sin introducir nuevas dependencias ni romper la lÃ³gica existente.
 - Resultado:
   - se agregaron bloques de briefing editorial en la home;
   - se agregaron shortcuts hacia Liquidez, Renta fija ARS, CER, Soberanos y Corporativos;
-  - se mejoró la jerarquía visual de tablas, cards, subnav y contenedores.
+  - se mejorÃ³ la jerarquÃ­a visual de tablas, cards, subnav y contenedores.
 - Problemas encontrados: ninguno nuevo en esta pasada.
 - Decisiones tomadas:
-  - mantener la home como composición estática con enlaces hash, sin agregar lógica compleja;
-  - seguir separando identidad visual de refactor técnico profundo.
+  - mantener la home como composiciÃ³n estÃ¡tica con enlaces hash, sin agregar lÃ³gica compleja;
+  - seguir separando identidad visual de refactor tÃ©cnico profundo.
 - Pendientes:
-  - decidir si este bloque ya se toma como primer commit lógico;
-  - luego pasar a una segunda ola de reorganización de navegación y estructuras por sección.
+  - decidir si este bloque ya se toma como primer commit lÃ³gico;
+  - luego pasar a una segunda ola de reorganizaciÃ³n de navegaciÃ³n y estructuras por secciÃ³n.
 - Siguiente paso sugerido:
   - preparar indicaciones simples para que el usuario pueda levantar la app localmente y validar visualmente este primer hito.
 ## 2026-03-25 14:48:00 -03:00
-- AcciÃ³n: refuerzo del override BDI y actualizacion de documentacion operativa.
+- AcciÃƒÂ³n: refuerzo del override BDI y actualizacion de documentacion operativa.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-overrides.js`
   - `rendimientos-ar/public/index.html`
@@ -411,10 +411,10 @@
   - preparar la guia simple para abrir la app localmente;
   - validar visualmente el resultado en navegador real.
 - Siguiente paso sugerido:
-  - dejar listo el primer commit logico y luego acompaÃ±ar al usuario en la apertura local de la app para testing manual.
+  - dejar listo el primer commit logico y luego acompaÃƒÂ±ar al usuario en la apertura local de la app para testing manual.
 
 ## 2026-03-25 15:02:00 -03:00
-- AcciÃ³n: documentacion de apertura local y testing manual inicial.
+- AcciÃƒÂ³n: documentacion de apertura local y testing manual inicial.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
@@ -429,12 +429,12 @@
   - reservar para el siguiente paso el acompanamiento del usuario durante su primer intento real.
 - Pendientes:
   - pedir al usuario que verifique si `node -v` y `npm -v` existen en su maquina;
-  - luego acompaÃ±ar la primera apertura local y validar visualmente el hito.
+  - luego acompaÃƒÂ±ar la primera apertura local y validar visualmente el hito.
 - Siguiente paso sugerido:
   - guiar al usuario en la comprobacion de `node` y, si esta disponible, avanzar con `npm install` y `npm start`.
 
 ## 2026-03-25 15:12:00 -03:00
-- AcciÃ³n: documentacion de incidencia local con PowerShell y `npm`.
+- AcciÃƒÂ³n: documentacion de incidencia local con PowerShell y `npm`.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
@@ -453,7 +453,7 @@
   - hacer la primera ejecucion local con `npm.cmd`.
 
 ## 2026-03-25 15:22:00 -03:00
-- AcciÃ³n: registro de primera prueba local exitosa de la app.
+- AcciÃƒÂ³n: registro de primera prueba local exitosa de la app.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
@@ -477,7 +477,7 @@
   - tomar un commit del hito actual y luego abrir el bloque de correcciones tecnicas.
 
 ## 2026-03-25 15:38:00 -03:00
-- AcciÃ³n: rearmado del servidor local para estabilizacion funcional.
+- AcciÃƒÂ³n: rearmado del servidor local para estabilizacion funcional.
 - Archivos afectados:
   - `rendimientos-ar/server.js`
   - `README.md`
@@ -502,7 +502,7 @@
   - hacer una segunda prueba local focalizada sobre las secciones que fallaron en el primer test.
 
 ## 2026-03-25 15:47:00 -03:00
-- AcciÃ³n: ajuste fino de frontend para navegacion y tolerancia a Chart.js.
+- AcciÃƒÂ³n: ajuste fino de frontend para navegacion y tolerancia a Chart.js.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-overrides.js`
   - `rendimientos-ar/public/app.js`
@@ -523,7 +523,7 @@
   - reiniciar el servidor local y validar otra vez Soberanos y Corporativos.
 
 ## 2026-03-26 09:05:00 -03:00
-- AcciÃ³n: registro de segunda validacion manual positiva.
+- AcciÃƒÂ³n: registro de segunda validacion manual positiva.
 - Archivos afectados:
   - `README.md`
   - `LOG.md`
@@ -535,7 +535,7 @@
 - Problemas encontrados:
   - no se muestran curvas/graficos de `TIR` vs `Duration` en Soberanos, Corporativos y Renta fija ARS.
 - Decisiones tomadas:
-  - tomar la recuperacion o rediseño de curvas como el siguiente bloque funcional;
+  - tomar la recuperacion o rediseÃ±o de curvas como el siguiente bloque funcional;
   - no usar ese faltante como bloqueo para el commit actual.
 - Pendientes:
   - definir e implementar la version BDI de las curvas de instrumentos;
@@ -544,7 +544,7 @@
   - hacer commit del estado actual y abrir el siguiente bloque para graficos/curvas.
 
 ## 2026-03-26 09:18:00 -03:00
-- AcciÃ³n: implementacion de curvas propias para instrumentos.
+- AcciÃƒÂ³n: implementacion de curvas propias para instrumentos.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `rendimientos-ar/public/index.html`
@@ -566,7 +566,7 @@
   - reiniciar el servidor local y revisar las curvas de `Renta fija ARS`, `Soberanos` y `Corporativos`.
 
 ## 2026-03-26 09:31:00 -03:00
-- AcciÃ³n: refinamiento visual de curvas propias.
+- AcciÃƒÂ³n: refinamiento visual de curvas propias.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `rendimientos-ar/public/styles.css`
@@ -588,7 +588,7 @@
   - refrescar la app y comparar la nueva presentacion de `Renta fija ARS`, `Soberanos` y `Corporativos`.
 
 ## 2026-03-26 09:46:00 -03:00
-- AcciÃ³n: correccion conceptual de curvas segun criterio financiero del usuario.
+- AcciÃƒÂ³n: correccion conceptual de curvas segun criterio financiero del usuario.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `rendimientos-ar/public/styles.css`
@@ -609,7 +609,7 @@
   - refrescar la app y revisar otra vez `Renta fija ARS`, `Soberanos` y `Corporativos`.
 
 ## 2026-03-26 10:02:00 -03:00
-- AcciÃ³n: rediseÃ±o de la trayectoria de curvas con forma controlada.
+- AcciÃƒÂ³n: rediseÃƒÂ±o de la trayectoria de curvas con forma controlada.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `README.md`
@@ -629,7 +629,7 @@
   - refrescar la app y comparar otra vez con las referencias del usuario.
 
 ## 2026-03-26 10:16:00 -03:00
-- AcciÃ³n: agrandado de graficos y cambio a interpolacion monotona por tramos.
+- AcciÃƒÂ³n: agrandado de graficos y cambio a interpolacion monotona por tramos.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `rendimientos-ar/public/styles.css`
@@ -646,7 +646,7 @@
   - refrescar la app y revisar otra vez las tres secciones de curvas.
 
 ## 2026-03-26 10:29:00 -03:00
-- AcciÃ³n: ajuste de escala de graficos y depuracion de puntos para curvas.
+- AcciÃƒÂ³n: ajuste de escala de graficos y depuracion de puntos para curvas.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `rendimientos-ar/public/styles.css`
@@ -664,7 +664,7 @@
   - refrescar la app y comparar otra vez con especial foco en la curva local de soberanos y la curva de LECAPs.
 
 ## 2026-03-26 10:42:00 -03:00
-- AcciÃ³n: segunda ampliacion de escala y separacion entre curva guia y puntos visibles.
+- AcciÃƒÂ³n: segunda ampliacion de escala y separacion entre curva guia y puntos visibles.
 - Archivos afectados:
   - `rendimientos-ar/public/bdi-charts.js`
   - `rendimientos-ar/public/styles.css`
@@ -769,7 +769,7 @@
 - Resultado:
   - cada familia ahora puede construir su guia con tickers representativos concretos;
   - se agrego `yDomain` por grafico para mejorar la lectura y evitar aplastamientos;
-  - `LECAPs`, `CER`, `Soberanos` y `Corporativos` pasan a una logica donde la curva intenta pasar cerca de nombres relevantes y no forzar un ajuste global extraño.
+  - `LECAPs`, `CER`, `Soberanos` y `Corporativos` pasan a una logica donde la curva intenta pasar cerca de nombres relevantes y no forzar un ajuste global extraÃ±o.
 - Decisiones tomadas:
   - dejar de insistir con una unica formula universal para todas las familias;
   - usar guias curadas por instrumentos relevantes, que es mas cercano a la referencia visual que busca el usuario.
@@ -855,7 +855,7 @@
   - usar una tabla simple con endpoint, fuente real, tipo de dato, mantenimiento y riesgo.
 - Pendientes:
   - seguir con el siguiente bloque visual/funcional de la pagina;
-  - decidir luego si conviene exponer parte de esta informacion como “fuente” dentro de la propia UI.
+  - decidir luego si conviene exponer parte de esta informacion como â€œfuenteâ€ dentro de la propia UI.
 - Siguiente paso sugerido:
   - continuar con home/dashboard y jerarquia de la portada BDI.
 
@@ -1007,19 +1007,19 @@
   - explicarle al usuario como crear el repo en GitHub y conectar Netlify sin asumir conocimiento tecnico.
 
 ## 2026-03-26 15:04:00 -03:00
-- Accion: reemplazo del icono de pestaña/app por isotipo BDI.
+- Accion: reemplazo del icono de pestaÃ±a/app por isotipo BDI.
 - Archivos afectados:
   - `rendimientos-ar/public/icons/icon-192.png`
   - `rendimientos-ar/public/icons/icon-512.png`
   - `README.md`
   - `LOG.md`
-- Motivo: el usuario pidio dejar de usar el icono heredado de la app base y reemplazarlo por marca BDI visible en la pestaña del navegador y manifest.
+- Motivo: el usuario pidio dejar de usar el icono heredado de la app base y reemplazarlo por marca BDI visible en la pestaÃ±a del navegador y manifest.
 - Resultado:
   - los iconos que consumen `index.html` y `manifest.json` ahora usan una version redimensionada del isotipo BDI;
   - no hizo falta cambiar rutas porque la app ya apuntaba a esos mismos archivos.
 - Pendientes:
   - validar visualmente el nuevo icono en Chrome;
-  - si el navegador sigue mostrando el anterior, limpiar cache o reabrir pestaña.
+  - si el navegador sigue mostrando el anterior, limpiar cache o reabrir pestaÃ±a.
 - Siguiente paso sugerido:
   - refrescar la app, comprobar el nuevo icono y luego avanzar con GitHub + Netlify paso a paso.
 
@@ -1029,7 +1029,7 @@
   - `rendimientos-ar/public/index.html`
   - `README.md`
   - `LOG.md`
-- Motivo: el usuario pidio explicitar `BDI Consultora, elaborado por Tomás Rodríguez` antes de publicar la app.
+- Motivo: el usuario pidio explicitar `BDI Consultora, elaborado por TomÃ¡s RodrÃ­guez` antes de publicar la app.
 - Resultado:
   - el footer ahora deja visible la autoria;
   - las fuentes quedan resumidas como `Fuentes consultadas`, manteniendo transparencia sobre el origen de los datos.
@@ -1046,7 +1046,7 @@
   - `rendimientos-ar/public/icons/icon-512.png`
   - `README.md`
   - `LOG.md`
-- Motivo: el usuario detecto que el isotipo BDI se veia demasiado chico en la pestaña del navegador.
+- Motivo: el usuario detecto que el isotipo BDI se veia demasiado chico en la pestaÃ±a del navegador.
 - Resultado:
   - se recalcularon los limites utiles del PNG original;
   - los iconos fueron regenerados con menos margen transparente y mas presencia visual.
@@ -1054,7 +1054,7 @@
   - validar en Chrome si el icono ya se percibe mas grande;
   - si siguiera muy chico, considerar una version simplificada del isotipo solo para favicon.
 - Siguiente paso sugerido:
-  - cerrar y reabrir la pestaña o limpiar cache del icono, y luego continuar con GitHub + Netlify.
+  - cerrar y reabrir la pestaÃ±a o limpiar cache del icono, y luego continuar con GitHub + Netlify.
 ## 2026-04-01 13:56:58 -03:00
 - Accion: integracion inicial del monitor BDI de obligaciones negociables dentro de la seccion `Corporativos`.
 - Archivos afectados:
@@ -1639,7 +1639,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - se agrego una nueva solapa principal `Heatmap USA`;
   - se incorporo un endpoint `/api/heatmap` para traer precio, variacion diaria y market cap desde Yahoo sobre un universo curado de large caps;
   - se agrego version serverless equivalente en Netlify;
-  - se implemento un treemap SVG agrupado por sector, con tamaño por market cap y color por variacion diaria;
+  - se implemento un treemap SVG agrupado por sector, con tamaÃ±o por market cap y color por variacion diaria;
   - se sumaron traducciones base ES/EN y controles de refresh.
 - Verificacion:
   - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
@@ -1697,7 +1697,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - los sectores ahora se distribuyen en tres filas para reducir compresion lateral;
   - se mejoro el criterio de visibilidad de labels para ticker, variacion, industria y encabezados de sector;
   - se reforzo el marco visual oscuro del mapa y la leyenda para que todo el bloque se lea como una pieza unificada;
-  - se aclaro en la fuente que precio y variacion diaria vienen de Yahoo, mientras que el tamaño relativo por market cap sigue siendo curado en esta primera version.
+  - se aclaro en la fuente que precio y variacion diaria vienen de Yahoo, mientras que el tamaÃ±o relativo por market cap sigue siendo curado en esta primera version.
 - Verificacion:
   - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
   - `node --check` valido sin errores `rendimientos-ar/server.js`.
@@ -1954,7 +1954,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - `LOG.md`
 - Motivo: el usuario pidio sumar a Juan Di Maria junto a Tomas Rodriguez en la linea de autoria del footer.
 - Resultado:
-  - el footer base ahora muestra `BDI Consultora, elaborado por Tomás Rodríguez y Juan Di Maria.`;
+  - el footer base ahora muestra `BDI Consultora, elaborado por TomÃ¡s RodrÃ­guez y Juan Di Maria.`;
   - se alinearon las variantes de override en espanol e ingles para conservar consistencia visual y de idioma.
 - Verificacion:
   - cambio de copy solamente, sin impacto en navegacion ni logica.
@@ -2133,7 +2133,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - se reforzo la jerarquia visual del bloque con hint y fuente mejor integrados;
   - se amplio el contenedor del heatmap y se le dio mas presencia al frame SVG;
   - el treemap argentino ahora usa una proporcion un poco mas favorable (`3` filas en vez de `4`) para ganar legibilidad;
-  - se agrego una sanitizacion defensiva de copy para evitar que aparezcan textos rotos como `variaciÃ³n diaria` o `TamaÃ±o`.
+  - se agrego una sanitizacion defensiva de copy para evitar que aparezcan textos rotos como `variaciÃƒÂ³n diaria` o `TamaÃƒÂ±o`.
 - Verificacion:
   - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
   - `node --check` valido sin errores `rendimientos-ar/server.js`.
@@ -2314,14 +2314,14 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - refrescar `Argentina ARS` y `Argentina USD`; si todavia quedaran cajas desbalanceadas, revisar ya no el peso sino el universo filtrado de tickers por sector.
 
 ## 2026-04-13 19:32:00 -03:00
-- Accion: correccion de textos visibles con `años` en graficos y ejes.
+- Accion: correccion de textos visibles con `aÃ±os` en graficos y ejes.
 - Archivos afectados:
   - `rendimientos-ar/public/app.js`
   - `rendimientos-ar/public/bdi-charts.js`
   - `LOG.md`
-- Motivo: el usuario reporto que en algunos graficos seguia apareciendo `anos` en vez de `años`.
+- Motivo: el usuario reporto que en algunos graficos seguia apareciendo `anos` en vez de `aÃ±os`.
 - Resultado:
-  - se corrigieron labels de ejes `Duration (años)` y `Duration aproximada (años)` en la capa SVG de curvas;
+  - se corrigieron labels de ejes `Duration (aÃ±os)` y `Duration aproximada (aÃ±os)` en la capa SVG de curvas;
   - se corrigieron tambien textos de la calculadora/axis usando escapes Unicode para evitar nuevas roturas de encoding.
 - Verificacion:
   - `node --check` valido sin errores `rendimientos-ar/public/app.js`;
@@ -2514,7 +2514,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
 - Verificacion:
   - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js` y `rendimientos-ar/public/app.js`.
 - Siguiente paso sugerido:
-  - refrescar `Renta fija ARS`; si la tabla ya entra pero el grafico todavia no convence, el siguiente salto de calidad seria pasar a etiquetas compactas en una sola linea (`Ticker · TIR`) o tooltip al hover para despejar la zona izquierda.
+  - refrescar `Renta fija ARS`; si la tabla ya entra pero el grafico todavia no convence, el siguiente salto de calidad seria pasar a etiquetas compactas en una sola linea (`Ticker Â· TIR`) o tooltip al hover para despejar la zona izquierda.
 ## 2026-04-14 12:14:56 -03:00
 - Accion: reemplazo del etiquetado manual por un sistema automatico comun para todos los graficos de renta fija.
 - Archivos afectados:
@@ -2562,7 +2562,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - en zonas densas se muestra solo el ticker y el porcentaje queda en hover;
   - los puntos CER usan radio levemente menor;
   - se agregaron lineas guia cortas (`callout`) para relacionar mejor etiqueta y punto cuando el label queda desplazado;
-  - se sumo clase visual `cer-label` para bajar apenas tamaño y peso del texto en ese grafico.
+  - se sumo clase visual `cer-label` para bajar apenas tamaÃ±o y peso del texto en ese grafico.
 - Verificacion:
   - `node --check` paso correctamente sobre `rendimientos-ar/public/bdi-charts.js`.
 - Siguiente paso sugerido:
@@ -2803,7 +2803,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
 - Verificacion:
   - ajuste visual en CSS, sin cambios de logica.
 - Siguiente paso sugerido:
-  - refrescar `Heatmap` y validar si el hint ya acompaña bien al bloque o si conviene atenuarlo aun mas.
+  - refrescar `Heatmap` y validar si el hint ya acompaÃ±a bien al bloque o si conviene atenuarlo aun mas.
 
 ## 2026-04-16 11:34:00 -03:00
 - Accion: nuevo ajuste de proporciones del box superior del `Heatmap`.
@@ -2834,7 +2834,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
 - Verificacion:
   - ajuste visual en CSS, sin cambios de logica.
 - Siguiente paso sugerido:
-  - refrescar `Heatmap USA` y validar si el box ya acompaña mejor al contenido o si queres compactar tambien un poco `Inicio` y `Fin`.
+  - refrescar `Heatmap USA` y validar si el box ya acompaÃ±a mejor al contenido o si queres compactar tambien un poco `Inicio` y `Fin`.
 
 ## 2026-04-16 12:35:00 -03:00
 - Accion: habilitacion de rango historico para `Heatmap` de acciones argentinas, preservando el mismo criterio visual de tamano.
@@ -3409,7 +3409,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - el boton `Hasta hoy` vuelve a setear ambos extremos del rango con esa misma logica;
   - se actualizaron los textos de hint para reflejar `ultima rueda disponible vs rueda previa`.
 - Decisiones:
-  - se privilegio consistencia de carga por encima de ahorrar un fetch al reabrir la pestaña;
+  - se privilegio consistencia de carga por encima de ahorrar un fetch al reabrir la pestaÃ±a;
   - no se intento resolver feriados de mercado en esta fase, solo fines de semana y lunes, que eran el problema reportado.
 - Problemas:
   - ninguno en codigo; la hipotesis principal fue que el `0%` de `Argentina ARS` estaba vinculado a fechas no habiles usadas como rango por defecto.
@@ -3500,7 +3500,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - se redujo el alto responsive de `760px` a `700px`;
   - se mantuvo intacto el calculo, el dominio Y y el SVG interno de la curva.
 - Pendientes:
-  - validar visualmente que el box acompañe mejor al grafico y que la curva siga sin cortarse.
+  - validar visualmente que el box acompaÃ±e mejor al grafico y que la curva siga sin cortarse.
 - Siguiente paso sugerido:
   - refrescar con `Ctrl + F5` y revisar `Bonos CER`.
 ## 2026-04-23 10:54:19 -03:00
@@ -3510,7 +3510,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - `rendimientos-ar/public/styles.css`
   - `LOG.md`
 - Motivo:
-  - el usuario pidio evitar reconfiguraciones manuales separadas entre el tamaÃ±o del grafico y el tamaÃ±o del box contenedor.
+  - el usuario pidio evitar reconfiguraciones manuales separadas entre el tamaÃƒÂ±o del grafico y el tamaÃƒÂ±o del box contenedor.
 - Resultado:
   - `renderScatter()` ahora publica el alto real del SVG en la variable CSS `--bdi-chart-height`;
   - `.scatter-plot` dejo de tener alto fijo y pasa a ajustarse automaticamente al contenido renderizado;
@@ -3519,7 +3519,7 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
 - Verificacion:
   - `node --check rendimientos-ar/public/bdi-charts.js` OK.
 - Pendientes:
-  - validar visualmente `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos` para confirmar que el box acompaÃ±a al grafico sin aire sobrante.
+  - validar visualmente `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos` para confirmar que el box acompaÃƒÂ±a al grafico sin aire sobrante.
 - Siguiente paso sugerido:
   - refrescar con `Ctrl + F5` y revisar primero `Bonos CER`; si queda bien, revisar las otras curvas.
 ## 2026-04-23 11:02:43 -03:00
@@ -3615,3 +3615,288 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - validar visualmente si la curva CER queda mas clara sin `PARP`.
 - Siguiente paso sugerido:
   - refrescar con `Ctrl + F5` y revisar `Curva CER`.
+## 2026-04-23 11:40:42 -03:00
+- Accion: primer paso de separacion tecnica para la calculadora de `Interes compuesto`.
+- Archivos afectados:
+  - `rendimientos-ar/public/compound-core.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio empezar a separar la seccion de `Interes compuesto` del resto de secciones, siguiendo una refactorizacion chica, reversible y de bajo riesgo.
+- Resultado:
+  - se creo `rendimientos-ar/public/compound-core.js` con la logica financiera pura de la calculadora;
+  - `app.js` dejo de alojar `getEffectiveMonthlyRate()` y `runCompoundScenario()`;
+  - `runCompoundCalculator()` ahora consume `window.BDICompoundCore.buildCompoundResults()` e `isValidCompoundInputSet()`;
+  - `index.html` carga el nuevo modulo antes de `app.js`;
+  - no se modifico todavia el render visual ni la estructura HTML de la seccion.
+- Verificacion:
+  - `node --check rendimientos-ar/public/app.js` OK.
+  - `node --check rendimientos-ar/public/compound-core.js` OK.
+- Decisiones:
+  - se priorizo separar primero calculo vs UI, porque es el bloque mas seguro para mover sin romper la experiencia.
+- Pendientes:
+  - mover en un segundo paso la lectura de inputs y el armado de resultados intermedios a helpers propios de la seccion;
+  - dejar para una etapa posterior la separacion del render SVG/tabla/resumen.
+- Siguiente paso sugerido:
+  - hacer un segundo paso chico sobre la seccion para desacoplar `runCompoundCalculator()` del DOM y dejar a `app.js` solo como orquestador liviano.
+## 2026-04-23 11:44:53 -03:00
+- Accion: segundo paso de separacion tecnica para la calculadora de `Interes compuesto`.
+- Archivos afectados:
+  - `rendimientos-ar/public/compound-ui.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - continuar la separacion incremental de la seccion, reduciendo la dependencia directa de `runCompoundCalculator()` respecto del DOM y del texto inline de status.
+- Resultado:
+  - se creo `rendimientos-ar/public/compound-ui.js`;
+  - la lectura de inputs del formulario ahora vive en `readCompoundCalculatorInputs()`;
+  - el mensaje de estado posterior al calculo ahora se compone con `buildCompoundStatusMessage()`;
+  - `index.html` carga el nuevo modulo antes de `app.js`;
+  - `runCompoundCalculator()` quedo mas cerca de un orquestador que conecta `UI -> core -> render`.
+- Verificacion:
+  - `node --check rendimientos-ar/public/app.js` OK.
+  - `node --check rendimientos-ar/public/compound-ui.js` OK.
+- Decisiones:
+  - se mantuvo un fallback defensivo dentro de `app.js` por si el helper no carga, para no romper la calculadora.
+- Pendientes:
+  - separar en un proximo paso el render del grafico/resumen/tabla fuera de `app.js` o, al menos, centralizar el armado de view-models de la seccion.
+- Siguiente paso sugerido:
+  - hacer un tercer paso chico para mover la preparacion de datos del grafico y del breakdown a helpers propios de `Interes compuesto`.
+## 2026-04-23 11:49:12 -03:00
+- Accion: tercer paso de separacion tecnica para la calculadora de `Interes compuesto`.
+- Archivos afectados:
+  - `rendimientos-ar/public/compound-view-models.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - continuar la modularizacion de la seccion, dejando fuera de `app.js` la preparacion de datos para el resumen, el breakdown y el grafico.
+- Resultado:
+  - se creo `rendimientos-ar/public/compound-view-models.js`;
+  - `renderCompoundSummary()` ahora consume un summary model;
+  - `renderCompoundBreakdown()` ahora consume un breakdown model;
+  - `renderCompoundChart()` ahora consume un chart model;
+  - `app.js` conserva el render SVG/HTML, pero deja de calcular internamente buena parte de la estructura previa a la vista.
+- Verificacion:
+  - `node --check rendimientos-ar/public/app.js` OK.
+  - `node --check rendimientos-ar/public/compound-view-models.js` OK.
+- Decisiones:
+  - se mantuvo el render dentro de `app.js` para no abrir un frente grande de riesgo en esta etapa.
+- Pendientes:
+  - mover en un paso posterior el render SVG/HTML de la calculadora a un modulo propio;
+  - revisar si conviene crear un namespace `BDICompound` que agrupe `core`, `ui` y `view-models`.
+- Siguiente paso sugerido:
+  - hacer un cuarto paso chico para separar el render del chart y/o de las tarjetas, manteniendo el comportamiento actual.
+## 2026-04-23 12:03:43 -03:00
+- Accion: cuarto y quinto paso juntos para la separacion tecnica de la calculadora de `Interes compuesto`.
+- Archivos afectados:
+  - `rendimientos-ar/public/compound-renderers.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - completar la separacion de la capa visual de la seccion, moviendo el render del resumen, la tabla final y el grafico a un modulo propio, sin abrir un refactor riesgoso.
+- Resultado:
+  - se creo `rendimientos-ar/public/compound-renderers.js`;
+  - el render de tarjetas, breakdown y grafico ahora vive fuera de `app.js`;
+  - `index.html` carga el nuevo bundle antes de `app.js`;
+  - `app.js` quedo como orquestador y delega el render en `window.BDICompoundRenderers`;
+  - se agrego una validacion defensiva para abortar con mensaje claro si la capa de render no estuviera disponible.
+- Verificacion:
+  - pendiente de validacion sintactica final sobre `app.js` y `compound-renderers.js`.
+- Decisiones:
+  - se mantuvo una transicion conservadora dentro de `app.js`, priorizando bajo riesgo y reversibilidad por sobre limpieza agresiva en un solo paso.
+- Pendientes:
+  - correr la validacion sintactica final;
+  - evaluar en una etapa posterior si conviene remover el render legacy ya eclipsado dentro de `app.js`.
+- Siguiente paso sugerido:
+  - revisar visualmente la calculadora y, si todo sigue estable, avanzar con una limpieza controlada del codigo legado que ya no participa del flujo activo.
+## 2026-04-23 12:06:37 -03:00
+- Accion: documentacion del pendiente de limpieza legacy en la seccion de `Interes compuesto`.
+- Archivos afectados:
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - dejar explicitado que todavia existe codigo legacy eclipsado dentro de `app.js`, aunque no bloquea la arquitectura actual ni requiere accion inmediata.
+- Resultado:
+  - se agrego en `README.md` la nota de pendiente sobre una futura limpieza controlada del codigo legacy de la calculadora.
+- Decisiones:
+  - no avanzar por ahora con la remocion del codigo legado para mantener bajo riesgo y evitar cambios innecesarios.
+- Pendientes:
+  - solo abordar esa limpieza si mas adelante aporta claridad real o simplifica mantenimiento.
+## 2026-04-23 12:17:06 -03:00
+- Accion: limpieza de menciones documentales heredadas del nombre `Cocos`.
+- Archivos afectados:
+  - `AGENTS.md`
+  - `README.md`
+  - `LOG.md`
+  - `rendimientos-ar/public/app.js`
+- Motivo:
+  - erradicar referencias documentales y metadatos no funcionales asociadas al broker original, manteniendo intacto el comportamiento de la pagina.
+- Resultado:
+  - se reemplazo el naming documental `BDI App Cocos / BDI-App-Cocos` por `BDI Consultora App / BDI-Consultora-App`;
+  - se actualizaron rutas documentales para reflejar el workspace actual;
+  - se removio una referencia textual no funcional en un comentario de `app.js`;
+  - se verifico que las unicas menciones remanentes a `Cocos` estan en `config.json` y en el matching funcional de logos/datos dentro de `app.js`.
+- Decisiones:
+  - no se tocaron `rendimientos-ar/public/config.json` ni las claves/matches funcionales de `rendimientos-ar/public/app.js` para no alterar datos, logos ni comportamiento visible de la pagina.
+- Pendientes:
+  - si en una etapa posterior se quiere eliminar por completo la presencia del broker tambien a nivel funcional/visible, habra que definir un reemplazo de datos y branding que no rompa la UX ni el contenido financiero.
+## 2026-04-23 12:50:33 -03:00
+- Accion: primer paso de ordenamiento de metadata manual de `Renta fija` en una capa propia BDI.
+- Archivos afectados:
+  - `rendimientos-ar/public/fixed-income/shared/schemas.js`
+  - `rendimientos-ar/public/fixed-income/shared/dates.js`
+  - `rendimientos-ar/public/fixed-income/shared/cashflows.js`
+  - `rendimientos-ar/public/fixed-income/shared/labels.js`
+  - `rendimientos-ar/public/fixed-income/corporativos/instruments.js`
+  - `rendimientos-ar/public/fixed-income/corporativos/issuers.js`
+  - `rendimientos-ar/public/fixed-income/corporativos/catalog.js`
+  - `rendimientos-ar/public/fixed-income/corporativos/adapters.js`
+  - `rendimientos-ar/public/fixed-income/lecaps/instruments.js`
+  - `rendimientos-ar/public/fixed-income/lecaps/catalog.js`
+  - `rendimientos-ar/public/fixed-income/lecaps/adapters.js`
+  - `rendimientos-ar/public/fixed-income/cer/instruments.js`
+  - `rendimientos-ar/public/fixed-income/cer/catalog.js`
+  - `rendimientos-ar/public/fixed-income/cer/adapters.js`
+  - `rendimientos-ar/public/fixed-income/soberanos/instruments.js`
+  - `rendimientos-ar/public/fixed-income/soberanos/catalog.js`
+  - `rendimientos-ar/public/fixed-income/soberanos/adapters.js`
+  - `rendimientos-ar/public/fixed-income/index.js`
+  - `rendimientos-ar/public/bdi-ons-data.js`
+  - `rendimientos-ar/public/index.html`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - comenzar la migracion de metadata manual hacia una estructura mas prolija, mantenible y propia de BDI, empezando por `corporativos`.
+- Resultado:
+  - se creo la carpeta `fixed-income/` con estructura por familia y helpers compartidos;
+  - se migraron los datos manuales de `corporativos` desde el antiguo `bdi-ons-data.js` a una separacion `instrumentos + emisores + catalogo + adapters`;
+  - se mantuvo `bdi-ons-data.js` como shim de compatibilidad para que la app siga leyendo `window.BDI_ON_MONITOR` sin cambios visibles;
+  - `index.html` ahora carga la nueva capa antes del shim.
+- Verificacion:
+  - `node --check` OK en `schemas.js`, `catalog.js`, `adapters.js`, `fixed-income/index.js` y `bdi-ons-data.js`;
+  - el shim de compatibilidad sigue exponiendo `15` instrumentos en `window.BDI_ON_MONITOR`.
+- Problemas:
+  - durante el cambio se reemplazo momentaneamente `bdi-ons-data.js`; se recompuso inmediatamente como archivo de compatibilidad para respetar la restriccion de no borrar archivos y conservar bajo riesgo.
+- Decisiones:
+  - no migrar todavia `lecaps`, `cer` ni `soberanos` para mantener el paso acotado;
+  - dejar creados los directorios y stubs del resto de familias para fijar desde ahora la arquitectura objetivo.
+- Pendientes:
+  - migrar `soberanos`, `cer` y `lecaps` a la nueva capa `fixed-income/`;
+  - cuando la migracion este completa, evaluar una limpieza controlada de referencias legacy en `config.json` y otros archivos puente.
+## 2026-04-23 12:58:58 -03:00
+- Accion: migracion de la metadata manual de `Soberanos` a la capa `fixed-income/`.
+- Archivos afectados:
+  - `rendimientos-ar/public/fixed-income/soberanos/instruments.js`
+  - `rendimientos-ar/public/fixed-income/soberanos/catalog.js`
+  - `rendimientos-ar/public/fixed-income/soberanos/adapters.js`
+  - `rendimientos-ar/public/fixed-income/index.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo:
+  - continuar el ordenamiento de la renta fija manual en una estructura mas clara y consistente, manteniendo compatibilidad con la app actual.
+- Resultado:
+  - se genero `fixed-income/soberanos/instruments.js` a partir de la metadata actual de `config.json`;
+  - se agregaron `catalog.js` y `adapters.js` para exponer la familia de forma ordenada;
+  - `index.html` ahora carga la familia `soberanos` dentro de la nueva capa;
+  - `app.js` ya consulta primero `BDIFixedIncomeData.soberanos` y solo usa `config.soberanos` como fallback transitorio;
+  - esto impacta tanto en la seccion de `Soberanos` como en la lectura de holdings del portfolio.
+- Verificacion:
+  - `node --check` OK en `soberanos/instruments.js`, `soberanos/catalog.js`, `soberanos/adapters.js` y `app.js`;
+  - el catalogo nuevo expone la misma cantidad de bonos que `config.soberanos`: `13:13`.
+- Decisiones:
+  - no se removio todavia `config.soberanos` para mantener rollback simple y riesgo bajo;
+  - se reutilizo exactamente la metadata vigente para asegurar equivalencia funcional.
+
+## 2026-04-23 19:08:00 -03:00
+- Accion: migracion de la metadata manual de `CER` a la capa `fixed-income/`.
+- Archivos afectados:
+  - `rendimientos-ar/public/fixed-income/cer/instruments.js`
+  - `rendimientos-ar/public/fixed-income/cer/catalog.js`
+  - `rendimientos-ar/public/fixed-income/cer/adapters.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: continuar la separacion prolija de metadata manual de renta fija fuera de `config.json` y consolidar la familia `CER` en la arquitectura BDI `fixed-income/*`.
+- Resultado:
+  - se genero `fixed-income/cer/instruments.js` a partir de la metadata vigente de `config.json`;
+  - `catalog.js` y `adapters.js` ahora exponen la familia CER de forma consistente con `corporativos` y `soberanos`;
+  - `index.html` carga la nueva familia antes de `fixed-income/index.js`;
+  - `app.js` ya consulta primero `BDIFixedIncomeData.cer` y mantiene `config.bonos_cer` como fallback transitorio;
+  - esto impacta tanto en `Bonos CER` como en la lectura de holdings CER dentro de `Mi cartera`.
+- Problemas encontrados:
+  - un parche grande inicial no enganchó completo y se reaplicó en bloques más chicos para mantener bajo riesgo.
+- Decisiones tomadas:
+  - preservar por ahora el fallback hacia `config.json` para sostener una reversión simple;
+  - no limpiar todavía `config.bonos_cer` hasta terminar la migración de `LECAPs/BONCAPs`.
+- Pendientes:
+  - validar la paridad exacta de instrumentos CER contra `config.json`;
+  - migrar `LECAPs/BONCAPs` a la misma estructura.
+- Siguiente paso sugerido:
+  - completar `LECAPs/BONCAPs` y luego evaluar una limpieza controlada de metadata legacy en `config.json`.
+
+## 2026-04-23 19:23:00 -03:00
+- Accion: migracion de la metadata manual de `LECAPs/BONCAPs` a la capa `fixed-income/`.
+- Archivos afectados:
+  - `rendimientos-ar/public/fixed-income/lecaps/instruments.js`
+  - `rendimientos-ar/public/fixed-income/lecaps/catalog.js`
+  - `rendimientos-ar/public/fixed-income/lecaps/adapters.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: completar la migracion de la renta fija ARS manual a la arquitectura BDI `fixed-income/*`, preservando fuente, fecha de actualizacion y universo de instrumentos.
+- Resultado:
+  - se genero `fixed-income/lecaps/instruments.js` a partir de la metadata vigente de `config.json`;
+  - `catalog.js` y `adapters.js` ahora exponen la familia con `fuente`, `actualizado`, lista de letras y lookup por ticker;
+  - `index.html` carga la nueva familia antes de `fixed-income/index.js`;
+  - `app.js` ya consulta primero `BDIFixedIncomeData.lecaps` tanto en la seccion principal como en el flujo de `Mi cartera`, manteniendo `config.lecaps` como fallback transitorio.
+- Decisiones tomadas:
+  - modelar `LECAPs/BONCAPs` con una estructura levemente mas rica que otras familias para preservar `fuente` y `actualizado`;
+  - mantener la nomenclatura y reglas de calculo actuales, sin tocar presentacion ni formulas.
+- Pendientes:
+  - validar paridad exacta entre la capa nueva y `config.json`;
+  - evaluar, en una siguiente etapa, la limpieza controlada de metadata legacy ya duplicada en `config.json`.
+- Siguiente paso sugerido:
+  - validar paridad y, si da bien, pasar a revisar si ya conviene planificar la limpieza gradual de `config.json`.
+
+## 2026-04-23 19:41:00 -03:00
+- Accion: limpieza controlada de metadata legacy duplicada en `config.json`.
+- Archivos afectados:
+  - `rendimientos-ar/public/config.json`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario valido visualmente que la app ya funciona correctamente leyendo la nueva capa `public/fixed-income/`, por lo que la metadata duplicada en `config.json` podia reducirse sin perder funcionamiento visible.
+- Resultado:
+  - `lecaps` se redujo a un placeholder minimo con `fuente`, `actualizado` y `letras: []`;
+  - `soberanos` se redujo a `{}`;
+  - `bonos_cer` se redujo a `{}`;
+  - `config.json` sigue siendo JSON valido y la app mantiene fallback tecnico basico, pero la fuente real de metadata manual ya es `public/fixed-income/`.
+- Problemas encontrados:
+  - durante la limpieza manual quedo un remanente del bloque viejo de `soberanos` y el JSON se invalido temporalmente;
+  - se reconstruyo el archivo por bloques de texto y se valido de nuevo antes de cerrar la tarea.
+- Decisiones tomadas:
+  - no eliminar por completo las claves del JSON para conservar forma de esquema y fallback basico;
+  - concentrar la metadata operativa de renta fija en la nueva capa BDI y dejar `config.json` liviano.
+- Verificacion:
+  - `JSON.parse` OK sobre `rendimientos-ar/public/config.json`;
+  - `node --check` OK sobre `rendimientos-ar/public/app.js`;
+  - `config.json` muestra placeholders limpios en `lecaps`, `soberanos` y `bonos_cer`.
+- Pendientes:
+  - evaluar en una etapa posterior si conviene quitar tambien los fallbacks legacy de `app.js` una vez que la nueva capa quede considerada definitiva.
+- Siguiente paso sugerido:
+  - hacer una ultima prueba visual rapida de `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Mi cartera`, y si sigue todo bien, dar por cerrada la migracion de metadata manual de renta fija.
+- Pendientes:
+  - migrar `cer` y `lecaps` a la misma capa;
+  - cuando todas las familias esten migradas, evaluar una limpieza controlada de `config.json`.
+

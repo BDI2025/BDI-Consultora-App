@@ -1,81 +1,81 @@
-# BDI App Cocos
+﻿# BDI Consultora App
 
 ## Objetivo General2
-Transformar la aplicación base `rendimientos-ar` en un producto propio de BDI Consultora, preservando las funcionalidades valiosas y redefiniendo identidad visual, experiencia, arquitectura de presentación, organización de la información, textos y branding.
+Transformar la aplicaciÃ³n base `rendimientos-ar` en un producto propio de BDI Consultora, preservando las funcionalidades valiosas y redefiniendo identidad visual, experiencia, arquitectura de presentaciÃ³n, organizaciÃ³n de la informaciÃ³n, textos y branding.
 
-## Objetivos Específicos
-- Auditar técnicamente el proyecto base antes de modificarlo.
+## Objetivos EspecÃ­ficos
+- Auditar tÃ©cnicamente el proyecto base antes de modificarlo.
 - Identificar dependencias, fuentes de datos, endpoints y riesgos de mantenimiento.
 - Definir una propuesta de producto y sistema visual alineados con BDI Consultora.
-- Implementar una migración progresiva, con bajo riesgo y documentación persistente.
+- Implementar una migraciÃ³n progresiva, con bajo riesgo y documentaciÃ³n persistente.
 - Mantener compatibilidad funcional mientras se refactoriza.
 
 ## Estado Actual Del Workspace
-- Carpeta de trabajo activa: `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`
+- Carpeta de trabajo activa: `C:\Users\juand\Documents\GitHub\BDI-Consultora-App`
 - Estado de Git/worktree:
-  - la carpeta raíz `BDI-App-Cocos` ahora es el repositorio Git principal del proyecto;
+  - la carpeta raÃ­z `BDI-Consultora-App` ahora es el repositorio Git principal del proyecto;
   - estado actual: repo BDI inicializado y ya con commits locales de trabajo;
-  - no hay remoto configurado todavía;
-  - `rendimientos-ar` ya no contiene `.git` propio y quedó integrado como carpeta de código dentro del proyecto BDI.
+  - no hay remoto configurado todavÃ­a;
+  - `rendimientos-ar` ya no contiene `.git` propio y quedÃ³ integrado como carpeta de cÃ³digo dentro del proyecto BDI.
 - Contenido detectado al inicio:
   - `Estilo visual BDI/Manual de marca.pdf`
   - `Estilo visual BDI/Marca_02 Isotipo 6.png`
-- Estado del código fuente de la app:
+- Estado del cÃ³digo fuente de la app:
   - el repositorio base ya fue clonado localmente;
-  - la auditoría ya puede hacerse sobre archivos reales del proyecto.
+  - la auditorÃ­a ya puede hacerse sobre archivos reales del proyecto.
 
 ## Estructura Actual Del Proyecto
 ```text
-BDI-App-Cocos/
-├─ Estilo visual BDI/
-│  ├─ Manual de marca.pdf
-│  └─ Marca_02 Isotipo 6.png
-├─ rendimientos-ar/
-│  ├─ netlify/functions/
-│  ├─ public/
-│  ├─ supabase/
-│  ├─ test/
-│  ├─ server.js
-│  ├─ netlify.toml
-│  └─ package.json
-├─ README.md
-├─ AGENTS.md
-└─ LOG.md
+BDI-Consultora-App/
+â”œâ”€ Estilo visual BDI/
+â”‚  â”œâ”€ Manual de marca.pdf
+â”‚  â””â”€ Marca_02 Isotipo 6.png
+â”œâ”€ rendimientos-ar/
+â”‚  â”œâ”€ netlify/functions/
+â”‚  â”œâ”€ public/
+â”‚  â”œâ”€ supabase/
+â”‚  â”œâ”€ test/
+â”‚  â”œâ”€ server.js
+â”‚  â”œâ”€ netlify.toml
+â”‚  â””â”€ package.json
+â”œâ”€ README.md
+â”œâ”€ AGENTS.md
+â””â”€ LOG.md
 ```
 
 ## Estructura Objetivo Tentativa
-Pendiente de confirmar luego de la auditoría técnica del repositorio base. La estructura final deberá separar claramente:
-- frontend público,
-- configuración,
+Pendiente de confirmar luego de la auditorÃ­a tÃ©cnica del repositorio base. La estructura final deberÃ¡ separar claramente:
+- frontend pÃºblico,
+- configuraciÃ³n,
 - funciones serverless o adapters,
-- documentación de despliegue,
+- documentaciÃ³n de despliegue,
 - assets de marca BDI.
 
-## Reglas De Organización
-- Trabajar únicamente dentro de `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`.
-- No borrar, mover ni renombrar archivos sin instrucción explícita del usuario.
+## Reglas De OrganizaciÃ³n
+- Trabajar Ãºnicamente dentro de `C:\Users\juand\Documents\GitHub\BDI-Consultora-App`.
+- No borrar, mover ni renombrar archivos sin instrucciÃ³n explÃ­cita del usuario.
 - Inspeccionar siempre antes de modificar.
 - Documentar cada cambio relevante en `README.md`, `AGENTS.md` y `LOG.md` cuando corresponda.
-- Mantener diferenciados: hallazgo técnico, propuesta de mejora, cambio obligatorio y mejora opcional.
+- Mantener diferenciados: hallazgo tÃ©cnico, propuesta de mejora, cambio obligatorio y mejora opcional.
 
-## Estándar Técnico Activo
-- Para el desarrollo de BDI, especialmente en `Optimizador de carteras` y en los módulos de `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`, se adopta como referencia técnica el bloque `Engineering / Compound` incluido en [AGENTS.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/AGENTS.md).
+## EstÃ¡ndar TÃ©cnico Activo
+- Para el desarrollo de BDI, especialmente en `Optimizador de carteras` y en los mÃ³dulos de `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`, se adopta como referencia tÃ©cnica el bloque `Engineering / Compound` incluido en [AGENTS.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/AGENTS.md).
 - Esto implica priorizar:
-  - arquitectura explícita y mantenible;
-  - separación clara entre cálculo, transformación de datos y render;
-  - reglas y mapeos explícitos;
+  - arquitectura explÃ­cita y mantenible;
+  - separaciÃ³n clara entre cÃ¡lculo, transformaciÃ³n de datos y render;
+  - reglas y mapeos explÃ­citos;
   - estructuras de datos consistentes;
-  - validaciones técnicas antes de cerrar cambios relevantes.
-- La documentación operativa de BDI no cambia:
-  - [LOG.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/LOG.md) sigue siendo el registro cronológico obligatorio;
+  - validaciones tÃ©cnicas antes de cerrar cambios relevantes.
+- La documentaciÃ³n operativa de BDI no cambia:
+  - [LOG.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/LOG.md) sigue siendo el registro cronolÃ³gico obligatorio;
   - [README.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/README.md) refleja cambios de comportamiento, alcance y estructura;
   - [AGENTS.md](/C:/Users/juand/Documents/GitHub/BDI-Consultora-App/AGENTS.md) conserva las reglas y restricciones activas.
 
 ## Estado Actual Del Proyecto
-- Etapa activa: `Etapa 4 - Plan técnico de implementación`
-- Documentación operativa inicial: creada.
-- Auditoría del repositorio fuente: en curso, ahora sobre el clon local `rendimientos-ar` y complementada con la app publicada `https://rendimientos.co/`.
-- Implementación local sobre el código fuente: iniciada en `Bloque 1 - identidad visual y branding base`.
+- Etapa activa: `Etapa 4 - Plan tÃ©cnico de implementaciÃ³n`
+- DocumentaciÃ³n operativa inicial: creada.
+- AuditorÃ­a del repositorio fuente: en curso, ahora sobre el clon local `rendimientos-ar` y complementada con la app publicada `https://rendimientos.co/`.
+- ImplementaciÃ³n local sobre el cÃ³digo fuente: iniciada en `Bloque 1 - identidad visual y branding base`.
 
 ## Propuesta Inicial De Producto BDI
 
@@ -83,10 +83,10 @@ Pendiente de confirmar luego de la auditoría técnica del repositorio base. La 
 Convertir la app actual desde un comparador financiero amplio hacia una herramienta de lectura de mercado y seguimiento de instrumentos con enfoque consultivo, institucional y claro para usuarios argentinos.
 
 ### Cambio De Enfoque Recomendado
-- De: comparador general con navegación por tipo técnico de producto.
-- A: terminal liviana / dashboard consultivo de BDI con navegación por objetivo, moneda y lectura de mercado.
+- De: comparador general con navegaciÃ³n por tipo tÃ©cnico de producto.
+- A: terminal liviana / dashboard consultivo de BDI con navegaciÃ³n por objetivo, moneda y lectura de mercado.
 
-### Qué Conservar
+### QuÃ© Conservar
 - Monitor global.
 - Cotizaciones y noticias.
 - Billeteras / liquidez.
@@ -96,23 +96,23 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 - Bonos CER.
 - Soberanos USD.
 - ONs corporativas.
-- Herramientas de análisis propias de BDI:
+- Herramientas de anÃ¡lisis propias de BDI:
   - optimizador de carteras;
   - heatmap de mercado tipo Finviz para large caps de Estados Unidos;
-  - calculadora de interés compuesto.
+  - calculadora de interÃ©s compuesto.
 
-### Qué Reordenar
-- La navegación principal.
+### QuÃ© Reordenar
+- La navegaciÃ³n principal.
 - El naming de secciones.
-- La jerarquía entre home, secciones locales y renta fija.
-- La lógica de presentación de tablas, badges y resúmenes.
+- La jerarquÃ­a entre home, secciones locales y renta fija.
+- La lÃ³gica de presentaciÃ³n de tablas, badges y resÃºmenes.
 
-### Qué Dejar En Revisión
+### QuÃ© Dejar En RevisiÃ³n
 - Portfolio:
   - aporta valor, pero agrega complejidad por depender de Supabase, login Google, permisos y persistencia;
-  - conviene mantenerlo como módulo secundario hasta estabilizar el core público BDI.
+  - conviene mantenerlo como mÃ³dulo secundario hasta estabilizar el core pÃºblico BDI.
 
-### Navegación BDI Propuesta
+### NavegaciÃ³n BDI Propuesta
 - `Inicio`
   - resumen ejecutivo del mercado;
   - indicadores clave;
@@ -127,32 +127,32 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
   - instrumentos a tasa fija en pesos;
   - tabla con TNA, TIR, TEM, duration y duration modificada.
 - `Bonos CER`
-  - bonos ajustados por inflación;
+  - bonos ajustados por inflaciÃ³n;
   - lectura de duration, TIR real, TEM y sensibilidad.
 - `Renta fija USD`
   - soberanos hard dollar;
-  - curva y métricas clave.
+  - curva y mÃ©tricas clave.
 - `Corporativos`
   - ONs en USD;
   - comparador institucional con filtros por emisor, duration y rendimiento.
-- `Interés compuesto`
-  - simulador de capital inicial, aportes, tasa y frecuencia de capitalización;
-  - comparación entre trayectoria sin invertir y escenarios con inversión compuesta.
+- `InterÃ©s compuesto`
+  - simulador de capital inicial, aportes, tasa y frecuencia de capitalizaciÃ³n;
+  - comparaciÃ³n entre trayectoria sin invertir y escenarios con inversiÃ³n compuesta.
 - `Heatmap USA`
   - mapa sectorial tipo Finviz con acciones large cap de Estados Unidos;
-  - tamaño relativo por market cap y color por variación diaria.
+  - tamaÃ±o relativo por market cap y color por variaciÃ³n diaria.
   - proveedor preparado para migrar de Yahoo fallback a Polygon mediante `POLYGON_API_KEY`.
 - `Mi cartera` o `Portfolio`
-  - sólo si se decide preservar el módulo autenticado en la primera versión BDI.
+  - sÃ³lo si se decide preservar el mÃ³dulo autenticado en la primera versiÃ³n BDI.
 
 ### Criterio De Renombre
-- `Mundo` → `Inicio` o `Mercado`
-- `ARS` → desagregar en `Liquidez`, `Renta fija ARS` y `Bonos CER`
-- `Bonos` → `Renta fija USD`
-- `ONs` → `Corporativos`
-- `Portfolio` → `Mi cartera` o `Mi portfolio BDI`
+- `Mundo` â†’ `Inicio` o `Mercado`
+- `ARS` â†’ desagregar en `Liquidez`, `Renta fija ARS` y `Bonos CER`
+- `Bonos` â†’ `Renta fija USD`
+- `ONs` â†’ `Corporativos`
+- `Portfolio` â†’ `Mi cartera` o `Mi portfolio BDI`
 
-### Priorización Recomendada
+### PriorizaciÃ³n Recomendada
 1. Inicio / Resumen ejecutivo
 2. Liquidez
 3. Renta fija ARS
@@ -163,57 +163,57 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 
 ### Tono Y Copy Recomendados
 - Profesional, claro y directo.
-- Menos comparador informal, más lectura de mercado.
+- Menos comparador informal, mÃ¡s lectura de mercado.
 - Evitar tono fintech o trading especulativo.
 - Usar lenguaje como:
   - `Rendimiento estimado`
   - `Tasa nominal anual`
-  - `Duración`
+  - `DuraciÃ³n`
   - `Perfil conservador / moderado`
-  - `Fuente y actualización`
-  - `Lectura rápida`
+  - `Fuente y actualizaciÃ³n`
+  - `Lectura rÃ¡pida`
 
 ### Home BDI Propuesta
-- Encabezado con resumen del día:
+- Encabezado con resumen del dÃ­a:
   - tasas clave;
-  - dólar oficial / MEP / CCL;
-  - riesgo país;
+  - dÃ³lar oficial / MEP / CCL;
+  - riesgo paÃ­s;
   - equity y commodities globales.
-- Bloque de “Lectura BDI”:
-  - breve interpretación del contexto.
-- Bloques de acceso rápido:
+- Bloque de â€œLectura BDIâ€:
+  - breve interpretaciÃ³n del contexto.
+- Bloques de acceso rÃ¡pido:
   - Liquidez;
   - Pesos a tasa fija;
   - CER;
   - USD;
   - Corporativos.
-- Noticias en formato más sobrio y menos “ticker invasivo”.
+- Noticias en formato mÃ¡s sobrio y menos â€œticker invasivoâ€.
 
 ### Principios De UX Recomendados
-- Menos tabs horizontales técnicas.
-- Más jerarquía editorial.
-- Tablas con filtros claros y badges útiles.
-- Priorizar mobile como lectura guiada, no como réplica comprimida del desktop.
-- Mostrar fuente y fecha de actualización en cada módulo crítico.
+- Menos tabs horizontales tÃ©cnicas.
+- MÃ¡s jerarquÃ­a editorial.
+- Tablas con filtros claros y badges Ãºtiles.
+- Priorizar mobile como lectura guiada, no como rÃ©plica comprimida del desktop.
+- Mostrar fuente y fecha de actualizaciÃ³n en cada mÃ³dulo crÃ­tico.
 
 ## Insumos De Marca Disponibles
 - Carpeta de marca:
-  - `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\Estilo visual BDI`
+  - `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\Estilo visual BDI`
 - Archivos detectados:
   - `Manual de marca.pdf`
   - `Marca_02 Isotipo 6.png`
 
 ## Nota Sobre La Etapa Visual
 - El isotipo pudo inspeccionarse visualmente de forma local.
-- El manual PDF está disponible y debe considerarse fuente de verdad de la marca.
-- Limitación actual del entorno:
-  - no fue posible extraer texto legible del PDF con las herramientas disponibles en esta sesión;
-  - por eso, la propuesta visual se apoya en señales verificables del isotipo y en una traducción prudente a sistema de interfaz, sin afirmar reglas exactas del manual que no pudieron leerse automáticamente.
+- El manual PDF estÃ¡ disponible y debe considerarse fuente de verdad de la marca.
+- LimitaciÃ³n actual del entorno:
+  - no fue posible extraer texto legible del PDF con las herramientas disponibles en esta sesiÃ³n;
+  - por eso, la propuesta visual se apoya en seÃ±ales verificables del isotipo y en una traducciÃ³n prudente a sistema de interfaz, sin afirmar reglas exactas del manual que no pudieron leerse automÃ¡ticamente.
 
 ## Confirmaciones Visuales Aportadas Por El Usuario
-- Aplicación preferente de marca:
+- AplicaciÃ³n preferente de marca:
   - usar la marca en color institucional negro con isotipo color siempre que se pueda;
-  - en fondos complejos o fotográficos, usar variantes monocromáticas según necesidad.
+  - en fondos complejos o fotogrÃ¡ficos, usar variantes monocromÃ¡ticas segÃºn necesidad.
 - Paleta confirmada desde capturas del manual:
   - Negro: `#232323`
   - Verde oscuro: `#157347`
@@ -222,36 +222,36 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
   - Gris: `#EEEEEF`
   - Blanco: `#FFFFFF`
 
-## Observación Operativa Sobre Git/GitHub Desktop
-- La carpeta raíz `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` ahora sí es el repositorio Git principal.
-- `rendimientos-ar` dejó de ser un repo independiente y pasó a ser parte del proyecto BDI.
-- Para ver el proyecto correctamente en GitHub Desktop debe abrirse la carpeta raíz `BDI-App-Cocos`, no la subcarpeta `rendimientos-ar`.
+## ObservaciÃ³n Operativa Sobre Git/GitHub Desktop
+- La carpeta raÃ­z `C:\Users\juand\Documents\GitHub\BDI-Consultora-App` ahora sÃ­ es el repositorio Git principal.
+- `rendimientos-ar` dejÃ³ de ser un repo independiente y pasÃ³ a ser parte del proyecto BDI.
+- Para ver el proyecto correctamente en GitHub Desktop debe abrirse la carpeta raÃ­z `BDI-Consultora-App`, no la subcarpeta `rendimientos-ar`.
 
-## Decisión De Estructura Tomada
+## DecisiÃ³n De Estructura Tomada
 - Objetivo elegido por el usuario:
   - pasar a un repo propio de BDI con independencia real;
-  - conservar la estructura de trabajo y el contenido base que hoy está dentro de `rendimientos-ar`.
-- Implicancia técnica:
-  - el clon original no alcanzaba para ser “propio” solo por existir en la máquina local;
-  - esa dependencia quedó cortada al eliminar `.git` dentro de `rendimientos-ar` y crear `.git` en la raíz del proyecto.
+  - conservar la estructura de trabajo y el contenido base que hoy estÃ¡ dentro de `rendimientos-ar`.
+- Implicancia tÃ©cnica:
+  - el clon original no alcanzaba para ser â€œpropioâ€ solo por existir en la mÃ¡quina local;
+  - esa dependencia quedÃ³ cortada al eliminar `.git` dentro de `rendimientos-ar` y crear `.git` en la raÃ­z del proyecto.
 - Estrategia objetivo:
-  - `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` ya es el repo principal del producto BDI;
-  - el código fuente quedó incorporado como parte del proyecto propio;
-  - código, documentación y branding ya comparten una sola raíz versionada.
+  - `C:\Users\juand\Documents\GitHub\BDI-Consultora-App` ya es el repo principal del producto BDI;
+  - el cÃ³digo fuente quedÃ³ incorporado como parte del proyecto propio;
+  - cÃ³digo, documentaciÃ³n y branding ya comparten una sola raÃ­z versionada.
 
-## Próximo Paso Operativo En Git
-1. Abrir `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` en GitHub Desktop.
+## PrÃ³ximo Paso Operativo En Git
+1. Abrir `C:\Users\juand\Documents\GitHub\BDI-Consultora-App` en GitHub Desktop.
 2. Verificar que aparezcan como cambios:
   - `AGENTS.md`
 
 ## Estado De Datos Del Heatmap
 - Fuente actual por default:
-  - `Yahoo Finance` para precio y variación diaria;
-  - escala curada de market cap para el tamaño relativo.
-- Migración preparada:
+  - `Yahoo Finance` para precio y variaciÃ³n diaria;
+  - escala curada de market cap para el tamaÃ±o relativo.
+- MigraciÃ³n preparada:
   - si existe la variable de entorno `POLYGON_API_KEY`, el backend del heatmap prioriza `Polygon`;
-  - en ese modo, el endpoint intenta usar snapshots y referencia corporativa de Polygon para mejorar realismo en precio, variación diaria y market cap;
-  - si Polygon no está configurado o falla, el sistema vuelve automáticamente al fallback de Yahoo para no romper la visualización.
+  - en ese modo, el endpoint intenta usar snapshots y referencia corporativa de Polygon para mejorar realismo en precio, variaciÃ³n diaria y market cap;
+  - si Polygon no estÃ¡ configurado o falla, el sistema vuelve automÃ¡ticamente al fallback de Yahoo para no romper la visualizaciÃ³n.
    - `LOG.md`
    - `README.md`
    - `Estilo visual BDI/`
@@ -259,14 +259,14 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
 3. Crear luego un repositorio nuevo de BDI en GitHub y agregarlo como remoto cuando el usuario lo decida.
 
 ## Estado Git Actual
-- La carpeta raíz ya fue agregada a GitHub Desktop como repositorio local confiable.
+- La carpeta raÃ­z ya fue agregada a GitHub Desktop como repositorio local confiable.
 - Es normal que el primer estado muestre una gran cantidad de archivos para commit:
-  - incluye documentación raíz;
+  - incluye documentaciÃ³n raÃ­z;
   - incluye assets de marca;
-  - incluye todo el código fuente dentro de `rendimientos-ar/`.
+  - incluye todo el cÃ³digo fuente dentro de `rendimientos-ar/`.
 - Esto corresponde al primer versionado del proyecto BDI como repositorio independiente.
 
-## Avance De Implementación
+## Avance De ImplementaciÃ³n
 
 ### Bloque 1 En Curso
 - Branding base aplicado en:
@@ -276,73 +276,73 @@ Convertir la app actual desde un comparador financiero amplio hacia una herramie
   - `rendimientos-ar/netlify/functions/auth-config.js`
   - `rendimientos-ar/public/bdi-overrides.js`
 - Cambios introducidos:
-  - títulos y metadatos BDI;
-  - header y navegación con naming inicial BDI;
-  - tipografía base migrada a `IBM Plex Sans` / `IBM Plex Mono`;
+  - tÃ­tulos y metadatos BDI;
+  - header y navegaciÃ³n con naming inicial BDI;
+  - tipografÃ­a base migrada a `IBM Plex Sans` / `IBM Plex Mono`;
   - paleta base alineada con colores confirmados de marca;
   - visual principal movida desde terminal oscura a interfaz clara institucional;
   - CORS preparado para `bdiconsultora.com`.
-  - script de overrides para alinear títulos y copy visibles sin reescribir por completo la lógica central de `app.js`.
+  - script de overrides para alinear tÃ­tulos y copy visibles sin reescribir por completo la lÃ³gica central de `app.js`.
   - home reforzada con briefing editorial y shortcuts a bloques principales.
 
-### Limitación De Verificación Actual
-- En esta sesión no hay `node` ni `npm`, por lo que no fue posible levantar la app localmente desde el entorno del agente.
-- El testing visual/manual de este bloque deberá hacerse en la máquina del usuario cuando lo indique el flujo.
+### LimitaciÃ³n De VerificaciÃ³n Actual
+- En esta sesiÃ³n no hay `node` ni `npm`, por lo que no fue posible levantar la app localmente desde el entorno del agente.
+- El testing visual/manual de este bloque deberÃ¡ hacerse en la mÃ¡quina del usuario cuando lo indique el flujo.
 
-## Plan Técnico De Implementación
+## Plan TÃ©cnico De ImplementaciÃ³n
 
 ### Objetivo Del Plan
-Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando compatibilidad funcional mientras se desacopla branding, navegación y lógica.
+Aplicar la transformaciÃ³n a producto BDI en bloques de bajo riesgo, preservando compatibilidad funcional mientras se desacopla branding, navegaciÃ³n y lÃ³gica.
 
 ### Orden Recomendado De Trabajo
 1. `Bloque 0 - Base y seguridad operativa`
-   - corregir documentación del proyecto propio;
+   - corregir documentaciÃ³n del proyecto propio;
    - revisar `.gitignore` y variables de entorno;
    - confirmar estructura final de trabajo.
 2. `Bloque 1 - Identidad visual y branding base`
-   - reemplazar nombre, metadatos, favicon, colores y tipografía;
+   - reemplazar nombre, metadatos, favicon, colores y tipografÃ­a;
    - actualizar header, footer y textos de marca;
    - corregir problemas de encoding visibles.
-3. `Bloque 2 - Reorganización de navegación`
-   - transformar la jerarquía actual de tabs hacia la navegación BDI;
-   - sin alterar todavía cálculos financieros ni endpoints.
-4. `Bloque 3 - Rediseño de home e información clave`
+3. `Bloque 2 - ReorganizaciÃ³n de navegaciÃ³n`
+   - transformar la jerarquÃ­a actual de tabs hacia la navegaciÃ³n BDI;
+   - sin alterar todavÃ­a cÃ¡lculos financieros ni endpoints.
+4. `Bloque 3 - RediseÃ±o de home e informaciÃ³n clave`
    - convertir `Mundo` en `Inicio`/`Resumen ejecutivo`;
-   - reformular ticker, cotizaciones y noticias a formato más consultivo.
+   - reformular ticker, cotizaciones y noticias a formato mÃ¡s consultivo.
 5. `Bloque 4 - Reordenamiento por secciones`
    - Liquidez;
    - Renta fija ARS;
    - Bonos CER;
    - Renta fija USD;
    - Corporativos.
-6. `Bloque 5 - Refactor técnico interno`
+6. `Bloque 5 - Refactor tÃ©cnico interno`
    - modularizar `app.js`;
-   - separar fetch, transformación y render;
+   - separar fetch, transformaciÃ³n y render;
    - aislar config y utilidades.
 7. `Bloque 6 - Portfolio`
    - decidir continuidad;
    - si se conserva, rebrandear y auditar auth/Supabase con cuidado.
 8. `Bloque 7 - Deploy y endurecimiento`
-   - actualizar README técnico;
+   - actualizar README tÃ©cnico;
    - documentar variables de entorno;
    - preparar remoto y despliegue propio.
 
 ### Archivos A Modificar Primero
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\index.html`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\styles.css`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\app.js`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\manifest.json`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\config.json`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\server.js`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\netlify.toml`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\netlify\functions\auth-config.js`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\README.md`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\public\index.html`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\public\styles.css`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\public\app.js`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\public\manifest.json`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\public\config.json`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\server.js`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\netlify.toml`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\netlify\functions\auth-config.js`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\README.md`
 
 ### Archivos Nuevos Recomendados
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\docs\migration-plan.md`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\docs\deploy.md`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\docs\data-sources.md`
-- `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar\public\icons\...` actualizados a marca BDI
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\docs\migration-plan.md`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\docs\deploy.md`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\docs\data-sources.md`
+- `C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar\public\icons\...` actualizados a marca BDI
 - archivos modulares futuros para reemplazar partes de `app.js`, por ejemplo:
   - `public/js/navigation.js`
   - `public/js/market-home.js`
@@ -351,20 +351,20 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 
 ### Archivos A No Tocar En La Primera Ola
 - `supabase/rls_policies.sql` salvo necesidad puntual.
-- lógica de cálculos financieros profundos mientras se reordena branding y UX.
-- funciones serverless de datos, excepto branding/cors/documentación mínima.
+- lÃ³gica de cÃ¡lculos financieros profundos mientras se reordena branding y UX.
+- funciones serverless de datos, excepto branding/cors/documentaciÃ³n mÃ­nima.
 
 ### Riesgos De Compatibilidad
-- cambiar nombres de secciones sin mapear bien los IDs y hashes puede romper navegación.
-- mover demasiado rápido lógica desde `app.js` puede romper render, eventos y cálculos.
+- cambiar nombres de secciones sin mapear bien los IDs y hashes puede romper navegaciÃ³n.
+- mover demasiado rÃ¡pido lÃ³gica desde `app.js` puede romper render, eventos y cÃ¡lculos.
 - tocar `config.json` sin disciplina puede romper portfolio, bonos y cashflows.
 - tocar Netlify o auth demasiado temprano puede romper entorno productivo y login.
 - cambiar branding sin revisar manifest, metadata social y favicon deja inconsistencias de producto.
 
 ### Estrategia De Testing Manual
 - revisar desktop y mobile en cada bloque.
-- validar navegación hash/tab por tab.
-- validar que cada sección cargue datos o falle de forma controlada.
+- validar navegaciÃ³n hash/tab por tab.
+- validar que cada secciÃ³n cargue datos o falle de forma controlada.
 - verificar:
   - Mundo/Inicio
   - Liquidez
@@ -386,15 +386,15 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
   - CORS y dominios permitidos;
 - definir luego remoto GitHub propio y target de hosting propio.
 
-## Auditoría Remota Inicial Del Repositorio Base
+## AuditorÃ­a Remota Inicial Del Repositorio Base
 
 ### Stack Detectado
-- Frontend web estático en `HTML + CSS + JavaScript` sin framework SPA moderno visible.
+- Frontend web estÃ¡tico en `HTML + CSS + JavaScript` sin framework SPA moderno visible.
 - Backend liviano para desarrollo local con `Node.js + Express`.
 - Serverless functions en `Netlify Functions`.
-- Configuración de despliegue en `netlify.toml`.
+- ConfiguraciÃ³n de despliegue en `netlify.toml`.
 - PWA con `manifest.json` y `service worker`.
-- Integración real con `Supabase` para autenticación Google, portfolio y tracking de page views.
+- IntegraciÃ³n real con `Supabase` para autenticaciÃ³n Google, portfolio y tracking de page views.
 
 ### Estructura Remota Detectada
 - `.agents/`
@@ -413,8 +413,8 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 
 ### Estructura Funcional Principal
 - `public/index.html`: landing/app principal.
-- `public/app.js`: lógica central del frontend y renderizado de secciones.
-- `public/config.json`: configuración estática y hardcodeada de instrumentos/flujos.
+- `public/app.js`: lÃ³gica central del frontend y renderizado de secciones.
+- `public/config.json`: configuraciÃ³n estÃ¡tica y hardcodeada de instrumentos/flujos.
 - `public/styles.css`: estilos y dark mode.
 - `server.js`: servidor Express para desarrollo local.
 - `netlify/functions/*.js`: adapters/proxies para fuentes externas.
@@ -423,13 +423,13 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 - `.env.example` expone solo:
   - `PORT=3000`
   - `NODE_ENV=development`
-- Observación:
+- ObservaciÃ³n:
   - el servidor local expone `/api/auth-config`, que espera:
     - `SUPABASE_URL`
     - `SUPABASE_ANON_KEY`
-  - estas variables no están documentadas en `.env.example`, por lo que la configuración actual está incompleta.
+  - estas variables no estÃ¡n documentadas en `.env.example`, por lo que la configuraciÃ³n actual estÃ¡ incompleta.
 
-### Endpoints Públicos Documentados
+### Endpoints PÃºblicos Documentados
 - `GET /api/mundo`
 - `GET /api/mundo?symbol=X&range=Y`
 - `GET /api/news`
@@ -452,62 +452,62 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 - ArgentinaDatos: FCIs y plazo fijo.
 - CAFCI: fichas de fondos.
 - data912: LECAPs, BONCAPs, soberanos USD, ONs y precios CER.
-- BCRA: índice CER y último CER.
-- Config estática en `config.json`: billeteras y flujos hardcodeados.
+- BCRA: Ã­ndice CER y Ãºltimo CER.
+- Config estÃ¡tica en `config.json`: billeteras y flujos hardcodeados.
 
-### Dependencias Críticas
+### Dependencias CrÃ­ticas
 - `express` y `node-fetch` como dependencias declaradas en `package.json`.
-- Netlify como capa de routing serverless en producción.
+- Netlify como capa de routing serverless en producciÃ³n.
 - Terceros de mercado y scraping/proxy para precios.
-- Configuración manual en `config.json` para instrumentos y cashflows.
+- ConfiguraciÃ³n manual en `config.json` para instrumentos y cashflows.
 - Supabase para auth, persistencia del portfolio y page views.
 
 ### Riesgos Iniciales
 - Fuerte dependencia de terceros sin contrato estable: Yahoo Finance, Google News RSS, data912, BCRA, ArgentinaDatos, CAFCI.
-- La lógica de negocio está muy concentrada en `public/app.js` (aprox. 182 KB), lo que sugiere acoplamiento alto entre fetch, transformación, cálculos financieros y UI.
+- La lÃ³gica de negocio estÃ¡ muy concentrada en `public/app.js` (aprox. 182 KB), lo que sugiere acoplamiento alto entre fetch, transformaciÃ³n, cÃ¡lculos financieros y UI.
 - `config.json` concentra datos manuales sensibles al mantenimiento.
-- Entorno local incompleto respecto de producción: el proyecto usa redirects y funciones Netlify que no quedan totalmente replicadas con `server.js`.
-- La configuración de Supabase no aparece claramente documentada en `.env.example`.
+- Entorno local incompleto respecto de producciÃ³n: el proyecto usa redirects y funciones Netlify que no quedan totalmente replicadas con `server.js`.
+- La configuraciÃ³n de Supabase no aparece claramente documentada en `.env.example`.
 - `server.js` intenta leer `data_base/CER_serie.csv`, pero esa carpeta no existe en el clon local; esto puede romper la parte CER en entorno local.
-- Se observan problemas de encoding de texto (`Ã`, `â`) en varios archivos, lo que indica inconsistencias de codificación a corregir en la migración.
+- Se observan problemas de encoding de texto (`Ãƒ`, `Ã¢`) en varios archivos, lo que indica inconsistencias de codificaciÃ³n a corregir en la migraciÃ³n.
 
-### Observación Legal/Licencia
-- En `package.json` figura `"license": "ISC"`, pero no se detectó archivo `LICENSE` visible en la raíz del repositorio base durante la inspección remota.
-- Hasta validar la licencia efectiva y el alcance de reutilización comercial, **no conviene asumir libre explotación comercial del repo tal como está**.
-- Recomendación: antes de desplegar una versión comercial BDI derivada, confirmar licencia del repo y, si hace falta, solicitar autorización explícita o reconstruir componentes sensibles con implementación propia.
+### ObservaciÃ³n Legal/Licencia
+- En `package.json` figura `"license": "ISC"`, pero no se detectÃ³ archivo `LICENSE` visible en la raÃ­z del repositorio base durante la inspecciÃ³n remota.
+- Hasta validar la licencia efectiva y el alcance de reutilizaciÃ³n comercial, **no conviene asumir libre explotaciÃ³n comercial del repo tal como estÃ¡**.
+- RecomendaciÃ³n: antes de desplegar una versiÃ³n comercial BDI derivada, confirmar licencia del repo y, si hace falta, solicitar autorizaciÃ³n explÃ­cita o reconstruir componentes sensibles con implementaciÃ³n propia.
 
 ## Hallazgos Iniciales Importantes
-- La carpeta local seleccionada todavía no contiene el código fuente de la aplicación objetivo.
+- La carpeta local seleccionada todavÃ­a no contiene el cÃ³digo fuente de la aplicaciÃ³n objetivo.
 - Existe material de marca BDI disponible para informar el futuro rebranding.
-- Antes de cualquier refactor o rebranding, será necesario decidir si:
-  - se clona el repositorio base dentro de esta carpeta y se trabaja allí, o
-  - se recrea una base propia tomando el repo sólo como referencia técnica.
+- Antes de cualquier refactor o rebranding, serÃ¡ necesario decidir si:
+  - se clona el repositorio base dentro de esta carpeta y se trabaja allÃ­, o
+  - se recrea una base propia tomando el repo sÃ³lo como referencia tÃ©cnica.
 
 ## Supuestos Importantes
 - El usuario quiere preservar la compatibilidad funcional del producto actual mientras se lo transforma.
-- La nueva app será una evolución del proyecto original, no una copia superficial.
-- La marca BDI requiere una estética institucional, sobria y clara.
-- La documentación del proyecto debe poder reconstruir el contexto aunque se pierda la conversación.
+- La nueva app serÃ¡ una evoluciÃ³n del proyecto original, no una copia superficial.
+- La marca BDI requiere una estÃ©tica institucional, sobria y clara.
+- La documentaciÃ³n del proyecto debe poder reconstruir el contexto aunque se pierda la conversaciÃ³n.
 
 ## Restricciones Relevantes
 - No borrar archivos.
 - No mover archivos.
 - No renombrar archivos.
-- No salir de la carpeta seleccionada salvo instrucción explícita del usuario.
+- No salir de la carpeta seleccionada salvo instrucciÃ³n explÃ­cita del usuario.
 - No modificar carpetas externas o vecinas.
 - No hacer cambios destructivos ni reestructuraciones no autorizadas.
-- No dejar documentación desactualizada respecto del estado real del proyecto.
+- No dejar documentaciÃ³n desactualizada respecto del estado real del proyecto.
 
-## Próximos Pasos Sugeridos
-1. Completar la auditoría local del clon `rendimientos-ar`.
-2. Explicar arquitectura y conceptos base en lenguaje no técnico para acompañar la decisión de producto.
-3. Evaluar legalidad/licencia de reutilización comercial.
-4. Proponer estrategia de migración BDI sobre el repo local sin romper endpoints.
-5. Definir estructura objetivo y fases de implementación antes de editar la app.
+## PrÃ³ximos Pasos Sugeridos
+1. Completar la auditorÃ­a local del clon `rendimientos-ar`.
+2. Explicar arquitectura y conceptos base en lenguaje no tÃ©cnico para acompaÃ±ar la decisiÃ³n de producto.
+3. Evaluar legalidad/licencia de reutilizaciÃ³n comercial.
+4. Proponer estrategia de migraciÃ³n BDI sobre el repo local sin romper endpoints.
+5. Definir estructura objetivo y fases de implementaciÃ³n antes de editar la app.
 ## Actualizacion De Estado 2026-03-25
 
 ### Repo Y Worktree
-- La raiz `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos` ya es el repo Git principal del proyecto BDI.
+- La raiz `C:\Users\juand\Documents\GitHub\BDI-Consultora-App` ya es el repo Git principal del proyecto BDI.
 - `rendimientos-ar` ya no es un repo separado: quedo integrado como carpeta de codigo dentro del proyecto propio.
 - La documentacion operativa que se debe mantener es:
   - `README.md`
@@ -545,8 +545,8 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
     - turquesa de apoyo `#17BEBB`;
     - separacion visual mas clara entre dashboard, `Hot Movers` y `Noticias de mercado`.
   - iconos de app y favicon reemplazados por el isotipo BDI en `public/icons/icon-192.png` y `public/icons/icon-512.png`.
-  - iconos regenerados con recorte mas cerrado para que el isotipo se perciba mas grande en la pestaña del navegador.
-  - footer institucional actualizado a `BDI Consultora, elaborado por Tomás Rodríguez` con fuentes resumidas.
+  - iconos regenerados con recorte mas cerrado para que el isotipo se perciba mas grande en la pestaÃ±a del navegador.
+  - footer institucional actualizado a `BDI Consultora, elaborado por TomÃ¡s RodrÃ­guez` con fuentes resumidas.
   - seccion `Corporativos` rearmada sobre una seleccion BDI de ONs para mostrar:
     - precio en USD;
     - precio en ARS cuando existe punta local;
@@ -598,7 +598,7 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 - `Liquidez`, `Soberanos`, `Corporativos` y `Renta fija ARS` ya cargan sin los errores bloqueantes detectados en la primera prueba.
 - La navegacion visible ya no duplica labels en el header.
 - Queda pendiente una mejora funcional de visualizacion:
-  - recuperar o rediseñar las curvas de TIR vs Duration en `Renta fija ARS`, `Soberanos` y `Corporativos`.
+  - recuperar o rediseÃ±ar las curvas de TIR vs Duration en `Renta fija ARS`, `Soberanos` y `Corporativos`.
 - Decision vigente:
   - el estado actual ya es apto para un commit de estabilizacion;
   - la vuelta de curvas/graficos se toma como siguiente bloque de trabajo, no como bloqueo para este corte.
@@ -616,7 +616,7 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 
 ### Siguiente Bloque Funcional Sugerido
 - Reincorporar curvas de `Duration` vs `TIR` de forma estable y consistente con la identidad BDI.
-- Revisar si conviene mantener el esquema anterior de scatter plot o rediseñar los graficos con una presentacion mas consultiva e institucional.
+- Revisar si conviene mantener el esquema anterior de scatter plot o rediseÃ±ar los graficos con una presentacion mas consultiva e institucional.
 
 ### Avance Del Bloque De Curvas
 - Se agrego `rendimientos-ar/public/bdi-charts.js` como capa propia de visualizacion para curvas de instrumentos.
@@ -680,14 +680,14 @@ Aplicar la transformación a producto BDI en bloques de bajo riesgo, preservando
 
 ### Que significa "levantar la app"
 - No es abrir un archivo suelto.
-- Es encender un pequeño servidor local para que la app funcione como sitio web en tu computadora.
+- Es encender un pequeÃ±o servidor local para que la app funcione como sitio web en tu computadora.
 - Este proyecto usa `node` para eso.
 
 ### Paso 1 - Ver si ya tenes Node instalado
 En Windows, abri:
 - `PowerShell`, o
 - `Terminal`, o
-- `Símbolo del sistema`
+- `SÃ­mbolo del sistema`
 
 Y ejecuta:
 
@@ -719,13 +719,13 @@ npm.cmd start
 ### Paso 2 - Ir a la carpeta correcta
 La carpeta desde la que hay que correr la app es:
 
-`C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar`
+`C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar`
 
 ### Paso 3 - Instalar dependencias
 Solo la primera vez:
 
 ```powershell
-cd "C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos\rendimientos-ar"
+cd "C:\Users\juand\Documents\GitHub\BDI-Consultora-App\rendimientos-ar"
 npm install
 ```
 
@@ -773,7 +773,7 @@ Cuando el servidor arranque, abri:
 
 ### Paso A Paso Simple
 1. Crear un repositorio nuevo en GitHub con el proyecto BDI.
-2. Subir el contenido actual de `C:\Users\Tomas\Documents\GitHub\BDI-App-Cocos`.
+2. Subir el contenido actual de `C:\Users\juand\Documents\GitHub\BDI-Consultora-App`.
 3. Crear una cuenta o iniciar sesion en [Netlify](https://www.netlify.com/).
 4. Elegir `Add new site` o `Import from Git`.
 5. Conectar Netlify con el repo de GitHub donde quedo este proyecto.
@@ -811,7 +811,7 @@ Cuando el servidor arranque, abri:
 1. Publicar primero en una URL de Netlify.
 2. Revisar la app online.
 3. Corregir detalles finales.
-4. Recién despues conectar dominio propio si hace falta.
+4. ReciÃ©n despues conectar dominio propio si hace falta.
 
 ## Actualizacion De Home BDI
 - El monitor global deja de estar renderizado como una sola grilla plana.
@@ -847,7 +847,7 @@ Cuando el servidor arranque, abri:
 - `Yahoo Finance`: buena para monitor global y sparklines, pero no es fuente institucional formal.
 - `ArgentinaDatos`: razonablemente confiable para datos publicos, pero hay que vigilar cambios de esquema o disponibilidad.
 - `data912`: hoy es critica para renta fija; si falla, impacta fuerte en LECAPs, CER, soberanos y ONs.
-- `config.json`: es clave porque contiene parte del “cerebro” del producto; si queda desactualizado, aunque la API viva responda, los calculos pueden quedar mal.
+- `config.json`: es clave porque contiene parte del â€œcerebroâ€ del producto; si queda desactualizado, aunque la API viva responda, los calculos pueden quedar mal.
 ## Estado Actual Del Heatmap USA
 - El modulo `Heatmap USA` ya puede trabajar con un esquema hibrido para mejorar realismo sin romper la app actual.
 - Si existe `POLYGON_API_KEY`:
@@ -904,12 +904,20 @@ Cuando el servidor arranque, abri:
   - el flujo buscado sigue al script Python original: descarga de Yahoo, retornos diarios, media/covarianza anualizadas, optimizacion de Sharpe, minima volatilidad, retorno objetivo, frontera eficiente, CAGR y matriz de correlacion.
 
 ## Ajustes recientes
+- La calculadora de `Interes compuesto` comenzo su separacion tecnica del resto de `app.js`:
+  - la logica financiera pura vive ahora en `rendimientos-ar/public/compound-core.js`;
+  - la lectura del formulario y el armado del mensaje de estado viven ahora en `rendimientos-ar/public/compound-ui.js`;
+  - la preparacion de datos para resumen, breakdown y grafico vive ahora en `rendimientos-ar/public/compound-view-models.js`;
+  - el render visual de tarjetas, tabla y grafico vive ahora en `rendimientos-ar/public/compound-renderers.js`;
+  - `app.js` conserva por ahora solo la orquestacion de la seccion;
+  - la separacion actual ya desacopla calculo, UI, view-models y render sin cambiar el comportamiento visible;
+  - queda pendiente una limpieza controlada del codigo legacy que quedo eclipsado dentro de `app.js`, aunque ya no es necesaria para que la arquitectura siga separada y estable.
 - `Renta fija ARS` y `Bonos CER` suman columna `TEM` en sus tablas de monitoreo.
 - `Renta fija ARS` excluye automaticamente letras o bonos capitalizables que ya vencieron o que vencen en la fecha de liquidacion T+1, evitando TIRs artificiales al cierre del instrumento.
 - Los graficos de monitoreo de activos a cotizacion actual (`Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`) ahora muestran una `regresion polinomica` de grado 2 en `JavaScript` como guia visual; en `Renta fija ARS`, la logica `Nelson-Siegel` sigue preservada en codigo para futuras comparaciones.
 - Los graficos SVG de monitoreo de activos ahora muestran solo puntos y etiquetas, sin lineas de union.
 - `Soberanos` usa un eje Y dinamico para evitar que queden puntos fuera del grafico.
-- `Renta fija ARS`, `Bonos CER` y `Corporativos` ahora tambien ajustan dinamicamente el eje Y para que la escala acompañe mejor a los datos visibles.
+- `Renta fija ARS`, `Bonos CER` y `Corporativos` ahora tambien ajustan dinamicamente el eje Y para que la escala acompanÌƒe mejor a los datos visibles.
 - Las etiquetas de los graficos de renta fija se distribuyen con reglas automaticas de colision, sin offsets manuales por ticker.
 - Los ejes X de los graficos de renta fija ya no se fuerzan a arrancar en `0`; ahora se ajustan automaticamente segun el rango efectivo de cada familia.
 - El `Heatmap` usa un date picker propio para las fechas de USA, evitando el calendario nativo del navegador.
@@ -919,7 +927,7 @@ Cuando el servidor arranque, abri:
 - El `Heatmap` ahora resuelve la rueda diaria por defecto con logica de ultima sesion valida:
   - si el dia actual es habil, compara contra la rueda previa;
   - si cae en fin de semana, toma la ultima rueda disponible y la compara contra la anterior;
-  - esto evita rangos triviales o engañosos al abrir `USA` y `Argentina ARS`.
+  - esto evita rangos triviales o engaÃ±osos al abrir `USA` y `Argentina ARS`.
 - Para el `Heatmap` por rango:
   - `USA` ahora puede usar precio live cuando la fecha final es `hoy` pero el historico diario todavia no incorporo esa rueda;
   - `Argentina ARS` tambien puede caer a la variacion live del feed cuando el historico de `data912` colapsa el rango actual a un mismo dia y devolveria `0%` artificial.
@@ -951,3 +959,37 @@ Cuando el servidor arranque, abri:
   - modo `daily` vs `range`;
   - provider esperado;
   - intento de referencia con `Polygon`.
+- La metadata manual de `Renta fija` comenzo a ordenarse en una capa propia bajo `rendimientos-ar/public/fixed-income/`:
+  - se creo la estructura base por familia: `lecaps/`, `cer/`, `soberanos/` y `corporativos/`;
+  - se agregaron helpers compartidos en `rendimientos-ar/public/fixed-income/shared/`;
+  - `corporativos` fue la primera familia migrada;
+  - los instrumentos de ONs ahora viven en `rendimientos-ar/public/fixed-income/corporativos/instruments.js`;
+  - la informacion de emisores vive en `rendimientos-ar/public/fixed-income/corporativos/issuers.js`;
+  - el catalogo normalizado y el adaptador de compatibilidad viven en:
+    - `rendimientos-ar/public/fixed-income/corporativos/catalog.js`
+    - `rendimientos-ar/public/fixed-income/corporativos/adapters.js`
+  - `rendimientos-ar/public/bdi-ons-data.js` se mantiene como shim de compatibilidad para no romper el monitor actual mientras se migra el resto de renta fija.
+- `Soberanos` fue la segunda familia migrada a esta capa:
+  - la metadata manual ahora vive en `rendimientos-ar/public/fixed-income/soberanos/instruments.js`;
+  - el catalogo y el adaptador viven en:
+    - `rendimientos-ar/public/fixed-income/soberanos/catalog.js`
+    - `rendimientos-ar/public/fixed-income/soberanos/adapters.js`
+  - `app.js` ya consume primero esta capa y usa `config.json` solo como fallback transitorio.
+- `CER` fue la tercera familia migrada a esta capa:
+  - la metadata manual ahora vive en `rendimientos-ar/public/fixed-income/cer/instruments.js`;
+  - el catalogo y el adaptador viven en:
+    - `rendimientos-ar/public/fixed-income/cer/catalog.js`
+    - `rendimientos-ar/public/fixed-income/cer/adapters.js`
+  - `app.js` ya consume primero esta capa y usa `config.json` solo como fallback transitorio.
+- `LECAPs/BONCAPs` fue la cuarta familia migrada a esta capa:
+  - la metadata manual ahora vive en `rendimientos-ar/public/fixed-income/lecaps/instruments.js`;
+  - el catalogo y el adaptador viven en:
+    - `rendimientos-ar/public/fixed-income/lecaps/catalog.js`
+    - `rendimientos-ar/public/fixed-income/lecaps/adapters.js`
+  - `app.js` ya consume primero esta capa y usa `config.json` solo como fallback transitorio.
+- Despues de validar visualmente la integracion de `LECAPs/BONCAPs`, `CER` y `Soberanos`, se realizo una limpieza controlada de metadata legacy en `rendimientos-ar/public/config.json`:
+  - `lecaps` quedo reducido a un placeholder minimo con `fuente`, `actualizado` y `letras: []`;
+  - `soberanos` quedo como objeto vacio;
+  - `bonos_cer` quedo como objeto vacio;
+  - la fuente operativa real para esas familias pasa a ser la capa `public/fixed-income/`.
+
