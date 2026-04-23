@@ -97,6 +97,17 @@
     return Array.from({ length: count }, (_, index) => min + step * index);
   }
 
+  function createRoundedTicks(min, max, step = 5) {
+    if (!Number.isFinite(min) || !Number.isFinite(max) || step <= 0) return [];
+    const start = Math.floor(min / step) * step;
+    const end = Math.ceil(max / step) * step;
+    const ticks = [];
+    for (let value = start; value <= end + step * 0.5; value += step) {
+      ticks.push(value);
+    }
+    return ticks;
+  }
+
   function cumulativeMax(values) {
     const result = [];
     let current = -Infinity;
@@ -380,6 +391,24 @@
     return path;
   }
 
+  function buildLinearPath(points, scaleX, scaleY) {
+    const sorted = sortByX(points);
+    if (!sorted.length) return '';
+    return sorted
+      .map((point, index) => `${index === 0 ? 'M' : 'L'} ${scaleX(point.x)} ${scaleY(point.y)}`)
+      .join(' ');
+  }
+
+  function buildCurvePath(points, scaleX, scaleY, className = '') {
+    const normalizedClass = String(className || '');
+    if (normalizedClass.includes('polynomial-curve')) {
+      // The polynomial already defines the smooth trend. Drawing it point-to-point
+      // avoids cubic interpolation ripples between sampled points.
+      return buildLinearPath(points, scaleX, scaleY);
+    }
+    return buildMonotonePath(points, scaleX, scaleY);
+  }
+
   function buildLegend(items) {
     if (!items?.length) return '';
     return `
@@ -404,7 +433,9 @@
 
   function estimateLabelBox(point, x, y, anchor = 'middle', options = {}) {
     const valueText = `${formatNumber(point.y, 2)}%`;
-    const inlineText = options.inline ? `${point.label}; ${valueText}` : null;
+    const inlineText = options.inline
+      ? (options.includeInlineValue === false ? String(point.label || '') : `${point.label}; ${valueText}`)
+      : null;
     const labelWidth = Math.max(36, String(point.label || '').length * 7.1);
     const valueWidth = Math.max(34, valueText.length * 6.2);
     const inlineWidth = inlineText ? Math.max(46, inlineText.length * 6.6) : 0;
@@ -463,7 +494,9 @@
     sorted.forEach(({ point, index }, sortedIndex) => {
       const cx = scaleX(point.x);
       const cy = scaleY(point.y);
-      const preferred = [
+      const preferred = typeof options.preferredPlacements === 'function'
+        ? options.preferredPlacements(point, index, sortedIndex, sorted)
+        : [
         { dx: 0, dy: -18, anchor: 'middle' },
         { dx: 0, dy: 24, anchor: 'middle' },
         { dx: 14, dy: -8, anchor: 'start' },
@@ -486,8 +519,13 @@
       preferred.forEach((candidate, candidateIndex) => {
         const x = cx + candidate.dx;
         const y = cy + candidate.dy;
-        const box = estimateLabelBox(point, x, y, candidate.anchor, { inline: options.inlineLabels });
-        let penalty = candidateIndex * 4;
+        const box = estimateLabelBox(point, x, y, candidate.anchor, {
+          inline: options.inlineLabels,
+          includeInlineValue: options.estimateInlineValues !== false,
+        });
+        const distance = Math.hypot(candidate.dx, candidate.dy);
+        let penalty = candidateIndex * 4 + distance * 0.35;
+        if (distance > 36) penalty += (distance - 36) * 2.2;
 
         if (box.left < plotLeft) penalty += (plotLeft - box.left) * 5;
         if (box.right > plotRight) penalty += (box.right - plotRight) * 5;
@@ -517,7 +555,15 @@
         }
       });
 
-      const resolved = best || { dx: 0, dy: -18, anchor: 'middle', box: estimateLabelBox(point, cx, cy - 18, 'middle', { inline: options.inlineLabels }) };
+      const resolved = best || {
+        dx: 0,
+        dy: -18,
+        anchor: 'middle',
+        box: estimateLabelBox(point, cx, cy - 18, 'middle', {
+          inline: options.inlineLabels,
+          includeInlineValue: options.estimateInlineValues !== false,
+        }),
+      };
       occupied.push(resolved.box);
       placements[index] = resolved;
     });
@@ -545,14 +591,17 @@
       return;
     }
 
-    const width = 1320;
-    const height = 620;
+    const width = config.width || 1320;
+    const height = config.height || 620;
+    host.style.setProperty('--bdi-chart-height', `${height}px`);
     const margin = { top: 12, right: 18, bottom: 72, left: 74 };
     const plotWidth = width - margin.left - margin.right;
     const plotHeight = height - margin.top - margin.bottom;
 
-    const xs = allPoints.map((point) => point.x);
-    const ys = allPoints.map((point) => point.y);
+    const extraCurvePoints = (config.extraCurves || []).flatMap((curve) => curve.points || []);
+    const domainPoints = [...allPoints, ...extraCurvePoints].filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
+    const xs = domainPoints.map((point) => point.x);
+    const ys = domainPoints.map((point) => point.y);
     let minX = config.xDomain ? config.xDomain[0] : Math.min(...xs);
     let maxX = config.xDomain ? config.xDomain[1] : Math.max(...xs);
     let minY = config.yDomain ? config.yDomain[0] : Math.min(...ys);
@@ -568,8 +617,8 @@
     const scaleX = (value) => margin.left + ((value - minX) / (maxX - minX || 1)) * plotWidth;
     const scaleY = (value) => margin.top + plotHeight - ((value - minY) / (maxY - minY || 1)) * plotHeight;
 
-    const xTicks = createTicks(minX, maxX, config.xTickCount || 5);
-    const yTicks = createTicks(minY, maxY, config.yTickCount || 5);
+    const xTicks = config.xTicks || createTicks(minX, maxX, config.xTickCount || 5);
+    const yTicks = config.yTicks || createTicks(minY, maxY, config.yTickCount || 5);
 
     const gridLines = [
       ...xTicks.map((tick) => {
@@ -581,6 +630,10 @@
         return `<line x1="${margin.left}" y1="${y}" x2="${margin.left + plotWidth}" y2="${y}" class="bdi-chart-grid" />`;
       }),
     ].join('');
+
+    const zeroLine = config.showZeroLine && minY < 0 && maxY > 0
+      ? `<line x1="${margin.left}" y1="${scaleY(0)}" x2="${margin.left + plotWidth}" y2="${scaleY(0)}" class="bdi-chart-zero-line" />`
+      : '';
 
     const xLabels = xTicks.map((tick) => {
       const x = scaleX(tick);
@@ -595,13 +648,13 @@
     const curveMarkup = config.showCurve
       ? series.map((serie) => {
           const guidePoints = typeof serie.guideBuilder === 'function' ? serie.guideBuilder(serie.points) : [];
-          const path = buildMonotonePath(guidePoints, scaleX, scaleY);
+          const path = buildCurvePath(guidePoints, scaleX, scaleY, config.curveClass || '');
           if (!path) return '';
           return `<path d="${path}" class="bdi-chart-curve ${config.curveClass || ''}" style="stroke:${config.curveColor || serie.color}" />`;
         }).join('')
       : '';
     const extraCurveMarkup = (config.extraCurves || []).map((curve) => {
-      const path = buildMonotonePath(curve.points || [], scaleX, scaleY);
+      const path = buildCurvePath(curve.points || [], scaleX, scaleY, curve.className || '');
       if (!path) return '';
       return `<path d="${path}" class="bdi-chart-curve ${curve.className || ''}" style="stroke:${curve.color || PALETTE.local}" />`;
     }).join('');
@@ -613,7 +666,12 @@
       width,
       height,
       margin,
-      { pointRepelRadius: config.pointRepelRadius, inlineLabels: config.inlineLabels }
+      {
+        pointRepelRadius: config.pointRepelRadius,
+        inlineLabels: config.inlineLabels,
+        estimateInlineValues: config.estimateInlineValues,
+        preferredPlacements: config.preferredLabelPlacements,
+      }
     );
     const compactThreshold = Number.isFinite(config.compactThreshold) ? config.compactThreshold : 2;
     const ultraCompactThreshold = Number.isFinite(config.ultraCompactThreshold) ? config.ultraCompactThreshold : 4;
@@ -660,13 +718,15 @@
         </g>
       `;
     }).join('');
+    const shellClass = String(config.shellClass || '').replace(/[^a-z0-9_-]/gi, '');
 
     host.innerHTML = `
-      <div class="bdi-chart-shell">
+      <div class="bdi-chart-shell ${shellClass}">
         ${buildLegend(config.legend)}
         <svg viewBox="0 0 ${width} ${height}" class="bdi-chart-svg" aria-label="${escapeHtml(config.title)}">
           <rect x="${margin.left}" y="${margin.top}" width="${plotWidth}" height="${plotHeight}" class="bdi-chart-plot-bg"></rect>
           ${gridLines}
+          ${zeroLine}
           <line x1="${margin.left}" y1="${margin.top + plotHeight}" x2="${margin.left + plotWidth}" y2="${margin.top + plotHeight}" class="bdi-chart-axis" />
           <line x1="${margin.left}" y1="${margin.top}" x2="${margin.left}" y2="${margin.top + plotHeight}" class="bdi-chart-axis" />
           ${curveMarkup}
@@ -713,6 +773,7 @@
 
     renderScatter(host, {
       title: 'Curva de renta fija ARS',
+      height: 760,
       series: [
         {
           color: PALETTE.local,
@@ -841,13 +902,76 @@
 
   function renderCERCurveBDI(items) {
     const host = ensureHost('#cer-chart-section .scatter-plot');
-    const cerPoints = items.map((item) => ({ x: item.duration, y: item.ytm, label: item.symbol, color: PALETTE.cer }));
+    const cerChartItems = items.filter((item) => String(item.symbol || '').toUpperCase() !== 'PARP');
+    const cerPoints = cerChartItems.map((item) => ({ x: item.duration, y: item.ytm, label: item.symbol, color: PALETTE.cer }));
     const cerPolynomialFit = fitPolynomialCurve(cerPoints, 2, 120);
-    const cerYDomain = getDynamicYDomain(cerPoints, -11.5, 25.5, { minPad: 0.6, padRatio: 0.14 });
+    const cerDomainPoints = [...cerPoints, ...(cerPolynomialFit?.points || [])];
+    let cerYDomain = getDynamicYDomain(cerDomainPoints, -11.5, 25.5, { minPad: 1.1, padRatio: 0.2 });
     const cerXDomain = getDynamicXDomain(cerPoints, 0, 7, { padRatio: 0.06, minPad: 0.08 });
+    const cerYTicks = createRoundedTicks(cerYDomain[0], cerYDomain[1], 5);
+    if (cerYTicks.length >= 2) {
+      cerYDomain = [cerYTicks[0], cerYTicks[cerYTicks.length - 1]];
+    }
+
+    const cerLabelPlacements = (point, index) => {
+      const shortDuration = point.x < 1.2;
+      const midDuration = point.x >= 1.2 && point.x < 2.6;
+      const longDuration = point.x >= 2.6;
+      const stagger = index % 2 === 0 ? 1 : -1;
+
+      if (shortDuration) {
+        return [
+          { dx: 16, dy: 4, anchor: 'start' },
+          { dx: 18, dy: -12, anchor: 'start' },
+          { dx: 18, dy: 16, anchor: 'start' },
+          { dx: -16, dy: 4, anchor: 'end' },
+          { dx: -18, dy: -12, anchor: 'end' },
+          { dx: -18, dy: 16, anchor: 'end' },
+          { dx: 24, dy: stagger * 22, anchor: 'start' },
+          { dx: -24, dy: stagger * 22, anchor: 'end' },
+          { dx: 0, dy: -24, anchor: 'middle' },
+          { dx: 0, dy: 26, anchor: 'middle' },
+        ];
+      }
+
+      if (midDuration) {
+        return [
+          { dx: 16, dy: 4, anchor: 'start' },
+          { dx: 16, dy: -14, anchor: 'start' },
+          { dx: 16, dy: 18, anchor: 'start' },
+          { dx: -16, dy: 4, anchor: 'end' },
+          { dx: -18, dy: -14, anchor: 'end' },
+          { dx: -18, dy: 18, anchor: 'end' },
+          { dx: 24, dy: 22, anchor: 'start' },
+          { dx: 0, dy: -26, anchor: 'middle' },
+          { dx: 0, dy: 28, anchor: 'middle' },
+        ];
+      }
+
+      if (longDuration) {
+        return [
+          { dx: 16, dy: 4, anchor: 'start' },
+          { dx: 16, dy: -14, anchor: 'start' },
+          { dx: 16, dy: 18, anchor: 'start' },
+          { dx: -16, dy: 4, anchor: 'end' },
+          { dx: -18, dy: -14, anchor: 'end' },
+          { dx: -18, dy: 18, anchor: 'end' },
+          { dx: 0, dy: -26, anchor: 'middle' },
+          { dx: 0, dy: 28, anchor: 'middle' },
+        ];
+      }
+
+      return [
+        { dx: 16, dy: 4, anchor: 'start' },
+        { dx: -16, dy: 4, anchor: 'end' },
+        { dx: 0, dy: -22, anchor: 'middle' },
+        { dx: 0, dy: 28, anchor: 'middle' },
+      ];
+    };
 
     renderScatter(host, {
       title: 'Curva CER',
+      height: 760,
       series: [
         {
           color: PALETTE.cer,
@@ -858,7 +982,7 @@
         {
           points: cerPolynomialFit.points,
           color: '#ff9500',
-          className: 'polynomial-curve cer-curve',
+          className: 'polynomial-curve cer-curve cer-trend-curve',
         },
       ] : [],
       legend: [
@@ -869,19 +993,23 @@
       yLabel: 'TIR real (%)',
       xDomain: cerXDomain,
       yDomain: cerYDomain,
+      yTicks: cerYTicks,
       xTickCount: 4,
-      yTickCount: 6,
       xTickFormat: (value) => formatNumber(value, 1),
       yTickFormat: (value) => `${formatNumber(value, 1)}%`,
       compactThreshold: 1,
-      ultraCompactThreshold: 2,
-      pointRadius: 6.5,
-      pointRepelRadius: 14,
+      ultraCompactThreshold: 3,
+      pointRadius: 7.2,
+      pointRepelRadius: 16,
       showCallout: true,
       inlineLabels: true,
+      estimateInlineValues: false,
       labelClass: 'cer-label',
-      showValue: (point, nearbyCount) => nearbyCount === 0,
-      caption: 'Curva Familia CER ultima cotizacion',
+      shellClass: 'cer-chart-shell',
+      showZeroLine: true,
+      preferredLabelPlacements: cerLabelPlacements,
+      showValue: (point, nearbyCount) => nearbyCount <= 1,
+      caption: 'TIR real por duration. La linea naranja muestra una tendencia estimada sobre la familia CER.',
     });
   }
 

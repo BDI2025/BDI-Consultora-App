@@ -3455,3 +3455,163 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
     - rango por defecto en lunes y fines de semana.
 - Siguiente paso sugerido:
   - reiniciar la app local y revisar `Heatmap` en `USA` y `Argentina ARS`; con eso deberiamos poder cerrar esta tanda de fixes del modulo.
+## 2026-04-23 00:00:00 -03:00
+- Accion: ajuste visual de las curvas polinomicas en graficos de renta fija.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que la curva polinomica visible en los graficos se veia con oscilaciones/serrucho, especialmente en soberanos.
+- Resultado:
+  - se agrego un trazado especifico para curvas polinomicas que usa segmentos lineales densos sobre los puntos ya calculados del ajuste;
+  - se evita la interpolacion cubica entre muestras del polinomio, que podia generar micro-ripples visuales;
+  - se agrego `shape-rendering: geometricPrecision` y `vector-effect: non-scaling-stroke` al stroke de curva para mejorar nitidez.
+- Pendientes:
+  - validar visualmente en `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos`.
+- Siguiente paso sugerido:
+  - refrescar la pagina con `Ctrl + F5` y revisar que la curva se vea continua, sin ondulaciones artificiales.
+## 2026-04-23 00:00:00 -03:00
+- Accion: aumento de altura y correccion de dominio para la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que el grafico CER no tenia suficiente espacio vertical y que la curva polinomica podia salir por arriba del grafico.
+- Resultado:
+  - `renderScatter()` ahora acepta altura configurable por grafico;
+  - `Curva CER` usa un SVG interno mas alto;
+  - el dominio Y de CER ahora se calcula incluyendo tambien los puntos de la curva polinomica, no solo los bonos;
+  - el contenedor CSS de CER subio a `900px` en desktop y `760px` en pantallas chicas.
+- Pendientes:
+  - validar visualmente que la curva ya no se corte y que el grafico respire mejor.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar `Bonos CER`.
+## 2026-04-23 10:47:37 -03:00
+- Accion: ajuste del alto visual del contenedor de la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que el grafico CER habia quedado mas alto, pero el box contenedor crecio demasiado y dejaba aire visual innecesario.
+- Resultado:
+  - se redujo el alto desktop del contenedor CER de `900px` a `800px`;
+  - se redujo el alto responsive de `760px` a `700px`;
+  - se mantuvo intacto el calculo, el dominio Y y el SVG interno de la curva.
+- Pendientes:
+  - validar visualmente que el box acompañe mejor al grafico y que la curva siga sin cortarse.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar `Bonos CER`.
+## 2026-04-23 10:54:19 -03:00
+- Accion: automatizacion del alto del box de graficos de renta fija.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio evitar reconfiguraciones manuales separadas entre el tamaÃ±o del grafico y el tamaÃ±o del box contenedor.
+- Resultado:
+  - `renderScatter()` ahora publica el alto real del SVG en la variable CSS `--bdi-chart-height`;
+  - `.scatter-plot` dejo de tener alto fijo y pasa a ajustarse automaticamente al contenido renderizado;
+  - se eliminaron reglas especificas de alto para `LECAPS` y `CER` que podian desincronizarse;
+  - `Renta fija ARS` conserva su alto amplio desde la configuracion del render, no desde CSS externo.
+- Verificacion:
+  - `node --check rendimientos-ar/public/bdi-charts.js` OK.
+- Pendientes:
+  - validar visualmente `Renta fija ARS`, `Bonos CER`, `Soberanos` y `Corporativos` para confirmar que el box acompaÃ±a al grafico sin aire sobrante.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar primero `Bonos CER`; si queda bien, revisar las otras curvas.
+## 2026-04-23 11:02:43 -03:00
+- Accion: mejora visual de labels, ticks y referencias en la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario aprobo mejorar la estetica del grafico CER, con foco especial en la legibilidad de labels y manteniendo posibilidad de volver atras si no convence.
+- Resultado:
+  - se agregaron ticks Y redondeados cada `5%` para que la escala sea mas facil de leer;
+  - se agrego una linea horizontal suave en `0%` de TIR real;
+  - se incorporo una estrategia especifica de ubicacion de labels CER con mas candidatos de posicion por tramo de duration;
+  - se amplio la separacion contra puntos para reducir solapamientos;
+  - la curva naranja paso a segundo plano con menor grosor y menor opacidad;
+  - el caption inferior se cambio por una explicacion mas clara de la lectura del grafico.
+- Verificacion:
+  - `node --check rendimientos-ar/public/bdi-charts.js` OK.
+- Pendientes:
+  - validar visualmente si los labels del tramo corto quedaron suficientemente claros o si conviene reforzar mas callouts.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5`, revisar `Bonos CER` y decidir si mantenemos esta version o revertimos el bloque visual.
+## 2026-04-23 11:09:17 -03:00
+- Accion: segunda mejora de labels en la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `rendimientos-ar/public/styles.css`
+  - `LOG.md`
+- Motivo:
+  - el usuario reporto que algunos nombres quedaban demasiado lejos del punto y se podia confundir a que bono correspondian.
+- Resultado:
+  - el algoritmo de labels ahora penaliza la distancia, priorizando posiciones cercanas al punto;
+  - los candidatos especificos para labels CER se redujeron en distancia maxima;
+  - se mantuvieron alternativas arriba/abajo/izquierda/derecha para evitar solapamientos sin perder asociacion visual;
+  - las lineas guia CER se hicieron un poco mas visibles para los casos donde el label deba separarse.
+- Verificacion:
+  - `node --check rendimientos-ar/public/bdi-charts.js` OK.
+- Pendientes:
+  - validar visualmente con captura si el tramo corto ya queda claro o si conviene pasar a un modo de labels con fondo/pill para mejorar todavia mas.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar especialmente los bonos de duration corta en `Curva CER`.
+## 2026-04-23 11:13:39 -03:00
+- Accion: ajuste de estimacion de cajas de labels en la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo:
+  - el usuario detecto que labels como `X31L6` quedaban demasiado lejos del punto; la causa era que el algoritmo podia estimar cajas de texto mas anchas que el label final visible.
+- Resultado:
+  - `estimateLabelBox()` ahora permite estimar labels inline sin asumir siempre que se muestra tambien el valor de TIR;
+  - `Curva CER` usa esa estimacion mas compacta para ubicar nombres cerca del punto;
+  - se bajo levemente el radio de repelencia de puntos en CER para evitar desplazamientos excesivos.
+- Verificacion:
+  - `node --check rendimientos-ar/public/bdi-charts.js` OK.
+- Pendientes:
+  - validar visualmente si `X31L6` y el cluster corto quedan mas cerca sin volver a solaparse.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar nuevamente la zona izquierda de la `Curva CER`.
+## 2026-04-23 11:23:53 -03:00
+- Accion: cambio de prioridad de ubicacion de labels en la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio que, cuando no haya problema de espacio, el nombre quede prioritariamente a la derecha del punto; izquierda ante congestion y diagonales solo cuando haya demasiados puntos.
+- Resultado:
+  - la lista de candidatos de labels CER ahora prioriza derecha horizontal;
+  - luego prueba derecha levemente arriba/abajo;
+  - despues prueba izquierda;
+  - por ultimo usa diagonales y posiciones verticales si el cluster esta muy cargado;
+  - se mantiene la penalizacion por distancia y solapamiento para no forzar posiciones ilegibles.
+- Verificacion:
+  - `node --check rendimientos-ar/public/bdi-charts.js` OK.
+- Pendientes:
+  - validar visualmente que los labels sin conflicto queden a la derecha y que el cluster corto siga legible.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar la distribucion de labels en `Curva CER`.
+## 2026-04-23 11:29:10 -03:00
+- Accion: exclusion visual provisoria de `PARP` en la `Curva CER`.
+- Archivos afectados:
+  - `rendimientos-ar/public/bdi-charts.js`
+  - `LOG.md`
+- Motivo:
+  - el usuario pidio sacar `PARP` del grafico para evaluar como queda la curva sin ese ticker de duration larga.
+- Resultado:
+  - `PARP` se filtra solo en el render del grafico CER;
+  - no se elimina de la fuente de datos ni de la tabla;
+  - el ajuste polinomico y dominio del grafico pasan a calcularse sobre los puntos visibles sin `PARP`.
+- Verificacion:
+  - `node --check rendimientos-ar/public/bdi-charts.js` OK.
+- Pendientes:
+  - validar visualmente si la curva CER queda mas clara sin `PARP`.
+- Siguiente paso sugerido:
+  - refrescar con `Ctrl + F5` y revisar `Curva CER`.
