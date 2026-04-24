@@ -3932,3 +3932,229 @@ ode --check valido sin errores endimientos-ar/public/bdi-overrides.js.
   - migrar `cer` y `lecaps` a la misma capa;
   - cuando todas las familias esten migradas, evaluar una limpieza controlada de `config.json`.
 
+## 2026-04-24 11:55:00 -03:00
+- Accion: primer refactor estructural del motor Python del `Optimizador`.
+- Archivos afectados:
+  - `rendimientos-ar/python/optimizer_runner.py`
+  - `rendimientos-ar/python/optimizer/__init__.py`
+  - `rendimientos-ar/python/optimizer/errors.py`
+  - `rendimientos-ar/python/optimizer/inputs.py`
+  - `rendimientos-ar/python/optimizer/data.py`
+  - `rendimientos-ar/python/optimizer/optimize.py`
+  - `rendimientos-ar/python/optimizer/analytics.py`
+  - `rendimientos-ar/python/optimizer/payloads.py`
+  - `README.md`
+  - `LOG.md`
+- Motivo: comenzar a desacoplar el script unico del optimizador en una estructura mantenible, preservando a `Python + SciPy` como motor canonico y dejando `optimizer_runner.py` solo como entrypoint.
+- Resultado:
+  - se creo la carpeta `rendimientos-ar/python/optimizer/` como paquete propio del optimizador;
+  - se separaron responsabilidades en parsing de inputs, descarga de datos, optimizacion, analytics y serializacion del payload;
+  - `optimizer_runner.py` paso a ser un wrapper fino de `stdin -> build_payload() -> stdout`;
+  - la validacion de sintaxis con `python -m py_compile` dio OK para el runner y todos los modulos nuevos.
+- Problemas encontrados:
+  - en el primer parche se elimino accidentalmente `optimizer_runner.py` al intentar reemplazarlo completo;
+  - el archivo fue restaurado de inmediato en la misma sesion, manteniendo la restriccion operativa de no dejar archivos borrados.
+- Decisiones tomadas:
+  - mantener intacto el contrato del endpoint `/api/optimizer`;
+  - no tocar todavia `server.js` ni el fallback JS del frontend;
+  - priorizar una primera separacion interna sin cambiar resultados visibles.
+- Pendientes:
+  - agregar tests Python para fijar comportamiento del motor;
+  - evaluar una segunda etapa para reducir el peso del fallback JS y dejarlo mas claramente como contingencia;
+  - revisar si conviene sumar una capa explicita de esquema/contrato para input-output del optimizador.
+- Siguiente paso sugerido:
+  - hacer una prueba funcional del optimizador desde la pagina y, si sigue todo bien, avanzar con tests y una segunda etapa de limpieza controlada.
+
+## 2026-04-24 12:12:00 -03:00
+- Accion: incorporacion de tests Python para el motor del `Optimizador`.
+- Archivos afectados:
+  - `rendimientos-ar/python/tests/test_inputs.py`
+  - `rendimientos-ar/python/tests/test_data.py`
+  - `rendimientos-ar/python/tests/test_optimize.py`
+  - `rendimientos-ar/python/tests/test_analytics.py`
+  - `README.md`
+  - `LOG.md`
+- Motivo: fijar comportamiento del motor Python desacoplado en la etapa anterior y reducir riesgo de regresiones futuras sin depender de Yahoo ni de la UI.
+- Resultado:
+  - se creo una suite de unit tests Python propia del optimizador;
+  - los tests cubren inputs, carga/preparacion de datos con mocks, restricciones de optimizacion y analytics basicos;
+  - corrida validada con:
+    - `python -m unittest discover rendimientos-ar/python/tests -v`
+  - resultado: `9 tests OK`.
+- Decisiones tomadas:
+  - usar `unittest` estandar para no sumar dependencias extra en esta etapa;
+  - evitar red real y usar datos sinteticos o mocks de `yfinance`.
+- Verificacion:
+  - `python -m unittest discover rendimientos-ar/python/tests -v` OK;
+  - `python -m py_compile ...` OK sobre runner, paquete y tests.
+- Pendientes:
+  - sumar tests de payload completo con fixtures mas cercanas a casos reales;
+  - evaluar si conviene exponer un comando npm/documentado de smoke test que incluya la suite Python.
+- Siguiente paso sugerido:
+  - probar una corrida funcional del optimizador en la pagina y luego decidir si el proximo foco es reducir el fallback JS o empezar a separar el frontend del optimizador en modulos.
+
+## 2026-04-24 12:28:00 -03:00
+- Accion: reduccion del peso del fallback JS del `Optimizador` para dejar a Python como motor mas claramente canonico.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: el usuario pidio avanzar con el paso de jerarquizar `Python + SciPy` como fuente de verdad, manteniendo el fallback JS solo como contingencia.
+- Resultado:
+  - el flujo JS dejo de presentarse como `Fallback JS` y pasa a mostrarse como `Modo contingencia JS`;
+  - el constructor del modelo JS se renombro a `buildOptimizerFallbackModel(...)` para explicitar su rol;
+  - el fallback JS ahora usa una carga computacional menor:
+    - `15000` portfolios aleatorios;
+    - `60` puntos de frontera eficiente;
+  - el motor Python sigue usando `100000` portfolios aleatorios como hasta ahora.
+- Decisiones tomadas:
+  - no eliminar el fallback JS en esta etapa para no romper resiliencia de la pagina;
+  - reducir su peso y dejar su rol mas explicito antes de encarar una eventual limpieza mayor del frontend.
+- Verificacion:
+  - `node --check rendimientos-ar/public/app.js` OK.
+- Pendientes:
+  - validar visualmente una corrida del optimizador cuando Python falle para confirmar que el status y el rendimiento percibido sean los esperados;
+  - evaluar si la siguiente etapa debe ser modularizar el frontend del optimizador o seguir achicando la superficie cuantitativa del fallback JS.
+- Siguiente paso sugerido:
+  - probar una corrida normal del optimizador y, si queres, despues avanzar con la separacion del frontend en modulos propios.
+
+## 2026-04-24 12:44:00 -03:00
+- Accion: primera separacion del frontend del `Optimizador` hacia un modulo propio.
+- Archivos afectados:
+  - `rendimientos-ar/public/optimizer-core.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: empezar a desacoplar del `app.js` la capa de fetch/hidratacion/modelado del optimizador, manteniendo bajo riesgo y sin tocar todavia el render final.
+- Resultado:
+  - se creo `rendimientos-ar/public/optimizer-core.js`;
+  - el modulo nuevo concentra:
+    - `fetchPythonOptimizerModel(...)`;
+    - `hydratePythonOptimizerModel(...)`;
+    - `fetchOptimizerHistories(...)`;
+    - `prepareOptimizerDataset(...)`;
+    - `buildOptimizerFallbackModel(...)`;
+  - `index.html` ahora carga este modulo antes de `app.js`;
+  - `runPortfolioOptimizer()` ya consume `window.BDIOptimizerCore` como capa explicita.
+- Decisiones tomadas:
+  - hacer una extraccion incremental sin tocar aun los renderizadores del optimizador;
+  - no eliminar todavia el bloque legacy equivalente que sigue dentro de `app.js`, para evitar una limpieza demasiado agresiva en esta etapa.
+- Verificacion:
+  - `node --check rendimientos-ar/public/optimizer-core.js` OK;
+  - `node --check rendimientos-ar/public/app.js` OK.
+- Pendientes:
+  - remover en una etapa siguiente el bloque legacy duplicado que sigue dentro de `app.js`;
+  - evaluar si conviene extraer despues los renderizadores (`summary`, `weights`, `frontier`, `performance`) a un modulo visual propio.
+- Siguiente paso sugerido:
+  - limpiar el bloque legacy duplicado del optimizador en `app.js` o, si preferis priorizar UX, empezar a modularizar los renderizadores visuales.
+
+## 2026-04-24 13:02:00 -03:00
+- Accion: limpieza controlada del bloque legacy duplicado del `Optimizador` en `app.js`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: completar el paso de separar el frontend del optimizador, dejando a `optimizer-core.js` como capa activa de modelo y reduciendo ruido operativo dentro de `app.js`.
+- Resultado:
+  - el bloque legacy de fetch/hidratacion/preparacion/modelado del optimizador dentro de `app.js` quedo encapsulado como bloque comentado;
+  - las funciones activas ahora son wrappers finos hacia `window.BDIOptimizerCore`;
+  - de esta forma, la ruta viva ya no depende del bloque viejo, pero se conserva rollback simple dentro del mismo archivo si hiciera falta una comparacion rapida.
+- Decisiones tomadas:
+  - no borrar todavia el bloque comentado para respetar una salida de regreso facil;
+  - dejar esta etapa como “limpieza controlada” y no como eliminacion definitiva del legado.
+- Verificacion:
+  - `node --check rendimientos-ar/public/app.js` OK.
+- Pendientes:
+  - decidir en una etapa futura si el bloque comentado ya puede eliminarse por completo;
+  - modularizar los renderizadores visuales del optimizador para completar la separacion frontend.
+- Siguiente paso sugerido:
+  - extraer `renderOptimizerSummary`, `renderOptimizerWeights`, `renderOptimizerFrontier` y `renderOptimizerPerformance` a un modulo visual propio.
+
+## 2026-04-24 13:18:00 -03:00
+- Accion: primera extraccion de renderizadores visuales del `Optimizador`.
+- Archivos afectados:
+  - `rendimientos-ar/public/optimizer-renderers.js`
+  - `rendimientos-ar/public/index.html`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: continuar la separacion del frontend del optimizador, desacoplando la capa visual principal del `app.js` sin tocar aun la logica de calculo ni la UI secundaria (`CAGR` y correlacion).
+- Resultado:
+  - se creo `rendimientos-ar/public/optimizer-renderers.js`;
+  - el modulo nuevo concentra los renderizadores principales:
+    - resumen;
+    - pesos;
+    - frontera eficiente;
+    - series de performance;
+  - `index.html` ahora carga este modulo antes de `app.js`;
+  - `runPortfolioOptimizer()` ya usa `window.BDIOptimizerRenderers` para el flujo vivo.
+- Decisiones tomadas:
+  - dejar `renderOptimizerCagr()` y `renderOptimizerCorrelation()` dentro de `app.js` por ahora para no abrir una separacion demasiado grande en una sola etapa;
+  - mantener las funciones visuales legacy dentro de `app.js` como red de seguridad temporal, igual que en la capa de modelo.
+- Verificacion:
+  - `node --check rendimientos-ar/public/optimizer-renderers.js` OK;
+  - `node --check rendimientos-ar/public/app.js` OK.
+- Pendientes:
+  - decidir si conviene extraer tambien `CAGR` y `correlation` al modulo visual nuevo;
+  - limpiar en una etapa futura las funciones visuales legacy que todavia quedan dentro de `app.js`.
+- Siguiente paso sugerido:
+  - completar la separacion visual extrayendo `renderOptimizerCagr()` y `renderOptimizerCorrelation()`, o bien hacer una prueba funcional completa del optimizador antes de seguir separando.
+
+## 2026-04-24 13:32:00 -03:00
+- Accion: cierre de la separacion visual principal del `Optimizador` con extraccion de `CAGR` y matriz de correlacion.
+- Archivos afectados:
+  - `rendimientos-ar/public/optimizer-renderers.js`
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: terminar de desacoplar la capa visual activa del optimizador para que `app.js` quede mas liviano y el modulo visual nuevo concentre tambien las vistas de `CAGR` y `correlation`.
+- Resultado:
+  - `optimizer-renderers.js` ahora concentra:
+    - `renderOptimizerSummary(...)`;
+    - `renderOptimizerWeights(...)`;
+    - `renderOptimizerCagr(...)`;
+    - `renderOptimizerCorrelation(...)`;
+    - `renderOptimizerFrontier(...)`;
+    - `renderOptimizerPerformance(...)`;
+  - `runPortfolioOptimizer()` ya consume `renderOptimizerCagr()` y `renderOptimizerCorrelation()` desde `window.BDIOptimizerRenderers`;
+  - las funciones legacy equivalentes siguen presentes en `app.js` solo como respaldo temporal de rollback.
+- Decisiones tomadas:
+  - no eliminar todavia las funciones visuales legacy del optimizador dentro de `app.js`;
+  - cerrar esta etapa como modularizacion operativa completa del frontend visual activo, manteniendo una salida de regreso simple.
+- Verificacion:
+  - `node --check rendimientos-ar/public/optimizer-renderers.js` OK;
+  - `node --check rendimientos-ar/public/app.js` OK.
+- Pendientes:
+  - decidir en una etapa futura cuando conviene retirar definitivamente el bloque visual legacy del optimizador en `app.js`.
+- Siguiente paso sugerido:
+  - hacer validacion funcional del optimizador ya con toda la capa visual activa separada, y luego decidir si vale la pena eliminar los restos legacy o dejarlos como red de seguridad.
+
+## 2026-04-24 13:48:00 -03:00
+- Accion: limpieza controlada del bloque visual legacy del `Optimizador` dentro de `app.js`.
+- Archivos afectados:
+  - `rendimientos-ar/public/app.js`
+  - `README.md`
+  - `LOG.md`
+- Motivo: dejar a `app.js` mas prolijo y consistente con la separacion previa de la capa de modelo, sacando de ejecucion la duplicacion visual que ya no usa el flujo activo.
+- Resultado:
+  - el bloque visual legacy del optimizador dentro de `app.js` quedo comentado;
+  - se agregaron wrappers finos para:
+    - `renderOptimizerSummary(...)`;
+    - `renderOptimizerWeights(...)`;
+    - `renderOptimizerCagr(...)`;
+    - `renderOptimizerCorrelation(...)`;
+    - `renderOptimizerFrontier(...)`;
+    - `renderOptimizerPerformance(...)`;
+  - estos wrappers delegan en `window.BDIOptimizerRenderers`.
+- Decisiones tomadas:
+  - mantener el bloque visual legacy comentado como salida de regreso simple;
+  - no eliminar todavia el legado para privilegiar bajo riesgo y rollback facil.
+- Verificacion:
+  - `node --check rendimientos-ar/public/app.js` OK;
+  - `node --check rendimientos-ar/public/optimizer-renderers.js` OK.
+- Pendientes:
+  - decidir mas adelante si conviene eliminar definitivamente el bloque visual legacy comentado del optimizador.
+- Siguiente paso sugerido:
+  - correr validacion tecnica y una pasada visual del optimizador; si todo sigue bien, considerar esta etapa cerrada.
+

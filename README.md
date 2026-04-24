@@ -902,6 +902,56 @@ Cuando el servidor arranque, abri:
   - instalacion local esperada: `python -m pip install -r rendimientos-ar/python/requirements.txt`;
   - si Python no esta disponible o falla, el modulo conserva un fallback en `JavaScript` para no romper la pagina;
   - el flujo buscado sigue al script Python original: descarga de Yahoo, retornos diarios, media/covarianza anualizadas, optimizacion de Sharpe, minima volatilidad, retorno objetivo, frontera eficiente, CAGR y matriz de correlacion.
+- Estructura tecnica actual del motor Python:
+  - `rendimientos-ar/python/optimizer_runner.py` queda como entrypoint fino de stdin/stdout JSON;
+  - el motor real ahora vive en `rendimientos-ar/python/optimizer/`;
+  - `inputs.py`: parsing y validacion de parametros;
+  - `data.py`: descarga y normalizacion de precios con `yfinance`;
+  - `optimize.py`: optimizacion con `SciPy / SLSQP`, frontera eficiente y portfolios aleatorios;
+  - `analytics.py`: series acumuladas, CAGR y series serializadas;
+  - `payloads.py`: orquestacion y armado del payload final;
+  - `errors.py`: errores de dominio para no acoplar el motor a stderr/stdout.
+- Criterio adoptado:
+  - `Python + SciPy` sigue siendo la fuente de verdad del optimizador;
+  - `JavaScript` se mantiene solo como capa de integracion/rendereo y fallback tecnico, no como motor cuantitativo preferido.
+- Estado actual del fallback JS:
+  - el fallback sigue existiendo para no romper la pagina si Python falla o no esta disponible;
+  - ya quedo reencuadrado como `modo contingencia JS`, no como motor equivalente al de Python;
+  - su carga computacional ahora es menor que la del motor Python:
+    - portfolios aleatorios reducidos a `15000`;
+    - frontera eficiente reducida a `60` puntos;
+  - esto busca que la experiencia publica siga siendo resiliente, pero que el resultado canonico del optimizador siga siendo claramente el de `Python + SciPy`.
+- Estructura actual del frontend del optimizador:
+  - la orquestacion principal sigue viviendo en `rendimientos-ar/public/app.js`;
+  - la capa de modelo frontend ya comenzo a separarse en `rendimientos-ar/public/optimizer-core.js`;
+  - la capa visual principal ya comenzo a separarse en `rendimientos-ar/public/optimizer-renderers.js`;
+  - este modulo concentra:
+    - fetch del endpoint Python;
+    - hidratacion del payload Python;
+    - preparacion de historicos;
+    - construccion del modelo de contingencia JS;
+  - `optimizer-renderers.js` concentra ahora:
+    - `renderOptimizerSummary(...)`;
+    - `renderOptimizerWeights(...)`;
+    - `renderOptimizerCagr(...)`;
+    - `renderOptimizerCorrelation(...)`;
+    - `renderOptimizerFrontier(...)`;
+    - `renderOptimizerPerformance(...)`;
+  - `app.js` ya consume este modulo mediante `window.BDIOptimizerCore`;
+  - `app.js` tambien ya consume la capa visual nueva mediante `window.BDIOptimizerRenderers`;
+  - el bloque legacy duplicado de fetch/hidratacion/modelado dentro de `app.js` ya quedo fuera de ejecucion;
+  - por seguridad de rollback, ese bloque se mantiene comentado temporalmente mientras el camino nuevo queda estabilizado;
+  - a nivel visual, el bloque legacy duplicado del optimizador dentro de `app.js` tambien ya quedo fuera de ejecucion y fue reemplazado por wrappers finos hacia `window.BDIOptimizerRenderers`;
+  - por seguridad de rollback, ese bloque visual legacy tambien se conserva comentado temporalmente mientras el camino nuevo queda estabilizado.
+- Testing actual del optimizador Python:
+  - se agrego una suite propia en `rendimientos-ar/python/tests/`;
+  - cobertura actual:
+    - parsing y validacion de inputs;
+    - normalizacion/carga de dataset con mocks de `yfinance`;
+    - restricciones y factibilidad basica de optimizacion con `SciPy`;
+    - helpers de analytics como `CAGR` y construccion de retornos de portfolios;
+  - comando de validacion:
+    - `python -m unittest discover rendimientos-ar/python/tests -v`
 
 ## Ajustes recientes
 - La calculadora de `Interes compuesto` comenzo su separacion tecnica del resto de `app.js`:

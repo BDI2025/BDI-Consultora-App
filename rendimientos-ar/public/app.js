@@ -6140,6 +6140,8 @@ function prepareOptimizerCanvas(canvasId, height = 420) {
 }
 
 async function runPortfolioOptimizer() {
+  const optimizerCore = window.BDIOptimizerCore;
+  const optimizerRenderers = window.BDIOptimizerRenderers;
   const tickersRaw = document.getElementById('optimizer-tickers')?.value || '';
   const years = Math.min(10, Math.max(1, parseInt(document.getElementById('optimizer-years')?.value || '5', 10) || 5));
   const rf = (parseFloat(String(document.getElementById('optimizer-rf')?.value || '2').replace(',', '.')) || 0) / 100;
@@ -6184,34 +6186,35 @@ async function runPortfolioOptimizer() {
   try {
     let model = null;
     let engine = 'python';
+    const optimizerPythonRandomCount = 100000;
 
     try {
-      model = await fetchPythonOptimizerModel({ tickers, years, rf, minWeight, targetReturn, randomCount: 100000 });
+      model = await optimizerCore.fetchPythonOptimizerModel({ tickers, years, rf, minWeight, targetReturn, randomCount: optimizerPythonRandomCount });
     } catch (pythonError) {
       console.warn('Python optimizer unavailable, falling back to JS engine:', pythonError.message);
-      engine = 'js-fallback';
-      const histories = await fetchOptimizerHistories(tickers, years);
-      const prepared = prepareOptimizerDataset(histories);
+      engine = 'js-contingency';
+      const histories = await optimizerCore.fetchOptimizerHistories(tickers, years);
+      const prepared = optimizerCore.prepareOptimizerDataset(histories);
       if (!prepared || prepared.assets.length === 0) {
         throw new Error(t('optimizer_no_histories'));
       }
-      model = buildOptimizerModel(prepared, rf, minWeight, targetReturn);
+      model = optimizerCore.buildOptimizerFallbackModel(prepared, rf, minWeight, targetReturn);
     }
 
     setOptimizerResultsVisible(true);
     setOptimizerChartVisibility(true);
-    renderOptimizerSummary(model);
-    renderOptimizerWeights(model);
-    renderOptimizerCagr(model);
-    renderOptimizerCorrelation(model);
+    optimizerRenderers.renderOptimizerSummary(model);
+    optimizerRenderers.renderOptimizerWeights(model);
+    optimizerRenderers.renderOptimizerCagr(model);
+    optimizerRenderers.renderOptimizerCorrelation(model);
     await new Promise((resolve) => setTimeout(resolve, 80));
-    renderOptimizerFrontier(model);
-    renderOptimizerPerformance(model);
+    optimizerRenderers.renderOptimizerFrontier(model);
+    optimizerRenderers.renderOptimizerPerformance(model);
 
     if (statusEl) {
       statusEl.textContent = engine === 'python'
         ? `${t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years })} · ${currentLanguage === 'en' ? 'Python engine' : 'Motor Python'}`
-        : `${t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years })} · ${currentLanguage === 'en' ? 'JS fallback' : 'Fallback JS'}`;
+        : `${t('optimizer_source', { assets: model.assets.length, days: model.dates.length, years })} · ${currentLanguage === 'en' ? 'JS contingency mode' : 'Modo contingencia JS'}`;
     }
   } catch (error) {
     setOptimizerResultsVisible(false);
@@ -6221,6 +6224,7 @@ async function runPortfolioOptimizer() {
   }
 }
 
+/* Legacy optimizer frontend block retained temporarily for rollback safety.
 async function fetchPythonOptimizerModel({ tickers, years, rf, minWeight, targetReturn, randomCount }) {
   const response = await fetch('/api/optimizer', {
     method: 'POST',
@@ -6257,6 +6261,7 @@ function hydratePythonOptimizerModel(payload) {
     correlation: Array.isArray(payload.correlation) ? payload.correlation : [],
     assetSeries: Array.isArray(payload.assetSeries) ? payload.assetSeries : [],
     cagrRows: Array.isArray(payload.cagrRows) ? payload.cagrRows : [],
+    engine: payload.engine || 'python-scipy',
   };
 
   const optimizedPortfolios = [
@@ -6290,6 +6295,9 @@ function hydratePythonOptimizerModel(payload) {
 
   return model;
 }
+
+const OPTIMIZER_JS_FALLBACK_RANDOM_COUNT = 15000;
+const OPTIMIZER_JS_FALLBACK_FRONTIER_POINTS = 60;
 
 async function fetchOptimizerHistories(tickers, years) {
   const responses = await Promise.all(
@@ -6341,12 +6349,12 @@ function prepareOptimizerDataset(histories) {
   return { assets, priceDates: commonDates, prices: priceMatrix, dates: returnDates, returnsByAsset, dailyReturnsMatrix };
 }
 
-function buildOptimizerModel(prepared, rf, minWeight, targetReturn) {
+function buildOptimizerFallbackModel(prepared, rf, minWeight, targetReturn) {
   const { assets, dates, prices, returnsByAsset, dailyReturnsMatrix } = prepared;
   const numAssets = assets.length;
   const meanReturns = returnsByAsset.map((series) => average(series) * 252);
   const covMatrix = covarianceMatrix(returnsByAsset, 252);
-  const randomCount = numAssets === 1 ? 1 : 100000;
+  const randomCount = numAssets === 1 ? 1 : OPTIMIZER_JS_FALLBACK_RANDOM_COUNT;
   const randomPortfolios = [];
   const w0 = Array(numAssets).fill(1 / numAssets);
   const optSharpe = optimizePortfolio({
@@ -6388,7 +6396,14 @@ function buildOptimizerModel(prepared, rf, minWeight, targetReturn) {
     }
   }
 
-  const frontierSolutions = buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, w0);
+  const frontierSolutions = buildEfficientFrontier(
+    meanReturns,
+    covMatrix,
+    rf,
+    minWeight,
+    w0,
+    OPTIMIZER_JS_FALLBACK_FRONTIER_POINTS
+  );
   const frontier = frontierSolutions.map((item) => ({ x: item.vol * 100, y: item.ret * 100 }));
   for (let i = 0; i < randomCount; i++) {
     const weights = sampleDirichletWeights(numAssets);
@@ -6430,7 +6445,7 @@ function buildOptimizerModel(prepared, rf, minWeight, targetReturn) {
   return {
     assets, dates, prices, returnsByAsset, dailyReturnsMatrix, rf, minWeight, targetReturn, meanReturns, covMatrix,
     randomPortfolios, frontier, maxSharpe, minVol, targetPortfolio, assetSeries, portfolioSeries, optimizedPortfolios,
-    cagrRows, correlation: correlationMatrix(returnsByAsset),
+    cagrRows, correlation: correlationMatrix(returnsByAsset), engine: 'js-contingency',
   };
 }
 
@@ -6583,8 +6598,8 @@ function optimizerGradient(weights, objective, meanReturns, covMatrix, rf, targe
   return gradient;
 }
 
-function buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, w0) {
-  const returnsRange = linspace(Math.min(...meanReturns), Math.max(...meanReturns), 100);
+function buildEfficientFrontier(meanReturns, covMatrix, rf, minWeight, w0, pointCount = 100) {
+  const returnsRange = linspace(Math.min(...meanReturns), Math.max(...meanReturns), Math.max(2, pointCount));
   const frontier = [];
 
   returnsRange.forEach((target) => {
@@ -6660,9 +6675,38 @@ function calcSeriesCagr(cumulativePercentSeries, dates) {
   return Math.pow(Math.max(totalReturn, 0.0001), 1 / years) - 1;
 }
 
+*/
+
+function getOptimizerCoreOrThrow() {
+  if (window.BDIOptimizerCore) return window.BDIOptimizerCore;
+  throw new Error('Optimizer core not available');
+}
+
+async function fetchPythonOptimizerModel(params) {
+  return getOptimizerCoreOrThrow().fetchPythonOptimizerModel(params);
+}
+
+function hydratePythonOptimizerModel(payload) {
+  return getOptimizerCoreOrThrow().hydratePythonOptimizerModel(payload);
+}
+
+async function fetchOptimizerHistories(tickers, years) {
+  return getOptimizerCoreOrThrow().fetchOptimizerHistories(tickers, years);
+}
+
+function prepareOptimizerDataset(histories) {
+  return getOptimizerCoreOrThrow().prepareOptimizerDataset(histories);
+}
+
+function buildOptimizerFallbackModel(prepared, rf, minWeight, targetReturn) {
+  return getOptimizerCoreOrThrow().buildOptimizerFallbackModel(prepared, rf, minWeight, targetReturn);
+}
+
 function formatPct(value, digits = 2) {
   return `${Number(value).toLocaleString('es-AR', { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
 }
+
+/*
 
 function renderOptimizerSummary(model) {
   const el = document.getElementById('optimizer-summary');
@@ -7121,4 +7165,35 @@ function optimizerCorrelationColor(value) {
   const green = Math.round(start.g + (end.g - start.g) * clamped);
   const blue = Math.round(start.b + (end.b - start.b) * clamped);
   return `rgb(${red}, ${green}, ${blue})`;
+}
+
+*/
+
+function getOptimizerRenderersOrThrow() {
+  if (window.BDIOptimizerRenderers) return window.BDIOptimizerRenderers;
+  throw new Error('Optimizer renderers not available');
+}
+
+function renderOptimizerSummary(model) {
+  return getOptimizerRenderersOrThrow().renderOptimizerSummary(model);
+}
+
+function renderOptimizerWeights(model) {
+  return getOptimizerRenderersOrThrow().renderOptimizerWeights(model);
+}
+
+function renderOptimizerFrontier(model) {
+  return getOptimizerRenderersOrThrow().renderOptimizerFrontier(model);
+}
+
+function renderOptimizerPerformance(model) {
+  return getOptimizerRenderersOrThrow().renderOptimizerPerformance(model);
+}
+
+function renderOptimizerCagr(model) {
+  return getOptimizerRenderersOrThrow().renderOptimizerCagr(model);
+}
+
+function renderOptimizerCorrelation(model) {
+  return getOptimizerRenderersOrThrow().renderOptimizerCorrelation(model);
 }
